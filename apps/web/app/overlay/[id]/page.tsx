@@ -16,7 +16,7 @@ export default function OverlayPage() {
   useEffect(() => {
     if (!id) return;
 
-    const socket = io("http://localhost:4000");
+    const socket = io("https://server-production-b88b.up.railway.app");
 
     console.log("Joining overlay:", id);
 

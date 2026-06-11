@@ -58,7 +58,6 @@ export default function GiftPlaneWidget() {
   useEffect(() => {
     if (!overlayId) return;
 
-    //const socket = io("http://localhost:4000");
     const socket = io("https://server-production-b88b.up.railway.app");
 
     socket.emit("join-overlay", overlayId);

@@ -7,7 +7,7 @@ export default function OverlayPage() {
   const [gift, setGift] = useState("");
 
   useEffect(() => {
-    const socket = io("http://localhost:4000");
+    const socket = io("https://server-production-b88b.up.railway.app");
 
     socket.on("gift-alert", (message: string) => {
       setGift(message);
