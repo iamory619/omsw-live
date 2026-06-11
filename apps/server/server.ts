@@ -145,6 +145,8 @@ app.get("/", (_, res) => {
   });
 });
 
-httpServer.listen(4000, () => {
-  console.log("🚀 OMSW Live Server running on http://localhost:4000");
+const PORT = Number(process.env.PORT) || 4000;
+
+httpServer.listen(PORT, () => {
+  console.log(`🚀 OMSW Live Server running on port ${PORT}`);
 });
