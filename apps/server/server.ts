@@ -1,0 +1,150 @@
+import express from "express";
+import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { WebcastPushConnection } from "tiktok-live-connector";
+import crypto from "crypto";
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+const connections = new Map<string, WebcastPushConnection>();
+
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+  },
+});
+
+let testRose = 0;
+
+app.post("/connect", async (req, res) => {
+  const { username } = req.body;
+
+  if (!username) {
+    return res.status(400).json({
+      error: "username required",
+    });
+  }
+
+  const overlayId = crypto.randomUUID();
+  const tiktok = new WebcastPushConnection(username);
+
+  try {
+    await tiktok.connect();
+
+    connections.set(overlayId, tiktok);
+
+    tiktok.on("gift", (data: any) => {
+      const giftPayload = {
+        user: data.nickname || "Someone",
+        giftName: data.giftName || "Gift",
+        amount: data.repeatCount || 1,
+        diamond: data.diamondCount || 0,
+        giftImage:
+          data.giftPictureUrl ||
+          data.giftDetails?.giftImage?.url?.[0] ||
+          "/assets/gift-box.png",
+      };
+
+      io.to(overlayId).emit(
+        "gift-alert",
+        `🎁 ${giftPayload.user} sent ${giftPayload.giftName} x${giftPayload.amount}`
+      );
+
+      io.to(overlayId).emit("gift-plane", giftPayload);
+    });
+
+    tiktok.on("chat", (data: any) => {
+      io.to(overlayId).emit(
+        "gift-alert",
+        `💬 ${data.nickname}: ${data.comment}`
+      );
+    });
+
+    tiktok.on("follow", (data: any) => {
+      io.to(overlayId).emit(
+        "gift-alert",
+        `❤️ ${data.nickname} followed`
+      );
+    });
+
+    res.json({
+      overlayId,
+    });
+  } catch (err: any) {
+    console.error("TikTok Connect Error:", err);
+
+    const message = err?.message || "";
+
+    if (
+      message.includes("isn't online") ||
+      message.includes("offline")
+    ) {
+      return res.status(400).json({
+        code: "USER_OFFLINE",
+        error: "บัญชีนี้ยังไม่ได้ Live",
+      });
+    }
+
+    res.status(500).json({
+      code: "SERVER_ERROR",
+      error: message || "Connect failed",
+    });
+  }
+});
+
+io.on("connection", (socket) => {
+  console.log("✅ Client connected:", socket.id);
+
+  socket.on("join-overlay", (overlayId: string) => {
+    socket.join(overlayId);
+
+    console.log(`📺 Overlay joined room: ${overlayId}`);
+  });
+
+  socket.on("test-gift", (overlayId: string) => {
+    testRose++;
+
+    console.log("🌹 Test Rose:", testRose);
+
+    const giftPayload = {
+      user: "Mimi",
+      giftName: "Rose",
+      amount: 1,
+      diamond: 1,
+      giftImage: "/assets/gift-box.png",
+    };
+
+    io.to(overlayId).emit("gift-alert", "🌹 Rose x1");
+    io.to(overlayId).emit("gift-progress", testRose);
+    io.to(overlayId).emit("gift-plane", giftPayload);
+  });
+
+  socket.on("reset-gift", (overlayId: string) => {
+    testRose = 0;
+
+    console.log("🔄 Reset Gift");
+
+    io.to(overlayId).emit("gift-progress", 0);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ Client disconnected");
+  });
+});
+
+app.get("/", (_, res) => {
+  res.json({
+    status: "ok",
+    service: "OMSW Live Server",
+  });
+});
+
+httpServer.listen(4000, () => {
+  console.log("🚀 OMSW Live Server running on http://localhost:4000");
+});
