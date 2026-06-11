@@ -9,7 +9,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
 
   const socket = useMemo(() => {
-    return io("http://localhost:4000");
+    return io("https://server-production-b88b.up.railway.app");
   }, []);
 
   const [status, setStatus] = useState<
@@ -25,7 +25,7 @@ export default function DashboardPage() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:4000/connect", {
+      const res = await fetch("https://server-production-b88b.up.railway.app/connect", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

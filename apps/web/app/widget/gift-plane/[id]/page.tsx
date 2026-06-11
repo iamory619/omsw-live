@@ -59,7 +59,7 @@ export default function GiftPlaneWidget() {
     if (!overlayId) return;
 
     //const socket = io("http://localhost:4000");
-    const socket = io("http://127.0.0.1:4000");
+    const socket = io("https://server-production-b88b.up.railway.app");
 
     socket.emit("join-overlay", overlayId);
 

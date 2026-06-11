@@ -16,7 +16,7 @@ export default function GiftGoalWidget() {
   useEffect(() => {
     if (!overlayId) return;
 
-    const socket = io("http://localhost:4000");
+    const socket = io("https://server-production-b88b.up.railway.app");
 
     console.log(
       "🎁 Gift Goal joined:",
