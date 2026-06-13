@@ -75,11 +75,10 @@ export default function GiftPlaneWidget() {
   }, [overlayId]);
 
   return (
-    <main className="relative h-screen w-screen overflow-hidden bg-transparent">
+    <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
       {showPlane && (
-        <div className="animate-plane absolute top-[8vh] flex items-center gap-4">
+        <div className="animate-plane fixed left-0 top-0 z-50 flex items-center gap-4">
           <div className="relative drop-shadow-2xl">
-
             <Image
               src="/assets/plane.png"
               alt="Gift plane"
@@ -123,9 +122,17 @@ export default function GiftPlaneWidget() {
       ))}
 
       <style jsx>{`
+        :global(html),
+        :global(body) {
+          background: transparent !important;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+        }
+
         @keyframes plane {
           0% {
-            transform: translateX(120vw) translateY(0) rotate(-3deg);
+            transform: translateX(-500px) translateY(70vh) rotate(-10deg);
             opacity: 0;
           }
 
@@ -133,20 +140,19 @@ export default function GiftPlaneWidget() {
             opacity: 1;
           }
 
-          45% {
-            transform: translateX(55vw) translateY(-25px) rotate(2deg);
+          40% {
+            transform: translateX(30vw) translateY(45vh) rotate(-5deg);
           }
 
-          75% {
-            transform: translateX(20vw) translateY(15px) rotate(-2deg);
+          70% {
+            transform: translateX(70vw) translateY(20vh) rotate(5deg);
           }
 
           100% {
-            transform: translateX(-350px) translateY(0) rotate(3deg);
+            transform: translateX(130vw) translateY(5vh) rotate(10deg);
             opacity: 0;
           }
         }
-
         @keyframes giftFall {
           0% {
             transform: translateY(-120px) rotate(0deg) scale(0.8);
