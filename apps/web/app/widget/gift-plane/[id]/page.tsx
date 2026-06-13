@@ -77,24 +77,28 @@ export default function GiftPlaneWidget() {
   return (
     <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
       {showPlane && (
-        <div className="animate-plane fixed left-0 top-0 z-50 flex items-center gap-4">
-          <div className="relative drop-shadow-2xl">
+        <div className="animate-plane fixed left-0 top-0 z-50">
+          <div className="relative h-[220px] w-[760px]">
             <Image
               src="/assets/plane.png"
               alt="Gift plane"
               width={360}
               height={180}
               priority
-              className="h-auto w-[18vw] max-w-[360px] min-w-[220px]"
+              className="absolute left-0 top-10 h-auto w-[260px]"
             />
 
-            <div className="animate-sparkle absolute -bottom-3 left-10 text-3xl">
+            {/* เชือกลากป้าย */}
+            <div className="absolute left-[230px] top-[105px] h-[4px] w-[90px] rotate-[-8deg] bg-white/80 shadow" />
+
+            {/* ป้ายข้อความ */}
+            <div className="absolute left-[300px] top-[55px] min-w-[420px] rotate-[-4deg] rounded-full border-4 border-white bg-pink-500/90 px-8 py-4 text-center text-2xl font-black text-white shadow-2xl">
+              {message || "Thank you!"}
+            </div>
+
+            <div className="animate-sparkle absolute left-8 top-[150px] text-3xl">
               ✨✨✨
             </div>
-          </div>
-
-          <div className="rounded-full border-4 border-white bg-pink-500 px-8 py-4 text-2xl font-black text-white shadow-2xl">
-            {message || "Thank you!"}
           </div>
         </div>
       )}
@@ -132,7 +136,7 @@ export default function GiftPlaneWidget() {
 
         @keyframes plane {
           0% {
-            transform: translateX(-500px) translateY(70vh) rotate(-10deg);
+            transform: translateX(-760px) translateY(65vh) rotate(-8deg);
             opacity: 0;
           }
 
@@ -140,19 +144,20 @@ export default function GiftPlaneWidget() {
             opacity: 1;
           }
 
-          40% {
-            transform: translateX(30vw) translateY(45vh) rotate(-5deg);
+          45% {
+            transform: translateX(25vw) translateY(40vh) rotate(-2deg);
           }
 
-          70% {
-            transform: translateX(70vw) translateY(20vh) rotate(5deg);
+          75% {
+            transform: translateX(55vw) translateY(20vh) rotate(3deg);
           }
 
           100% {
-            transform: translateX(130vw) translateY(5vh) rotate(10deg);
+            transform: translateX(120vw) translateY(8vh) rotate(8deg);
             opacity: 0;
           }
         }
+
         @keyframes giftFall {
           0% {
             transform: translateY(-120px) rotate(0deg) scale(0.8);
