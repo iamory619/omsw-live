@@ -36,11 +36,11 @@ export default function GiftPlaneWidget() {
     setMessage(text);
     setShowPlane(true);
 
-    const newDrops = Array.from({ length: 25 }).map((_, index) => ({
+    const newDrops = Array.from({ length: 10 }).map((_, index) => ({
       id: Date.now() + index,
       left: 8 + Math.random() * 84,
       delay: Math.random() * 1.8,
-      size: 32 + Math.random() * 28,
+      size: 32 + Math.random() * 16,
       image: gift.giftImage || "/assets/gift-box.png",
       name: gift.giftName,
       bottom: 10 + Math.random() * 70,
@@ -77,32 +77,29 @@ export default function GiftPlaneWidget() {
   return (
     <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
       {showPlane && (
-        <div className="animate-plane fixed left-0 top-0 z-50">
-          <div className="relative h-[220px] w-[760px]">
-            <Image
-              src="/assets/plane.png"
-              alt="Gift plane"
-              width={360}
-              height={180}
-              priority
-              className="absolute left-0 top-10 h-auto w-[260px]"
-            />
+  <div className="animate-plane fixed left-0 top-0 z-50">
+    <div className="relative h-[180px] w-[900px]">
+      <Image
+        src="/assets/plane.png"
+        alt="Gift plane"
+        width={300}
+        height={150}
+        priority
+        className="absolute left-0 top-[40px] h-auto w-[240px]"
+      />
 
-            {/* เชือกลากป้าย */}
-            <div className="absolute left-[230px] top-[105px] h-[4px] w-[90px] rotate-[-8deg] bg-white/80 shadow" />
+      <div className="absolute left-[220px] top-[95px] h-[3px] w-[120px] rotate-[-5deg] bg-white/80" />
 
-            {/* ป้ายข้อความ */}
-            <div className="absolute left-[300px] top-[55px] min-w-[420px] rotate-[-4deg] rounded-full border-4 border-white bg-pink-500/90 px-8 py-4 text-center text-2xl font-black text-white shadow-2xl">
-              {message || "Thank you!"}
-            </div>
+      <div className="absolute left-[330px] top-[52px] w-[420px] rotate-[-4deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
+        {message || "Thank you!"}
+      </div>
 
-            <div className="animate-sparkle absolute left-8 top-[150px] text-3xl">
-              ✨✨✨
-            </div>
-          </div>
-        </div>
-      )}
-
+      <div className="animate-sparkle absolute left-[40px] top-[130px] text-2xl">
+        ✨✨✨
+      </div>
+    </div>
+  </div>
+)}
       {drops.map((gift) => (
         <div
           key={gift.id}
@@ -134,29 +131,29 @@ export default function GiftPlaneWidget() {
           overflow: hidden;
         }
 
-        @keyframes plane {
-          0% {
-            transform: translateX(-760px) translateY(65vh) rotate(-8deg);
-            opacity: 0;
-          }
+       @keyframes plane {
+  0% {
+    transform: translateX(-900px) translateY(50vh) rotate(-5deg);
+    opacity: 0;
+  }
 
-          10% {
-            opacity: 1;
-          }
+  10% {
+    opacity: 1;
+  }
 
-          45% {
-            transform: translateX(25vw) translateY(40vh) rotate(-2deg);
-          }
+  50% {
+    transform: translateX(20vw) translateY(38vh) rotate(-2deg);
+  }
 
-          75% {
-            transform: translateX(55vw) translateY(20vh) rotate(3deg);
-          }
+  80% {
+    transform: translateX(55vw) translateY(24vh) rotate(2deg);
+  }
 
-          100% {
-            transform: translateX(120vw) translateY(8vh) rotate(8deg);
-            opacity: 0;
-          }
-        }
+  100% {
+    transform: translateX(120vw) translateY(15vh) rotate(5deg);
+    opacity: 0;
+  }
+}
 
         @keyframes giftFall {
           0% {
