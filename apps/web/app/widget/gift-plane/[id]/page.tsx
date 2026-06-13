@@ -38,7 +38,7 @@ export default function GiftPlaneWidget() {
 
     const newDrops = Array.from({ length: 10 }).map((_, index) => ({
       id: Date.now() + index,
-      left: 8 + Math.random() * 84,
+      left: 35 + Math.random() * 30,
       delay: Math.random() * 1.8,
       size: 32 + Math.random() * 16,
       image: gift.giftImage || "/assets/gift-box.png",
@@ -80,15 +80,15 @@ export default function GiftPlaneWidget() {
         <div className="animate-plane fixed left-0 top-0 z-50">
           <div className="relative h-[180px] w-[900px]">
             <Image
-  src="/assets/plane.png"
-  alt="Gift plane"
-  width={300}
-  height={150}
-  className="absolute left-[40px] top-[40px] w-[260px]"
-/>
+              src="/assets/plane.png"
+              alt="Gift plane"
+              width={300}
+              height={150}
+              className="absolute left-[40px] top-[40px] w-[260px]"
+            />
 
-<div className="absolute left-[240px] top-[100px] h-[3px] w-[70px] bg-white" />
-         <div className="absolute left-[300px] top-[55px] w-[360px] rotate-[-4deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
+            <div className="absolute left-[240px] top-[100px] h-[3px] w-[70px] bg-white" />
+            <div className="absolute left-[300px] top-[55px] w-[360px] rotate-[-4deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
               {" "}
               {message || "Thank you!"}
             </div>
@@ -132,7 +132,7 @@ export default function GiftPlaneWidget() {
 
         @keyframes plane {
           0% {
-            transform: translateX(-900px) translateY(50vh) rotate(-5deg);
+            transform: translateX(-700px) translateY(8vh) rotate(-3deg);
             opacity: 0;
           }
 
@@ -141,22 +141,22 @@ export default function GiftPlaneWidget() {
           }
 
           50% {
-            transform: translateX(20vw) translateY(38vh) rotate(-2deg);
+            transform: translateX(35vw) translateY(10vh) rotate(0deg);
           }
 
           80% {
-            transform: translateX(55vw) translateY(24vh) rotate(2deg);
+            transform: translateX(65vw) translateY(12vh) rotate(2deg);
           }
 
           100% {
-            transform: translateX(120vw) translateY(15vh) rotate(5deg);
+            transform: translateX(120vw) translateY(10vh) rotate(3deg);
             opacity: 0;
           }
         }
 
         @keyframes giftFall {
           0% {
-            transform: translateY(-120px) rotate(0deg) scale(0.8);
+            transform: translateY(10vh) rotate(0deg) scale(0.8);
             opacity: 0;
           }
 
@@ -165,8 +165,7 @@ export default function GiftPlaneWidget() {
           }
 
           100% {
-            transform: translateY(calc(100vh - 40px - var(--gift-bottom)))
-              rotate(var(--gift-rotate)) scale(1);
+            transform: translateY(85vh) rotate(var(--gift-rotate)) scale(1);
             opacity: 1;
           }
         }
