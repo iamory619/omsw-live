@@ -22,6 +22,9 @@ importers:
       tiktok-live-connector:
         specifier: 2.1.1-beta1
         version: 2.1.1-beta1
+      tsx:
+        specifier: ^4.22.4
+        version: 4.22.4
     devDependencies:
       '@types/cors':
         specifier: ^2.8.19
@@ -32,9 +35,6 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.19.42
-      tsx:
-        specifier: ^4.22.4
-        version: 4.22.4
       typescript:
         specifier: ^5
         version: 5.9.3
