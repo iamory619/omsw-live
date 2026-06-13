@@ -73,25 +73,25 @@ export default function DashboardPage() {
         {
           name: "🎁 Gift Goal",
           description: "เป้าหมายของขวัญ เช่น Rose 0/100",
-          url: `http://localhost:3000/widget/gift-goal/${overlayId}`,
+          url: `${window.location.origin}/widget/gift-goal/${overlayId}`,
           active: true,
         },
         {
           name: "✈️ Gift Plane",
           description: "เครื่องบินบินผ่านและโปรยของขวัญเต็มจอ",
-          url: `http://localhost:3000/widget/gift-plane/${overlayId}`,
+          url: `${window.location.origin}/widget/gift-plane/${overlayId}`,
           active: true,
         },
         {
           name: "🐱 Evolution Pet",
           description: "สัตว์เลี้ยงโตตามจำนวนของขวัญ",
-          url: `http://localhost:3000/widget/pet/${overlayId}`,
+          url: `${window.location.origin}/widget/pet/${overlayId}`,
           active: false,
         },
         {
           name: "🏆 Top Gifter",
           description: "จัดอันดับคนส่งของขวัญสูงสุด",
-          url: `http://localhost:3000/widget/top-gifter/${overlayId}`,
+          url: `${window.location.origin}/widget/top-gifter/${overlayId}`,
           active: false,
         },
       ]
