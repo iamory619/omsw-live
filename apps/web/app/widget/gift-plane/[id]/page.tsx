@@ -20,7 +20,6 @@ type DropGift = {
   size: number;
   image: string;
   name: string;
-  bottom: number;
   rotate: number;
   drift: number;
 };
@@ -46,12 +45,13 @@ export default function GiftPlaneWidget() {
       size: 30 + Math.random() * 18,
       image: gift.giftImage || "/assets/gift-box.png",
       name: gift.giftName,
-      bottom: 0,
       rotate: -180 + Math.random() * 360,
       drift: -80 + Math.random() * 160,
     }));
 
-    setDrops((prev) => [...prev, ...newDrops].slice(-120));
+    setTimeout(() => {
+      setDrops((prev) => [...prev, ...newDrops].slice(-120));
+    }, 1200);
 
     setTimeout(() => {
       setShowPlane(false);
@@ -68,7 +68,7 @@ export default function GiftPlaneWidget() {
 
     socket.on("gift-plane", (gift: GiftPayload) => {
       playEffect(
-        `thank you ${gift.user} For ${gift.giftName} x${gift.amount}`,
+        `ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`,
         gift,
       );
     });
@@ -83,34 +83,35 @@ export default function GiftPlaneWidget() {
       {showPlane && (
         <div className="animate-plane fixed left-0 top-0 z-50">
           <div className="relative h-[180px] w-[900px]">
+            <div className="absolute left-[50px] top-[72px] z-20 w-[380px] rotate-[-3deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
+              {message || "Thank you!"}
+            </div>
+
+            <div className="absolute left-[420px] top-[112px] z-10 h-[3px] w-[95px] bg-white/80" />
+
             <Image
               src="/assets/plane.png"
               alt="Gift plane"
               width={300}
               height={150}
+              priority
               className="absolute left-[450px] top-[30px] z-50 w-[260px]"
             />
 
-            <div className="absolute left-[420px] top-[112px] z-10 h-[3px] w-[95px] bg-white/80" />
-
-            <div className="absolute left-[50px] top-[72px] z-20 w-[380px] rotate-[-3deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
-              {message || "Thank you!"}
-            </div>
-
-            <div className="animate-sparkle absolute left-[40px] top-[130px] text-2xl">
+            <div className="animate-sparkle absolute left-[460px] top-[130px] text-2xl">
               ✨✨✨
             </div>
           </div>
         </div>
       )}
+
       {drops.map((gift) => (
         <div
           key={gift.id}
-          className="animate-gift-fall absolute top-0 drop-shadow-xl"
+          className="animate-gift-fall absolute top-0 z-10 drop-shadow-xl"
           style={{
             left: `${gift.left}%`,
             animationDelay: `${gift.delay}s`,
-            ["--gift-bottom" as string]: `${gift.bottom}px`,
             ["--gift-rotate" as string]: `${gift.rotate}deg`,
             ["--gift-drift" as string]: `${gift.drift}px`,
           }}
