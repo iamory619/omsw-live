@@ -66,7 +66,7 @@ export default function GiftPlaneWidget() {
 
     socket.on("gift-plane", (gift: GiftPayload) => {
       playEffect(
-        `ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`,
+        `thank you ${gift.user} For ${gift.giftName} x${gift.amount}`,
         gift,
       );
     });
