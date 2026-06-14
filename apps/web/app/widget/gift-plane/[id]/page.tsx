@@ -84,12 +84,12 @@ export default function GiftPlaneWidget() {
               alt="Gift plane"
               width={300}
               height={150}
-              className="absolute left-[40px] top-[40px] z-30 w-[260px]"
+              className="absolute left-[40px] top-[30px] z-30 w-[260px]"
             />
 
-            <div className="absolute left-[240px] top-[100px] z-10 h-[3px] w-[70px] bg-white" />
-            <div className="absolute left-[300px] top-[55px]  z-20 w-[360px] rotate-[-4deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
-              {" "}
+            <div className="absolute left-[210px] top-[112px] z-10 h-[3px] w-[95px] bg-white/80" />
+
+            <div className="absolute left-[280px] top-[72px] z-20 w-[380px] rotate-[-3deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
               {message || "Thank you!"}
             </div>
 
@@ -132,7 +132,7 @@ export default function GiftPlaneWidget() {
 
         @keyframes plane {
           0% {
-            transform: translateX(-700px) translateY(8vh) rotate(-3deg);
+            transform: translateX(-900px) translateY(10vh) rotate(-3deg);
             opacity: 0;
           }
 
@@ -141,11 +141,11 @@ export default function GiftPlaneWidget() {
           }
 
           50% {
-            transform: translateX(35vw) translateY(10vh) rotate(0deg);
+            transform: translateX(20vw) translateY(12vh) rotate(-2deg);
           }
 
           80% {
-            transform: translateX(65vw) translateY(12vh) rotate(2deg);
+            transform: translateX(55vw) translateY(8vh) rotate(2deg);
           }
 
           100% {
@@ -156,7 +156,7 @@ export default function GiftPlaneWidget() {
 
         @keyframes giftFall {
           0% {
-            transform: translateY(10vh) rotate(0deg) scale(0.8);
+            transform: translateY(12vh) rotate(0deg) scale(0.8);
             opacity: 0;
           }
 
@@ -165,7 +165,7 @@ export default function GiftPlaneWidget() {
           }
 
           100% {
-            transform: translateY(85vh) rotate(var(--gift-rotate)) scale(1);
+            transform: translateY(90vh) rotate(var(--gift-rotate)) scale(1);
             opacity: 1;
           }
         }
