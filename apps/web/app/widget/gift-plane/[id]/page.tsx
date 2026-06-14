@@ -84,11 +84,11 @@ export default function GiftPlaneWidget() {
               alt="Gift plane"
               width={300}
               height={150}
-              className="absolute left-[40px] top-[40px] w-[260px]"
+              className="absolute left-[40px] top-[40px] z-30 w-[260px]"
             />
 
-            <div className="absolute left-[240px] top-[100px] h-[3px] w-[70px] bg-white" />
-            <div className="absolute left-[300px] top-[55px] w-[360px] rotate-[-4deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
+            <div className="absolute left-[240px] top-[100px] z-10 h-[3px] w-[70px] bg-white" />
+            <div className="absolute left-[300px] top-[55px]  z-20 w-[360px] rotate-[-4deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
               {" "}
               {message || "Thank you!"}
             </div>
