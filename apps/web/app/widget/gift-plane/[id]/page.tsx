@@ -36,7 +36,9 @@ export default function GiftPlaneWidget() {
     setMessage(text);
     setShowPlane(true);
 
-    const newDrops = Array.from({ length: 10 }).map((_, index) => ({
+    const dropCount = Math.min(gift.amount || 1, 30);
+
+    const newDrops = Array.from({ length: dropCount }).map((_, index) => ({
       id: Date.now() + index,
       left: 35 + Math.random() * 30,
       delay: Math.random() * 1.8,
