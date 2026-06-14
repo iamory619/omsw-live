@@ -40,6 +40,7 @@ app.post("/connect", async (req, res) => {
     connections.set(overlayId, tiktok);
 
     tiktok.on("gift", (data: any) => {
+      console.log("GIFT DATA:", JSON.stringify(data, null, 2));
       const giftPayload = {
         user: data.nickname || "Someone",
         giftName: data.giftName || "Gift",
