@@ -84,7 +84,7 @@ export default function GiftPlaneWidget() {
               alt="Gift plane"
               width={300}
               height={150}
-              className="absolute left-[40px] top-[30px] z-50 w-[260px]"
+              className="absolute left-[400px] top-[30px] z-50 w-[260px]"
             />
 
             <div className="absolute left-[200px] top-[112px] z-10 h-[3px] w-[95px] bg-white/80" />
