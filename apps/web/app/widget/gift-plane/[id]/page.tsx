@@ -22,6 +22,7 @@ type DropGift = {
   name: string;
   bottom: number;
   rotate: number;
+  drift: number;
 };
 
 export default function GiftPlaneWidget() {
@@ -40,13 +41,14 @@ export default function GiftPlaneWidget() {
 
     const newDrops = Array.from({ length: dropCount }).map((_, index) => ({
       id: Date.now() + index,
-      left: 35 + Math.random() * 30,
-      delay: Math.random() * 1.8,
-      size: 32 + Math.random() * 16,
+      left: 25 + Math.random() * 45,
+      delay: index * 0.08 + Math.random() * 0.4,
+      size: 30 + Math.random() * 18,
       image: gift.giftImage || "/assets/gift-box.png",
       name: gift.giftName,
-      bottom: 10 + Math.random() * 70,
-      rotate: -25 + Math.random() * 50,
+      bottom: 0,
+      rotate: -180 + Math.random() * 360,
+      drift: -80 + Math.random() * 160,
     }));
 
     setDrops((prev) => [...prev, ...newDrops].slice(-120));
@@ -110,6 +112,7 @@ export default function GiftPlaneWidget() {
             animationDelay: `${gift.delay}s`,
             ["--gift-bottom" as string]: `${gift.bottom}px`,
             ["--gift-rotate" as string]: `${gift.rotate}deg`,
+            ["--gift-drift" as string]: `${gift.drift}px`,
           }}
         >
           <img
@@ -158,16 +161,22 @@ export default function GiftPlaneWidget() {
 
         @keyframes giftFall {
           0% {
-            transform: translateY(12vh) rotate(0deg) scale(0.8);
+            transform: translate3d(0, 12vh, 0) rotate(0deg) scale(0.75);
             opacity: 0;
           }
 
-          15% {
+          12% {
             opacity: 1;
           }
 
+          45% {
+            transform: translate3d(calc(var(--gift-drift) * 0.4), 45vh, 0)
+              rotate(calc(var(--gift-rotate) * 0.4)) scale(0.95);
+          }
+
           100% {
-            transform: translateY(90vh) rotate(var(--gift-rotate)) scale(1);
+            transform: translate3d(var(--gift-drift), 92vh, 0)
+              rotate(var(--gift-rotate)) scale(1);
             opacity: 1;
           }
         }
