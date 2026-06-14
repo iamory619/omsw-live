@@ -117,7 +117,7 @@ io.on("connection", (socket) => {
       giftName: "Rose",
       amount: 1,
       diamond: 1,
-      giftImage: "/assets/gift-box.png",
+      giftImage: "/assets/rose.png",
     };
 
     io.to(overlayId).emit("gift-alert", "🌹 Rose x1");
