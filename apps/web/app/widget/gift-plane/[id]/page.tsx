@@ -21,6 +21,9 @@ type DropGift = {
   name: string;
   rotate: number;
   drift: number;
+  startX: number;
+  startY: number;
+  fallY: number;
 };
 
 export default function GiftPlaneWidget() {
@@ -48,6 +51,9 @@ export default function GiftPlaneWidget() {
       name: gift.giftName,
       rotate: -120 + Math.random() * 240,
       drift: -70 + Math.random() * 140,
+      startX: 58,
+      startY: 22,
+      fallY: 55,
     }));
 
     newDrops.forEach((drop, index) => {
@@ -59,9 +65,14 @@ export default function GiftPlaneWidget() {
       );
     });
 
-    setTimeout(() => {
-      setLandedDrops(newDrops);
-    }, 3200);
+    newDrops.forEach((drop, index) => {
+      setTimeout(
+        () => {
+          setLandedDrops((prev) => [...prev, drop].slice(-100));
+        },
+        4300 + index * 120,
+      );
+    });
 
     setTimeout(() => {
       setShowPlane(false);
@@ -116,11 +127,14 @@ export default function GiftPlaneWidget() {
             {drops.map((gift) => (
               <div
                 key={gift.id}
-                className="animate-gift-fall fixed left-[58vw] top-[22vh] z-10 drop-shadow-xl"
+                className="animate-gift-fall fixed z-10 drop-shadow-xl"
                 style={{
+                  left: `${gift.startX}vw`,
+                  top: `${gift.startY}vh`,
                   animationDelay: `${gift.delay}s`,
                   ["--gift-rotate" as string]: `${gift.rotate}deg`,
                   ["--gift-drift" as string]: `${gift.drift}px`,
+                  ["--gift-fall" as string]: `${gift.fallY}vh`,
                 }}
               >
                 <img
@@ -137,20 +151,21 @@ export default function GiftPlaneWidget() {
         </div>
       )}
 
-      <div className="fixed bottom-4 left-0 z-20 flex w-full flex-wrap justify-center gap-1 px-10">
-        {landedDrops.map((gift) => (
-          <img
-            key={`landed-${gift.id}`}
-            src={gift.image}
-            alt={gift.name}
-            style={{
-              width: `${gift.size}px`,
-              height: `${gift.size}px`,
-              transform: `rotate(${gift.rotate}deg)`,
-            }}
-          />
-        ))}
-      </div>
+      {landedDrops.map((gift) => (
+        <img
+          key={`landed-${gift.id}`}
+          src={gift.image}
+          alt={gift.name}
+          className="fixed z-20 drop-shadow-xl"
+          style={{
+            left: `calc(${gift.startX}vw + ${gift.drift}px)`,
+            top: `calc(${gift.startY}vh + ${gift.fallY}vh)`,
+            width: `${gift.size}px`,
+            height: `${gift.size}px`,
+            transform: `rotate(${gift.rotate}deg)`,
+          }}
+        />
+      ))}
 
       <style jsx>{`
         :global(html),
@@ -196,7 +211,7 @@ export default function GiftPlaneWidget() {
           }
 
           100% {
-            transform: translate3d(var(--gift-drift), 55vh, 0)
+            transform: translate3d(var(--gift-drift), var(--gift-fall), 0)
               rotate(var(--gift-rotate)) scale(1);
             opacity: 1;
           }
