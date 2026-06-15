@@ -111,7 +111,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-60px] left-1/2 z-10 w-[950px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="absolute left-[230px] top-[1000px] z-30 h-[330px] w-[320px] overflow-hidden rounded-[45%]">
+        <div className="absolute left-[230px] top-[700px] z-30 h-[330px] w-[320px] overflow-hidden rounded-[45%]">
           {gifts.map((gift) => (
             <img
               key={gift.id}
