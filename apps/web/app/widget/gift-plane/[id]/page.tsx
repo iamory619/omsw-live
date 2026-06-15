@@ -30,7 +30,6 @@ export default function GiftPlaneWidget() {
   const [showPlane, setShowPlane] = useState(false);
   const [message, setMessage] = useState("");
   const [drops, setDrops] = useState<DropGift[]>([]);
-  const [landedDrops, setLandedDrops] = useState<DropGift[]>([]);
 
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
@@ -53,10 +52,7 @@ export default function GiftPlaneWidget() {
       setDrops(newDrops);
     }, 300);
 
-    setTimeout(() => {
-      setLandedDrops((prev) => [...prev, ...newDrops].slice(-120));
-    }, 3300);
-
+ 
     setTimeout(() => {
       setShowPlane(false);
       setMessage("");
