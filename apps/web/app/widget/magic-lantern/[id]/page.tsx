@@ -96,7 +96,13 @@ export default function MagicLanternWidget() {
       )}
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
-      <div className="absolute left-[310px] top-[560px] z-0 h-[260px] w-[260px] rounded-full bg-purple-500/20 blur-3xl" />
+        <div
+          className="absolute left-[335px] top-[515px] z-0 h-[290px] w-[220px] bg-purple-500/20 blur-2xl"
+          style={{
+            clipPath:
+              "polygon(18% 0%, 82% 0%, 82% 100%, 18% 100%, 10% 75%, 10% 25%)",
+          }}
+        />{" "}
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
@@ -105,9 +111,13 @@ export default function MagicLanternWidget() {
           priority
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
-
-       <div className="absolute left-[325px] top-[505px] z-30 h-[240px] w-[260px] overflow-hidden rounded-full">          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
-
+        <div
+          className="absolute left-[345px] top-[500px] z-30 h-[245px] w-[220px] overflow-hidden"
+          style={{
+            clipPath:
+              "polygon(16% 0%, 84% 0%, 84% 100%, 16% 100%, 8% 75%, 8% 25%)",
+          }}
+        >
           {gifts.map((gift) => (
             <img
               key={gift.id}
@@ -128,7 +138,6 @@ export default function MagicLanternWidget() {
             />
           ))}
         </div>
-
         <Image
           src="/assets/lantern/lantern-front.png"
           alt="Magic lantern front"
@@ -137,7 +146,6 @@ export default function MagicLanternWidget() {
           priority
           className="absolute bottom-[-50px] left-1/2 z-40 w-[820px] -translate-x-1/2 pointer-events-none"
         />
-
         <div className="animate-glow pointer-events-none absolute left-[345px] top-[455px] z-50 h-[210px] w-[220px] rounded-full bg-white/5 blur-sm" />
       </div>
 
