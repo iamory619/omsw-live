@@ -99,7 +99,7 @@ export default function MagicLanternWidget() {
         </div>
       )}
 
-      <div className="fixed bottom-[-10px] left-1/2 h-[980px] w-[780px] -translate-x-1/2">
+      <div className="fixed bottom-[10px] left-1/2 h-[980px] w-[780px] -translate-x-1/2">
         <div className="absolute bottom-[170px] left-1/2 z-0 h-[500px] w-[430px] -translate-x-1/2 rounded-full bg-purple-500/30 blur-3xl" />
 
         <Image
