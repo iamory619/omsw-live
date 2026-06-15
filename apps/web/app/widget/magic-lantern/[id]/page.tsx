@@ -47,14 +47,15 @@ export default function MagicLanternWidget() {
         id: Date.now() + index,
         image: giftImage,
         name: gift.giftName,
-        size: 10 + Math.random() * 4,
+        size: 11 + Math.random() * 5,
 
-        x: 30 + Math.random() * 90,
-        y: 50 + Math.random() * 120,
+        // ตำแหน่งภายในกล่องกุหลาบ
+        x: 28 + Math.random() * 110,
+        y: 35 + Math.random() * 135,
 
         rotate: -40 + Math.random() * 80,
-        floatX: -4 + Math.random() * 8,
-        floatY: -4 + Math.random() * 8,
+        floatX: -5 + Math.random() * 10,
+        floatY: -5 + Math.random() * 10,
         delay: Math.random() * 0.5,
         duration: 2.8 + Math.random() * 1.6,
       }),
@@ -98,7 +99,7 @@ export default function MagicLanternWidget() {
       )}
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
-        <div className="absolute left-1/2 top-[300px] z-0 h-[260px] w-[240px] -translate-x-1/2 rounded-full bg-purple-500/30 blur-3xl" />
+        <div className="absolute left-1/2 top-[390px] z-0 h-[250px] w-[230px] -translate-x-1/2 rounded-full bg-purple-500/25 blur-3xl" />
 
         <Image
           src="/assets/lantern/lantern-back.png"
@@ -109,7 +110,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="absolute left-[350px] top-[355px] z-30 h-[220px] w-[180px] overflow-hidden rounded-full">
+        <div className="absolute left-[358px] top-[455px] z-30 h-[190px] w-[170px] overflow-hidden rounded-full">
           <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
 
           {gifts.map((gift) => (
@@ -142,7 +143,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-40 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="animate-glow pointer-events-none absolute left-[370px] top-[360px] z-50 h-[230px] w-[180px] rounded-full bg-white/5 blur-sm" />
+        <div className="animate-glow pointer-events-none absolute left-[372px] top-[462px] z-50 h-[180px] w-[150px] rounded-full bg-white/5 blur-sm" />
       </div>
 
       <style jsx>{`
@@ -178,7 +179,7 @@ export default function MagicLanternWidget() {
         @keyframes floatGift {
           0% {
             opacity: 0;
-            transform: translateY(10px) scale(0.65) rotate(0deg);
+            transform: translateY(8px) scale(0.7) rotate(0deg);
           }
 
           20% {
@@ -208,8 +209,8 @@ export default function MagicLanternWidget() {
           }
 
           50% {
-            opacity: 0.8;
-            scale: 1.05;
+            opacity: 0.75;
+            scale: 1.04;
           }
         }
 
