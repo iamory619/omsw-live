@@ -83,7 +83,7 @@ export default function GiftPlaneWidget() {
       {showPlane && (
         <div className="animate-plane fixed left-0 top-0 z-50">
           <div className="relative h-[180px] w-[900px]">
-            <div className="absolute left-[200px] top-[72px] z-20 w-[280px] rotate-[-3deg] rounded-full border-4 border-white bg-pink-500/90 px-4 py-2 text-center text-base font-black text-white shadow-2xl">
+            <div className="absolute left-[180px] top-[72px] z-20 w-[280px] rotate-[-3deg] rounded-full border-4 border-white bg-pink-500/90 px-4 py-2 text-center text-base font-black text-white shadow-2xl">
               {message || "Thank you!"}
             </div>
 
