@@ -50,51 +50,59 @@ export default function GiftPlaneWidget() {
 
   const createPilePosition = (index: number) => {
     const centerX = 360;
-    const layer = Math.floor(index / 16);
-    const pos = index % 16;
 
-    const isOverflow = index > 95;
-    const angle = (pos / 16) * Math.PI * 2;
-    const radius = Math.min(28 + layer * 12, 155);
-
-    if (isOverflow) {
-      const overflowIndex = index - 95;
-      const groundIndex = overflowIndex - 25;
-
-      if (groundIndex >= 0) {
-        const side = groundIndex % 2 === 0 ? -1 : 1;
-        const groundRow = Math.floor(groundIndex / 16);
-        const groundPos = groundIndex % 16;
-
-        return {
-          pileX: centerX + side * (80 + groundPos * 18 + Math.random() * 20),
-          pileY: -10 + groundRow * 6 + Math.random() * 10,
-          pileScale: 0.75 + Math.random() * 0.18,
-          z: 15 + groundRow,
-        };
-      }
-
-      const side = overflowIndex % 2 === 0 ? -1 : 1;
-      const spillRow = Math.floor(overflowIndex / 12);
-      const spillPos = overflowIndex % 12;
+    // 0-79: กองในตะกร้า
+    if (index < 80) {
+      const layer = Math.floor(index / 14);
+      const pos = index % 14;
+      const angle = (pos / 14) * Math.PI * 2;
+      const radius = 18 + layer * 11;
 
       return {
-        pileX: centerX + side * (65 + spillPos * 14 + Math.random() * 12),
-        pileY: 20 + spillRow * 7 + Math.random() * 14,
-        pileScale: 0.78 + Math.random() * 0.22,
-        z: 35 + spillRow,
+        pileX:
+          centerX +
+          Math.cos(angle) * radius * (0.9 + Math.random() * 0.45) +
+          (Math.random() * 18 - 9),
+        pileY:
+          38 +
+          layer * 9 +
+          Math.sin(angle) * radius * 0.16 +
+          Math.random() * 8,
+        pileScale: 0.85 + Math.random() * 0.38,
+        z: 22 + layer,
       };
     }
+
+    // 80-129: ล้นปากตะกร้า แต่ยังชิดตะกร้า
+    if (index < 130) {
+      const overflowIndex = index - 80;
+      const side = overflowIndex % 2 === 0 ? -1 : 1;
+      const row = Math.floor(overflowIndex / 12);
+      const pos = overflowIndex % 12;
+
+      return {
+        pileX:
+          centerX +
+          side * (42 + pos * 11 + Math.random() * 12),
+        pileY: 28 + row * 7 + Math.random() * 12,
+        pileScale: 0.78 + Math.random() * 0.25,
+        z: 32 + row,
+      };
+    }
+
+    // 130+: หล่นพื้นซ้าย/ขวา
+    const groundIndex = index - 130;
+    const side = groundIndex % 2 === 0 ? -1 : 1;
+    const row = Math.floor(groundIndex / 18);
+    const pos = groundIndex % 18;
 
     return {
       pileX:
         centerX +
-        Math.cos(angle) * radius * (0.75 + Math.random() * 0.45) +
-        (Math.random() * 24 - 12),
-      pileY:
-        54 + layer * 11 + Math.sin(angle) * radius * 0.18 + Math.random() * 12,
-      pileScale: 0.82 + Math.random() * 0.5,
-      z: 20 + layer,
+        side * (78 + pos * 17 + Math.random() * 18),
+      pileY: 2 + row * 5 + Math.random() * 8,
+      pileScale: 0.68 + Math.random() * 0.22,
+      z: 12 + row,
     };
   };
 
@@ -114,11 +122,11 @@ export default function GiftPlaneWidget() {
           id: Date.now() + index,
           image: giftImage,
           name: gift.giftName,
-          size: 26 + Math.random() * 20,
-          x: -190 + Math.random() * 380,
-          y: -40 - Math.random() * 190,
+          size: 24 + Math.random() * 18,
+          x: -170 + Math.random() * 340,
+          y: -60 - Math.random() * 180,
           rotate: -140 + Math.random() * 280,
-          delay: Math.random() * 0.28,
+          delay: Math.random() * 0.22,
           pileX: pile.pileX,
           pileY: pile.pileY,
           pileScale: pile.pileScale,
@@ -127,11 +135,11 @@ export default function GiftPlaneWidget() {
       },
     );
 
-    const newSparkles: Sparkle[] = Array.from({ length: 20 }).map(
+    const newSparkles: Sparkle[] = Array.from({ length: 18 }).map(
       (_, index) => ({
         id: Date.now() + 10000 + index,
-        x: -230 + Math.random() * 460,
-        y: -250 + Math.random() * 260,
+        x: -220 + Math.random() * 440,
+        y: -230 + Math.random() * 250,
         delay: Math.random() * 1.2,
       }),
     );
@@ -140,8 +148,8 @@ export default function GiftPlaneWidget() {
     setSparkles(newSparkles);
 
     setTimeout(() => {
-      setPileGifts((prev) => [...prev, ...newGifts].slice(-220));
-    }, 1250);
+      setPileGifts((prev) => [...prev, ...newGifts].slice(-240));
+    }, 1200);
 
     setTimeout(() => {
       setFallingGifts([]);
@@ -183,7 +191,7 @@ export default function GiftPlaneWidget() {
       )}
 
       <div className="fixed bottom-8 left-1/2 z-40 h-[300px] w-[760px] -translate-x-1/2">
-        <div className="absolute bottom-0 left-1/2 z-10 h-[70px] w-[560px] -translate-x-1/2 rounded-full bg-pink-500/20 blur-2xl" />
+        <div className="absolute bottom-[6px] left-1/2 z-10 h-[58px] w-[560px] -translate-x-1/2 rounded-full bg-black/35 blur-2xl" />
 
         {fallingGifts.map((gift) => (
           <img
@@ -332,7 +340,7 @@ export default function GiftPlaneWidget() {
         }
 
         .animate-fall {
-          animation: fall 1.45s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+          animation: fall 1.45s cubic-bezier(0.18, 0.82, 0.28, 1) forwards;
         }
 
         .animate-pop {
