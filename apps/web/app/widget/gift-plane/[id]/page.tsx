@@ -53,10 +53,13 @@ export default function GiftPlaneWidget() {
     // }, 100);
 
     newDrops.forEach((drop, index) => {
-  setTimeout(() => {
-    setDrops((prev) => [...prev, drop]);
-  }, 300 + index * 120);
-});
+      setTimeout(
+        () => {
+          setDrops((prev) => [...prev, drop]);
+        },
+        300 + index * 120,
+      );
+    });
 
     setTimeout(() => {
       setShowPlane(false);
@@ -111,7 +114,7 @@ export default function GiftPlaneWidget() {
             {drops.map((gift) => (
               <div
                 key={gift.id}
-                className="animate-gift-fall absolute left-[545px] top-[110px] z-10 drop-shadow-xl"
+                className="animate-gift-fall fixed left-[58vw] top-[22vh] z-10 drop-shadow-xl"
                 style={{
                   animationDelay: `${gift.delay}s`,
                   ["--gift-rotate" as string]: `${gift.rotate}deg`,
@@ -175,13 +178,8 @@ export default function GiftPlaneWidget() {
             opacity: 1;
           }
 
-          45% {
-            transform: translate3d(calc(var(--gift-drift) * 0.35), 20vh, 0)
-              rotate(calc(var(--gift-rotate) * 0.45)) scale(0.9);
-          }
-
           100% {
-            transform: translate3d(var(--gift-drift), 34vh, 0)
+            transform: translate3d(var(--gift-drift), 55vh, 0)
               rotate(var(--gift-rotate)) scale(1);
             opacity: 1;
           }
