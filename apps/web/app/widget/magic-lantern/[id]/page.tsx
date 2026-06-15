@@ -51,7 +51,7 @@ export default function MagicLanternWidget() {
 
         // ตำแหน่งในโหล
         x: 250 + Math.random() * 180,
-        y: 300 + Math.random() * 170,
+        y: 260 + Math.random() * 240,
 
         rotate: -35 + Math.random() * 70,
 
@@ -107,10 +107,18 @@ export default function MagicLanternWidget() {
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
-          width={700}
-          height={900}
+          width={900}
+          height={1100}
           priority
-          className="absolute bottom-0 left-0 z-10 w-[700px]"
+          className="
+    absolute
+    bottom-[-40px]
+    left-1/2
+    z-10
+    w-[850px]
+    -translate-x-1/2
+    pointer-events-none
+  "
         />
 
         <div className="absolute left-[235px] top-[280px] z-30 h-[230px] w-[230px] overflow-hidden rounded-[45%]">
@@ -139,12 +147,19 @@ export default function MagicLanternWidget() {
         <Image
           src="/assets/lantern/lantern-front.png"
           alt="Magic lantern front"
-          width={700}
-          height={900}
+          width={900}
+          height={1100}
           priority
-          className="absolute bottom-0 left-0 z-40 w-[700px]"
+          className="
+    absolute
+    bottom-[-40px]
+    left-1/2
+    z-40
+    w-[850px]
+    -translate-x-1/2
+    pointer-events-none
+  "
         />
-
         <div className="animate-glow pointer-events-none absolute left-[250px] top-[190px] z-50 h-[320px] w-[210px] rounded-full bg-white/5 blur-sm" />
       </div>
 
