@@ -30,6 +30,7 @@ export default function GiftPlaneWidget() {
   const [showPlane, setShowPlane] = useState(false);
   const [message, setMessage] = useState("");
   const [drops, setDrops] = useState<DropGift[]>([]);
+  const [landedDrops, setLandedDrops] = useState<DropGift[]>([]);
 
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
@@ -53,10 +54,15 @@ export default function GiftPlaneWidget() {
     }, 300);
 
     setTimeout(() => {
-  setShowPlane(false);
-  setMessage("");
-  setDrops([]);
-}, 9000);
+      setLandedDrops((prev) => [...prev, ...newDrops].slice(-120));
+    }, 3300);
+
+    setTimeout(() => {
+      setShowPlane(false);
+      setMessage("");
+      setDrops([]);
+    }, 9000);
+  };
 
   useEffect(() => {
     if (!overlayId) return;
@@ -76,6 +82,7 @@ export default function GiftPlaneWidget() {
       setShowPlane(false);
       setMessage("");
       setDrops([]);
+      setLandedDrops([]);
     });
 
     return () => {
@@ -131,6 +138,22 @@ export default function GiftPlaneWidget() {
         </div>
       )}
 
+      {landedDrops.map((gift, index) => (
+        <img
+          key={`landed-${gift.id}`}
+          src={gift.image}
+          alt={gift.name}
+          className="fixed z-[998] drop-shadow-xl"
+          style={{
+            left: `calc(55vw + ${gift.drift}px + ${(index % 8) * 4}px)`,
+            top: `calc(72vh - ${Math.floor(index / 8) * 10}px)`,
+            width: `${gift.size}px`,
+            height: `${gift.size}px`,
+            transform: `rotate(${gift.rotate}deg)`,
+          }}
+        />
+      ))}
+
       <style jsx>{`
         :global(html),
         :global(body) {
@@ -181,12 +204,12 @@ export default function GiftPlaneWidget() {
             opacity: 1;
           }
 
-       100% {
-  transform: translate(var(--gift-drift), 360px)
-    rotate(var(--gift-rotate))
-    scale(1);
-  opacity: 1;
-}
+          100% {
+            transform: translate(var(--gift-drift), 360px)
+              rotate(var(--gift-rotate))
+              scale(1);
+            opacity: 1;
+          }
         }
 
         @keyframes sparkle {
