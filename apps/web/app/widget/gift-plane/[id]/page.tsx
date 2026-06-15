@@ -58,7 +58,22 @@ export default function GiftPlaneWidget() {
     const radius = Math.min(28 + layer * 12, 155);
 
     if (isOverflow) {
-      const overflowIndex = index - 70;
+      const overflowIndex = index - 95;
+      const groundIndex = overflowIndex - 25;
+
+      if (groundIndex >= 0) {
+        const side = groundIndex % 2 === 0 ? -1 : 1;
+        const groundRow = Math.floor(groundIndex / 16);
+        const groundPos = groundIndex % 16;
+
+        return {
+          pileX: centerX + side * (80 + groundPos * 18 + Math.random() * 20),
+          pileY: -10 + groundRow * 6 + Math.random() * 10,
+          pileScale: 0.75 + Math.random() * 0.18,
+          z: 15 + groundRow,
+        };
+      }
+
       const side = overflowIndex % 2 === 0 ? -1 : 1;
       const spillRow = Math.floor(overflowIndex / 12);
       const spillPos = overflowIndex % 12;
