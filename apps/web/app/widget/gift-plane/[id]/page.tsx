@@ -22,6 +22,7 @@ type DropGift = {
   rotate: number;
   drift: number;
   fallDistance: number;
+  startLeft: number;
 };
 
 type Sparkle = {
@@ -39,26 +40,25 @@ export default function GiftPlaneWidget() {
   const [showPlane, setShowPlane] = useState(false);
   const [message, setMessage] = useState("");
   const [drops, setDrops] = useState<DropGift[]>([]);
-  const [pileDrops, setPileDrops] = useState<DropGift[]>([]);
   const [sparkles, setSparkles] = useState<Sparkle[]>([]);
 
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
     setShowPlane(true);
-    setDrops([]);
 
     const effectCount = Math.min(Math.max((gift.amount || 1) * 5, 25), 120);
     const giftImage = gift.giftImage || "/assets/rose.png";
 
     const newDrops = Array.from({ length: effectCount }).map((_, index) => ({
       id: Date.now() + index,
-      delay: index * 0.035 + Math.random() * 0.25,
+      delay: index * 0.035 + Math.random() * 0.2,
       size: 22 + Math.random() * 22,
       image: giftImage,
       name: gift.giftName,
       rotate: -180 + Math.random() * 360,
-      drift: -160 + Math.random() * 320,
-      fallDistance: 380 + Math.random() * 170,
+      drift: -190 + Math.random() * 380,
+      fallDistance: 420 + Math.random() * 130,
+      startLeft: 610 + Math.random() * 80,
     }));
 
     const newSparkles = Array.from({ length: 28 }).map((_, index) => ({
@@ -69,20 +69,12 @@ export default function GiftPlaneWidget() {
       size: 12 + Math.random() * 14,
     }));
 
+    setDrops((prev) => [...prev, ...newDrops].slice(-260));
     setSparkles(newSparkles);
-
-    setTimeout(() => {
-      setDrops(newDrops);
-    }, 250);
-
-    setTimeout(() => {
-      setPileDrops((prev) => [...prev, ...newDrops].slice(-220));
-    }, 2900);
 
     setTimeout(() => {
       setShowPlane(false);
       setMessage("");
-      setDrops([]);
       setSparkles([]);
     }, 7000);
   };
@@ -105,7 +97,6 @@ export default function GiftPlaneWidget() {
       setShowPlane(false);
       setMessage("");
       setDrops([]);
-      setPileDrops([]);
       setSparkles([]);
     });
 
@@ -143,31 +134,32 @@ export default function GiftPlaneWidget() {
             <div className="animate-sparkle absolute left-[545px] top-[150px] text-3xl">
               ✨✨✨
             </div>
-
-            {drops.map((gift) => (
-              <div
-                key={gift.id}
-                className="animate-gift-rain absolute left-[630px] top-[145px] z-40 drop-shadow-xl"
-                style={{
-                  animationDelay: `${gift.delay}s`,
-                  ["--gift-drift" as string]: `${gift.drift}px`,
-                  ["--gift-rotate" as string]: `${gift.rotate}deg`,
-                  ["--gift-fall" as string]: `${gift.fallDistance}px`,
-                }}
-              >
-                <img
-                  src={gift.image}
-                  alt={gift.name}
-                  style={{
-                    width: `${gift.size}px`,
-                    height: `${gift.size}px`,
-                  }}
-                />
-              </div>
-            ))}
           </div>
         </div>
       )}
+
+      {drops.map((gift) => (
+        <div
+          key={gift.id}
+          className="animate-gift-rain fixed top-[24vh] z-40 drop-shadow-xl"
+          style={{
+            left: `${gift.startLeft}px`,
+            animationDelay: `${gift.delay}s`,
+            ["--gift-drift" as string]: `${gift.drift}px`,
+            ["--gift-rotate" as string]: `${gift.rotate}deg`,
+            ["--gift-fall" as string]: `${gift.fallDistance}px`,
+          }}
+        >
+          <img
+            src={gift.image}
+            alt={gift.name}
+            style={{
+              width: `${gift.size}px`,
+              height: `${gift.size}px`,
+            }}
+          />
+        </div>
+      ))}
 
       {sparkles.map((item) => (
         <div
@@ -183,30 +175,6 @@ export default function GiftPlaneWidget() {
           ✨
         </div>
       ))}
-
-      {pileDrops.map((gift, index) => {
-        const row = Math.floor(index / 24);
-        const col = index % 24;
-        const xJitter = ((index * 37) % 18) - 9;
-        const yJitter = ((index * 19) % 10) - 5;
-        const scaleBoost = row < 2 ? 1.2 : 1;
-
-        return (
-          <img
-            key={`pile-${gift.id}-${index}`}
-            src={gift.image}
-            alt={gift.name}
-            className="fixed z-30 drop-shadow-[0_0_10px_rgba(255,105,180,0.75)]"
-            style={{
-              left: `calc(50vw - 340px + ${col * 28 + xJitter}px)`,
-              top: `calc(86vh - ${row * 16 + yJitter}px)`,
-              width: `${gift.size * scaleBoost}px`,
-              height: `${gift.size * scaleBoost}px`,
-              transform: `rotate(${gift.rotate}deg)`,
-            }}
-          />
-        );
-      })}
 
       <style jsx>{`
         :global(html),
