@@ -99,8 +99,19 @@ export default function MagicLanternWidget() {
       )}
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
-        <div className="absolute left-[310px] top-[345px] z-0 h-[300px] w-[290px] rounded-full bg-purple-500/20 blur-3xl" />
-
+        <div
+          className="
+    absolute
+    left-[310px]
+    top-[460px]
+    z-0
+    h-[300px]
+    w-[290px]
+    rounded-full
+    bg-purple-500/20
+    blur-3xl
+  "
+        />
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
