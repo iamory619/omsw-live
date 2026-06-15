@@ -30,11 +30,13 @@ export default function GiftPlaneWidget() {
   const [showPlane, setShowPlane] = useState(false);
   const [message, setMessage] = useState("");
   const [drops, setDrops] = useState<DropGift[]>([]);
+  const [landedDrops, setLandedDrops] = useState<DropGift[]>([]);
 
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
     setShowPlane(true);
     setDrops([]);
+    setLandedDrops([]);
 
     const dropCount = Math.min(gift.amount || 1, 30);
 
@@ -48,10 +50,6 @@ export default function GiftPlaneWidget() {
       drift: -70 + Math.random() * 140,
     }));
 
-    // setTimeout(() => {
-    //   setDrops(newDrops);
-    // }, 100);
-
     newDrops.forEach((drop, index) => {
       setTimeout(
         () => {
@@ -60,6 +58,10 @@ export default function GiftPlaneWidget() {
         300 + index * 120,
       );
     });
+
+    setTimeout(() => {
+      setLandedDrops(newDrops);
+    }, 3200);
 
     setTimeout(() => {
       setShowPlane(false);
@@ -134,6 +136,21 @@ export default function GiftPlaneWidget() {
           </div>
         </div>
       )}
+
+      <div className="fixed bottom-4 left-0 z-20 flex w-full flex-wrap justify-center gap-1 px-10">
+        {landedDrops.map((gift) => (
+          <img
+            key={`landed-${gift.id}`}
+            src={gift.image}
+            alt={gift.name}
+            style={{
+              width: `${gift.size}px`,
+              height: `${gift.size}px`,
+              transform: `rotate(${gift.rotate}deg)`,
+            }}
+          />
+        ))}
+      </div>
 
       <style jsx>{`
         :global(html),
