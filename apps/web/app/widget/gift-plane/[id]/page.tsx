@@ -48,9 +48,15 @@ export default function GiftPlaneWidget() {
       drift: -70 + Math.random() * 140,
     }));
 
-    setTimeout(() => {
-      setDrops(newDrops);
-    }, 300);
+    // setTimeout(() => {
+    //   setDrops(newDrops);
+    // }, 100);
+
+    newDrops.forEach((drop, index) => {
+  setTimeout(() => {
+    setDrops((prev) => [...prev, drop]);
+  }, 300 + index * 120);
+});
 
     setTimeout(() => {
       setShowPlane(false);
