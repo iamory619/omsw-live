@@ -121,8 +121,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="absolute left-[325px] top-[340px] z-30 h-[300px] w-[260px] overflow-hidden rounded-full">
-          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
+      <div className="absolute left-[325px] top-[395px] z-30 h-[260px] w-[260px] overflow-hidden rounded-full">          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
 
           {gifts.map((gift) => (
             <img
@@ -154,8 +153,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-40 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="animate-glow pointer-events-none absolute left-[345px] top-[370px] z-50 h-[240px] w-[220px] rounded-full bg-white/5 blur-sm" />
-      </div>
+      <div className="animate-glow pointer-events-none absolute left-[345px] top-[455px] z-50 h-[210px] w-[220px] rounded-full bg-white/5 blur-sm" />      </div>
 
       <style jsx>{`
         :global(html),
