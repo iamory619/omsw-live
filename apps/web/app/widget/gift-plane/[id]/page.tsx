@@ -51,14 +51,14 @@ export default function GiftPlaneWidget() {
 
     const newDrops = Array.from({ length: effectCount }).map((_, index) => ({
       id: Date.now() + index,
-      delay: index * 0.035 + Math.random() * 0.2,
-      size: 22 + Math.random() * 22,
+      delay: Math.random() * 0.15,
+      size: 42 + Math.random() * 18,
       image: giftImage,
       name: gift.giftName,
       rotate: -180 + Math.random() * 360,
       drift: -190 + Math.random() * 380,
       fallDistance: 420 + Math.random() * 130,
-      startLeft: 610 + Math.random() * 80,
+      startLeft: 520 + Math.random() * 180,
     }));
 
     const newSparkles = Array.from({ length: 28 }).map((_, index) => ({
