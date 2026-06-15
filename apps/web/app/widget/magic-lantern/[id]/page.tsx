@@ -47,15 +47,14 @@ export default function MagicLanternWidget() {
         id: Date.now() + index,
         image: giftImage,
         name: gift.giftName,
-        size: 16 + Math.random() * 8,
+        size: 10 + Math.random() * 4,
 
-        // ตำแหน่งในโหลแบบเห็นชัด
-        x: 55 + Math.random() * 160,
-        y: 55 + Math.random() * 190,
+        x: 30 + Math.random() * 90,
+        y: 50 + Math.random() * 120,
 
         rotate: -40 + Math.random() * 80,
-        floatX: -10 + Math.random() * 20,
-        floatY: -10 + Math.random() * 20,
+        floatX: -4 + Math.random() * 8,
+        floatY: -4 + Math.random() * 8,
         delay: Math.random() * 0.5,
         duration: 2.8 + Math.random() * 1.6,
       }),
@@ -98,8 +97,8 @@ export default function MagicLanternWidget() {
         </div>
       )}
 
-      <div className="fixed bottom-[40px] left-1/2 h-[820px] w-[720px] -translate-x-1/2">
-        <div className="absolute left-1/2 top-[235px] z-0 h-[360px] w-[330px] -translate-x-1/2 rounded-full bg-purple-500/30 blur-3xl" />
+      <div className="fixed bottom-[-40px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
+        <div className="absolute left-1/2 top-[300px] z-0 h-[260px] w-[240px] -translate-x-1/2 rounded-full bg-purple-500/30 blur-3xl" />
 
         <Image
           src="/assets/lantern/lantern-back.png"
@@ -110,8 +109,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        {/* กล่องนี้คือพื้นที่ข้างในโหล */}
-        <div className="absolute left-[245px] top-[300px] z-30 h-[300px] w-[240px] overflow-hidden rounded-[45%]">
+        <div className="absolute left-[350px] top-[355px] z-30 h-[220px] w-[180px] overflow-hidden rounded-full">
           <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
 
           {gifts.map((gift) => (
@@ -119,7 +117,7 @@ export default function MagicLanternWidget() {
               key={gift.id}
               src={gift.image}
               alt={gift.name}
-              className="animate-float-gift absolute drop-shadow-[0_0_8px_rgba(255,105,180,0.85)]"
+              className="animate-float-gift absolute drop-shadow-[0_0_6px_rgba(255,105,180,0.75)]"
               style={{
                 left: `${gift.x}px`,
                 top: `${gift.y}px`,
@@ -144,7 +142,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-40 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="animate-glow pointer-events-none absolute left-[270px] top-[330px] z-50 h-[250px] w-[210px] rounded-full bg-white/5 blur-sm" />
+        <div className="animate-glow pointer-events-none absolute left-[370px] top-[360px] z-50 h-[230px] w-[180px] rounded-full bg-white/5 blur-sm" />
       </div>
 
       <style jsx>{`
