@@ -96,8 +96,7 @@ export default function MagicLanternWidget() {
       )}
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
-        <div className="absolute left-[310px] top-[460px] z-0 h-[300px] w-[290px] rounded-full bg-purple-500/20 blur-3xl" />
-
+      <div className="absolute left-[310px] top-[560px] z-0 h-[260px] w-[260px] rounded-full bg-purple-500/20 blur-3xl" />
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
@@ -107,8 +106,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="absolute left-[325px] top-[395px] z-30 h-[260px] w-[260px] overflow-hidden rounded-full">
-          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
+       <div className="absolute left-[325px] top-[505px] z-30 h-[240px] w-[260px] overflow-hidden rounded-full">          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
 
           {gifts.map((gift) => (
             <img
