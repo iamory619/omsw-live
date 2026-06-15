@@ -135,8 +135,8 @@ export default function GiftPlaneWidget() {
         ))}
 
         {pileGifts.map((gift, index) => {
-          const row = Math.floor(index / 18);
-          const col = index % 18;
+          const row = Math.floor(index / 12);
+          const col = index % 12;
           const xJitter = ((index * 37) % 22) - 11;
           const yJitter = ((index * 19) % 12) - 6;
 
@@ -147,8 +147,8 @@ export default function GiftPlaneWidget() {
               alt={gift.name}
               className="absolute z-20 drop-shadow-[0_0_10px_rgba(255,105,180,0.75)]"
               style={{
-                left: `${95 + col * 30 + xJitter}px`,
-                bottom: `${34 + row * 13 + yJitter}px`,
+                left: `${185 + col * 18 + xJitter}px`,
+                bottom: `${58 + row * 9 + yJitter}px`,
                 width: `${gift.size}px`,
                 height: `${gift.size}px`,
                 transform: `rotate(${gift.rotate}deg)`,
