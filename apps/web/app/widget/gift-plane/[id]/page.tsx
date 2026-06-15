@@ -30,6 +30,7 @@ export default function GiftPlaneWidget() {
   const [showPlane, setShowPlane] = useState(false);
   const [message, setMessage] = useState("");
   const [drops, setDrops] = useState<DropGift[]>([]);
+  const [landedDrops, setLandedDrops] = useState<DropGift[]>([]);
 
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
@@ -45,7 +46,7 @@ export default function GiftPlaneWidget() {
       image: gift.giftImage || "/assets/rose.png",
       name: gift.giftName,
       rotate: -80 + Math.random() * 160,
-      drift: -25 + Math.random() * 50,
+      drift: -35 + Math.random() * 70,
     }));
 
     setTimeout(() => {
@@ -53,10 +54,14 @@ export default function GiftPlaneWidget() {
     }, 300);
 
     setTimeout(() => {
+      setLandedDrops((prev) => [...prev, ...newDrops].slice(-150));
+    }, 3100);
+
+    setTimeout(() => {
       setShowPlane(false);
       setMessage("");
       setDrops([]);
-    }, 9000);
+    }, 6500);
   };
 
   useEffect(() => {
@@ -77,6 +82,7 @@ export default function GiftPlaneWidget() {
       setShowPlane(false);
       setMessage("");
       setDrops([]);
+      setLandedDrops([]);
     });
 
     return () => {
@@ -131,6 +137,27 @@ export default function GiftPlaneWidget() {
           </div>
         </div>
       )}
+
+      {landedDrops.map((gift, index) => {
+        const row = Math.floor(index / 12);
+        const col = index % 12;
+
+        return (
+          <img
+            key={`landed-${gift.id}-${index}`}
+            src={gift.image}
+            alt={gift.name}
+            className="fixed z-[998] drop-shadow-xl"
+            style={{
+              left: `calc(50vw - 170px + ${col * 28}px + ${gift.drift * 0.3}px)`,
+              top: `calc(78vh - ${row * 14}px)`,
+              width: `${gift.size}px`,
+              height: `${gift.size}px`,
+              transform: `rotate(${gift.rotate}deg)`,
+            }}
+          />
+        );
+      })}
 
       <style jsx>{`
         :global(html),
@@ -216,6 +243,6 @@ export default function GiftPlaneWidget() {
           animation: sparkle 0.8s ease-in-out infinite;
         }
       `}</style>
-    </main> 
+    </main>
   );
 }
