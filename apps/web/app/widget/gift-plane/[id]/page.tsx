@@ -52,7 +52,6 @@ export default function GiftPlaneWidget() {
       setDrops(newDrops);
     }, 300);
 
- 
     setTimeout(() => {
       setShowPlane(false);
       setMessage("");
@@ -78,7 +77,6 @@ export default function GiftPlaneWidget() {
       setShowPlane(false);
       setMessage("");
       setDrops([]);
-      setLandedDrops([]);
     });
 
     return () => {
@@ -133,22 +131,6 @@ export default function GiftPlaneWidget() {
           </div>
         </div>
       )}
-
-      {landedDrops.map((gift, index) => (
-        <img
-          key={`landed-${gift.id}`}
-          src={gift.image}
-          alt={gift.name}
-          className="fixed z-[998] drop-shadow-xl"
-          style={{
-            left: `calc(55vw + ${gift.drift}px + ${(index % 8) * 4}px)`,
-            top: `calc(72vh - ${Math.floor(index / 8) * 10}px)`,
-            width: `${gift.size}px`,
-            height: `${gift.size}px`,
-            transform: `rotate(${gift.rotate}deg)`,
-          }}
-        />
-      ))}
 
       <style jsx>{`
         :global(html),
@@ -234,6 +216,6 @@ export default function GiftPlaneWidget() {
           animation: sparkle 0.8s ease-in-out infinite;
         }
       `}</style>
-    </main>
+    </main> 
   );
-} 
+}
