@@ -147,7 +147,7 @@ export default function GiftPlaneWidget() {
               alt={gift.name}
               className="absolute z-20 drop-shadow-[0_0_10px_rgba(255,105,180,0.75)]"
               style={{
-                left: `${185 + col * 18 + xJitter}px`,
+                left: `${205 + col * 18 + xJitter}px`,
                 bottom: `${58 + row * 9 + yJitter}px`,
                 width: `${gift.size}px`,
                 height: `${gift.size}px`,
