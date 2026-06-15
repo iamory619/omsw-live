@@ -40,17 +40,17 @@ export default function GiftPlaneWidget() {
 
     const newDrops = Array.from({ length: dropCount }).map((_, index) => ({
       id: Date.now() + index,
-      delay: index * 0.18 + Math.random() * 0.25,
-      size: 32 + Math.random() * 16,
+      delay: index * 0.16 + Math.random() * 0.2,
+      size: 26 + Math.random() * 10,
       image: gift.giftImage || "/assets/gift-box.png",
       name: gift.giftName,
-      rotate: -160 + Math.random() * 320,
-      drift: -120 + Math.random() * 240,
+      rotate: -120 + Math.random() * 240,
+      drift: -70 + Math.random() * 140,
     }));
 
     setTimeout(() => {
       setDrops(newDrops);
-    }, 1000);
+    }, 900);
 
     setTimeout(() => {
       setShowPlane(false);
@@ -105,7 +105,7 @@ export default function GiftPlaneWidget() {
             {drops.map((gift) => (
               <div
                 key={gift.id}
-                className="animate-gift-fall absolute left-[545px] top-[120px] z-10 drop-shadow-xl"
+                className="animate-gift-fall absolute left-[545px] top-[110px] z-10 drop-shadow-xl"
                 style={{
                   animationDelay: `${gift.delay}s`,
                   ["--gift-rotate" as string]: `${gift.rotate}deg`,
@@ -169,13 +169,13 @@ export default function GiftPlaneWidget() {
             opacity: 1;
           }
 
-          40% {
-            transform: translate3d(calc(var(--gift-drift) * 0.35), 38vh, 0)
-              rotate(calc(var(--gift-rotate) * 0.4)) scale(0.9);
+          45% {
+            transform: translate3d(calc(var(--gift-drift) * 0.35), 20vh, 0)
+              rotate(calc(var(--gift-rotate) * 0.45)) scale(0.9);
           }
 
           100% {
-            transform: translate3d(var(--gift-drift), 45vh, 0)
+            transform: translate3d(var(--gift-drift), 34vh, 0)
               rotate(var(--gift-rotate)) scale(1);
             opacity: 1;
           }
@@ -200,7 +200,7 @@ export default function GiftPlaneWidget() {
 
         .animate-gift-fall {
           animation-name: giftFall;
-          animation-duration: 4.5s;
+          animation-duration: 4.2s;
           animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
           animation-fill-mode: forwards;
         }
