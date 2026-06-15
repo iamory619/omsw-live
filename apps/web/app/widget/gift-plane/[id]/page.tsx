@@ -15,7 +15,6 @@ type GiftPayload = {
 
 type DropGift = {
   id: number;
-  left: number;
   delay: number;
   size: number;
   image: string;
@@ -35,12 +34,12 @@ export default function GiftPlaneWidget() {
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
     setShowPlane(true);
+    setDrops([]);
 
     const dropCount = Math.min(gift.amount || 1, 30);
 
     const newDrops = Array.from({ length: dropCount }).map((_, index) => ({
       id: Date.now() + index,
-      left: 62 + Math.random() * 6,
       delay: index * 0.18 + Math.random() * 0.25,
       size: 32 + Math.random() * 16,
       image: gift.giftImage || "/assets/gift-box.png",
@@ -50,13 +49,14 @@ export default function GiftPlaneWidget() {
     }));
 
     setTimeout(() => {
-      setDrops((prev) => [...prev, ...newDrops].slice(-120));
+      setDrops(newDrops);
     }, 1000);
 
     setTimeout(() => {
       setShowPlane(false);
       setMessage("");
-    }, 5500);
+      setDrops([]);
+    }, 5600);
   };
 
   useEffect(() => {
@@ -101,31 +101,30 @@ export default function GiftPlaneWidget() {
             <div className="animate-sparkle absolute left-[460px] top-[130px] text-2xl">
               ✨✨✨
             </div>
+
+            {drops.map((gift) => (
+              <div
+                key={gift.id}
+                className="animate-gift-fall absolute left-[545px] top-[120px] z-10 drop-shadow-xl"
+                style={{
+                  animationDelay: `${gift.delay}s`,
+                  ["--gift-rotate" as string]: `${gift.rotate}deg`,
+                  ["--gift-drift" as string]: `${gift.drift}px`,
+                }}
+              >
+                <img
+                  src={gift.image}
+                  alt={gift.name}
+                  style={{
+                    width: `${gift.size}px`,
+                    height: `${gift.size}px`,
+                  }}
+                />
+              </div>
+            ))}
           </div>
         </div>
       )}
-
-      {drops.map((gift) => (
-        <div
-          key={gift.id}
-          className="animate-gift-fall absolute top-0 z-10 drop-shadow-xl"
-          style={{
-            left: `${gift.left}%`,
-            animationDelay: `${gift.delay}s`,
-            ["--gift-rotate" as string]: `${gift.rotate}deg`,
-            ["--gift-drift" as string]: `${gift.drift}px`,
-          }}
-        >
-          <img
-            src={gift.image}
-            alt={gift.name}
-            style={{
-              width: `${gift.size}px`,
-              height: `${gift.size}px`,
-            }}
-          />
-        </div>
-      ))}
 
       <style jsx>{`
         :global(html),
@@ -162,7 +161,7 @@ export default function GiftPlaneWidget() {
 
         @keyframes giftFall {
           0% {
-            transform: translate3d(0, 10vh, 0) rotate(0deg) scale(0.7);
+            transform: translate3d(0, 0, 0) rotate(0deg) scale(0.7);
             opacity: 0;
           }
 
@@ -170,18 +169,13 @@ export default function GiftPlaneWidget() {
             opacity: 1;
           }
 
-          35% {
-            transform: translate3d(calc(var(--gift-drift) * 0.25), 35vh, 0)
-              rotate(calc(var(--gift-rotate) * 0.35)) scale(0.9);
-          }
-
-          70% {
-            transform: translate3d(calc(var(--gift-drift) * 0.7), 68vh, 0)
-              rotate(calc(var(--gift-rotate) * 0.75)) scale(1);
+          40% {
+            transform: translate3d(calc(var(--gift-drift) * 0.35), 38vh, 0)
+              rotate(calc(var(--gift-rotate) * 0.4)) scale(0.9);
           }
 
           100% {
-            transform: translate3d(var(--gift-drift), 92vh, 0)
+            transform: translate3d(var(--gift-drift), 90vh, 0)
               rotate(var(--gift-rotate)) scale(1);
             opacity: 1;
           }
