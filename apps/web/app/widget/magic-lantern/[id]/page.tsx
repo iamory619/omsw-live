@@ -39,7 +39,7 @@ export default function MagicLanternWidget() {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
     setShowMessage(true);
 
-    const count = Math.min(Math.max((gift.amount || 1) * 3, 8), 60);
+    const count = Math.min(Math.max((gift.amount || 1) * 4, 10), 80);
     const giftImage = gift.giftImage || "/assets/rose.png";
 
     const newGifts: FloatingGift[] = Array.from({ length: count }).map(
@@ -47,22 +47,21 @@ export default function MagicLanternWidget() {
         id: Date.now() + index,
         image: giftImage,
         name: gift.giftName,
-        size: 10 + Math.random() * 6,
+        size: 16 + Math.random() * 8,
 
-        // ตำแหน่งกุหลาบในโหล
-        x: 95 + Math.random() * 110,
-        y: 110 + Math.random() * 90,
+        // ตำแหน่งในโหลแบบเห็นชัด
+        x: 55 + Math.random() * 160,
+        y: 55 + Math.random() * 190,
 
-        rotate: -35 + Math.random() * 70,
-        floatX: -8 + Math.random() * 16,
-        floatY: -8 + Math.random() * 16,
-
-        delay: Math.random() * 0.8,
-        duration: 2.6 + Math.random() * 1.8,
+        rotate: -40 + Math.random() * 80,
+        floatX: -10 + Math.random() * 20,
+        floatY: -10 + Math.random() * 20,
+        delay: Math.random() * 0.5,
+        duration: 2.8 + Math.random() * 1.6,
       }),
     );
 
-    setGifts((prev) => [...prev, ...newGifts].slice(-140));
+    setGifts((prev) => [...prev, ...newGifts].slice(-160));
 
     setTimeout(() => {
       setShowMessage(false);
@@ -99,26 +98,28 @@ export default function MagicLanternWidget() {
         </div>
       )}
 
-      <div className="fixed bottom-[40px] left-1/2 h-[980px] w-[780px] -translate-x-1/2">
-        <div className="absolute bottom-[110px] left-1/2 z-0 h-[420px] w-[340px] -translate-x-1/2 rounded-full bg-purple-500/30 blur-3xl" />
+      <div className="fixed bottom-[40px] left-1/2 h-[820px] w-[720px] -translate-x-1/2">
+        <div className="absolute left-1/2 top-[235px] z-0 h-[360px] w-[330px] -translate-x-1/2 rounded-full bg-purple-500/30 blur-3xl" />
 
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
-          width={980}
-          height={1200}
+          width={900}
+          height={1100}
           priority
-          className="absolute bottom-[-60px] left-1/2 z-10 w-[950px] -translate-x-1/2 pointer-events-none"
+          className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="absolute left-[260px] top-[355px] z-30 h-[330px] w-[260px] overflow-hidden rounded-[45%]">
-          {" "}
+        {/* กล่องนี้คือพื้นที่ข้างในโหล */}
+        <div className="absolute left-[245px] top-[300px] z-30 h-[300px] w-[240px] overflow-hidden rounded-[45%]">
+          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
+
           {gifts.map((gift) => (
             <img
               key={gift.id}
               src={gift.image}
               alt={gift.name}
-              className="animate-float-gift absolute drop-shadow-[0_0_6px_rgba(255,105,180,0.7)]"
+              className="animate-float-gift absolute drop-shadow-[0_0_8px_rgba(255,105,180,0.85)]"
               style={{
                 left: `${gift.x}px`,
                 top: `${gift.y}px`,
@@ -137,13 +138,13 @@ export default function MagicLanternWidget() {
         <Image
           src="/assets/lantern/lantern-front.png"
           alt="Magic lantern front"
-          width={980}
-          height={1200}
+          width={900}
+          height={1100}
           priority
-          className="absolute bottom-[-60px] left-1/2 z-40 w-[950px] -translate-x-1/2 pointer-events-none"
+          className="absolute bottom-[-50px] left-1/2 z-40 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="animate-glow pointer-events-none absolute left-[270px] top-[360px] z-50 h-[280px] w-[240px] rounded-full bg-white/5 blur-sm" />
+        <div className="animate-glow pointer-events-none absolute left-[270px] top-[330px] z-50 h-[250px] w-[210px] rounded-full bg-white/5 blur-sm" />
       </div>
 
       <style jsx>{`
@@ -179,7 +180,7 @@ export default function MagicLanternWidget() {
         @keyframes floatGift {
           0% {
             opacity: 0;
-            transform: translateY(18px) scale(0.6) rotate(0deg);
+            transform: translateY(10px) scale(0.65) rotate(0deg);
           }
 
           20% {
@@ -188,7 +189,7 @@ export default function MagicLanternWidget() {
 
           50% {
             transform: translate(var(--gift-float-x), var(--gift-float-y))
-              scale(1.08) rotate(var(--gift-rotate));
+              scale(1) rotate(var(--gift-rotate));
           }
 
           100% {
@@ -197,7 +198,7 @@ export default function MagicLanternWidget() {
                 calc(var(--gift-float-x) * -0.6),
                 calc(var(--gift-float-y) * -0.6)
               )
-              scale(1) rotate(calc(var(--gift-rotate) * -0.5));
+              scale(0.95) rotate(calc(var(--gift-rotate) * -0.5));
           }
         }
 
