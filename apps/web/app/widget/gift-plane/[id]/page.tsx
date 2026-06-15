@@ -138,8 +138,36 @@ export default function GiftPlaneWidget() {
         ))}
 
         {pileGifts.map((gift, index) => {
-          const row = Math.floor(index / 12);
-          const col = index % 12;
+          const insideLimit = 60;
+          const isOverflow = index >= insideLimit;
+
+          const insideIndex = index;
+          const overflowIndex = index - insideLimit;
+
+          if (isOverflow) {
+            const side = overflowIndex % 2 === 0 ? -1 : 1;
+            const row = Math.floor(overflowIndex / 10);
+            const spread = (overflowIndex % 10) * 18;
+
+            return (
+              <img
+                key={`pile-${gift.id}-${index}`}
+                src={gift.image}
+                alt={gift.name}
+                className="absolute z-40 drop-shadow-[0_0_10px_rgba(255,105,180,0.75)]"
+                style={{
+                  left: `${360 + side * (95 + spread)}px`,
+                  bottom: `${32 + row * 7}px`,
+                  width: `${gift.size * 0.9}px`,
+                  height: `${gift.size * 0.9}px`,
+                  transform: `rotate(${gift.rotate}deg)`,
+                }}
+              />
+            );
+          }
+
+          const row = Math.floor(insideIndex / 12);
+          const col = insideIndex % 12;
           const xJitter = ((index * 37) % 12) - 6;
           const yJitter = ((index * 19) % 8) - 4;
 
