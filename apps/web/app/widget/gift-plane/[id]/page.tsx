@@ -175,7 +175,7 @@ export default function GiftPlaneWidget() {
           }
 
           100% {
-            transform: translate3d(var(--gift-drift), 90vh, 0)
+            transform: translate3d(var(--gift-drift), 50vh, 0)
               rotate(var(--gift-rotate)) scale(1);
             opacity: 1;
           }
