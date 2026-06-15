@@ -35,6 +35,16 @@ type Sparkle = {
   delay: number;
 };
 
+type PetalItem = {
+  id: number;
+  startX: number;
+  startY: number;
+  drift: number;
+  rotate: number;
+  delay: number;
+  size: number;
+};
+
 export default function GiftPlaneWidget() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -47,6 +57,7 @@ export default function GiftPlaneWidget() {
   const [fallingGifts, setFallingGifts] = useState<GiftItem[]>([]);
   const [pileGifts, setPileGifts] = useState<GiftItem[]>([]);
   const [sparkles, setSparkles] = useState<Sparkle[]>([]);
+  const [petals, setPetals] = useState<PetalItem[]>([]);
 
   const createPilePosition = (index: number) => {
     const centerX = 360;
@@ -63,10 +74,7 @@ export default function GiftPlaneWidget() {
           Math.cos(angle) * radius * (0.9 + Math.random() * 0.35) +
           (Math.random() * 18 - 9),
         pileY:
-          36 +
-          layer * 8 +
-          Math.sin(angle) * radius * 0.16 +
-          Math.random() * 8,
+          36 + layer * 8 + Math.sin(angle) * radius * 0.16 + Math.random() * 8,
         pileScale: 0.85 + Math.random() * 0.35,
         z: 22 + layer,
       };
@@ -128,6 +136,20 @@ export default function GiftPlaneWidget() {
       },
     );
 
+    const newPetals: PetalItem[] = Array.from({ length: count * 2 }).map(
+      (_, index) => ({
+        id: Date.now() + 20000 + index,
+        startX: Math.random() * 100,
+        startY: -20 - Math.random() * 40,
+        drift: -80 + Math.random() * 160,
+        rotate: -360 + Math.random() * 720,
+        delay: Math.random() * 1.4,
+        size: 12 + Math.random() * 12,
+      }),
+    );
+
+    setPetals(newPetals);
+
     const newSparkles: Sparkle[] = Array.from({ length: 22 }).map(
       (_, index) => ({
         id: Date.now() + 10000 + index,
@@ -148,6 +170,7 @@ export default function GiftPlaneWidget() {
       setFallingGifts([]);
       setSparkles([]);
       setShowMessage(false);
+      setPetals([]);
     }, 4200);
   };
 
@@ -246,6 +269,24 @@ export default function GiftPlaneWidget() {
         ))}
       </div>
 
+      {petals.map((petal) => (
+        <img
+          key={petal.id}
+          src="/assets/petal.png"
+          alt="petal"
+          className="animate-petal-rain fixed z-40 drop-shadow-[0_0_8px_rgba(255,105,180,0.8)]"
+          style={{
+            left: `${petal.startX}vw`,
+            top: `${petal.startY}px`,
+            width: `${petal.size}px`,
+            height: `${petal.size}px`,
+            animationDelay: `${petal.delay}s`,
+            ["--petal-drift" as string]: `${petal.drift}px`,
+            ["--petal-rotate" as string]: `${petal.rotate}deg`,
+          }}
+        />
+      ))}
+
       <style jsx>{`
         :global(html),
         :global(body) {
@@ -342,6 +383,27 @@ export default function GiftPlaneWidget() {
             opacity: 1;
             scale: 1.25;
           }
+        }
+
+        @keyframes petalRain {
+          0% {
+            opacity: 0;
+            transform: translate3d(0, -60px, 0) rotate(0deg) scale(0.7);
+          }
+
+          10% {
+            opacity: 1;
+          }
+
+          100% {
+            opacity: 0.95;
+            transform: translate3d(var(--petal-drift), 92vh, 0)
+              rotate(var(--petal-rotate)) scale(1);
+          }
+        }
+
+        .animate-petal-rain {
+          animation: petalRain 4.2s linear forwards;
         }
 
         .animate-message {
