@@ -48,11 +48,8 @@ export default function MagicLanternWidget() {
         image: giftImage,
         name: gift.giftName,
         size: 11 + Math.random() * 5,
-
-        // ตำแหน่งดอกไม้ในโหล
         x: 45 + Math.random() * 150,
         y: 45 + Math.random() * 170,
-
         rotate: -40 + Math.random() * 80,
         floatX: -5 + Math.random() * 10,
         floatY: -5 + Math.random() * 10,
@@ -99,19 +96,8 @@ export default function MagicLanternWidget() {
       )}
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
-        <div
-          className="
-    absolute
-    left-[310px]
-    top-[460px]
-    z-0
-    h-[300px]
-    w-[290px]
-    rounded-full
-    bg-purple-500/20
-    blur-3xl
-  "
-        />
+        <div className="absolute left-[310px] top-[460px] z-0 h-[300px] w-[290px] rounded-full bg-purple-500/20 blur-3xl" />
+
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
@@ -121,7 +107,8 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-      <div className="absolute left-[325px] top-[395px] z-30 h-[260px] w-[260px] overflow-hidden rounded-full">          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
+        <div className="absolute left-[325px] top-[395px] z-30 h-[260px] w-[260px] overflow-hidden rounded-full">
+          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
 
           {gifts.map((gift) => (
             <img
@@ -153,11 +140,12 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-40 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-      <div className="animate-glow pointer-events-none absolute left-[345px] top-[455px] z-50 h-[210px] w-[220px] rounded-full bg-white/5 blur-sm" />      </div>
+        <div className="animate-glow pointer-events-none absolute left-[345px] top-[455px] z-50 h-[210px] w-[220px] rounded-full bg-white/5 blur-sm" />
+      </div>
 
-      <style jsx>{`
-        :global(html),
-        :global(body) {
+      <style>{`
+        html,
+        body {
           margin: 0;
           padding: 0;
           overflow: hidden;
