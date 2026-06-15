@@ -47,7 +47,7 @@ export default function MagicLanternWidget() {
         id: Date.now() + index,
         image: giftImage,
         name: gift.giftName,
-        size: 26 + Math.random() * 20,
+        size: 14 + Math.random() * 8,
 
         // ตำแหน่งกุหลาบในโหล
         x: 245 + Math.random() * 210,
@@ -117,7 +117,7 @@ export default function MagicLanternWidget() {
               key={gift.id}
               src={gift.image}
               alt={gift.name}
-              className="animate-float-gift absolute drop-shadow-[0_0_12px_rgba(255,105,180,0.95)]"
+              className="animate-float-gift absolute drop-shadow-[0_0_6px_rgba(255,105,180,0.7)]"
               style={{
                 left: `${gift.x - 230}px`,
                 top: `${gift.y - 330}px`,
