@@ -92,7 +92,7 @@ export default function MagicLanternWidget() {
   return (
     <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
       {showMessage && (
-        <div className="animate-message fixed left-1/2 top-[8vh] z-50 -translate-x-1/2 rounded-3xl border-4 border-purple-200 bg-yellow-700/90 px-8 py-4 text-center text-2xl font-black text-white shadow-[0_0_35px_rgba(168,85,247,0.9)]">
+        <div className="animate-message fixed left-1/2 top-[8vh] z-50 -translate-x-1/2 rounded-3xl border-4 border-purple-200 bg-purple-700/90 px-8 py-4 text-center text-2xl font-black text-white shadow-[0_0_35px_rgba(168,85,247,0.9)]">
           {message}
         </div>
       )}
@@ -118,7 +118,7 @@ export default function MagicLanternWidget() {
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
           width={900}
-          height={1100}
+          height={1100} 
           priority
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
