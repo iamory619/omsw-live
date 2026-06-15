@@ -51,9 +51,9 @@ export default function GiftPlaneWidget() {
         name: gift.giftName,
         rotate: -70 + Math.random() * 140,
         drift,
-        startX: 61 + Math.random() * 2,
-        startY: 24 + Math.random() * 2,
-        fallY: 42 + Math.random() * 4,
+       startX: 54 + Math.random() * 2,
+       startY: 17 + Math.random() * 2,
+       fallY: 50 + Math.random() * 3,
       };
     });
 
