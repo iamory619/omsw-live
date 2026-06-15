@@ -50,7 +50,7 @@ export default function GiftPlaneWidget() {
 
     setTimeout(() => {
       setDrops(newDrops);
-    }, 900);
+    }, 300);
 
     setTimeout(() => {
       setShowPlane(false);
