@@ -63,20 +63,14 @@ export default function GiftPlaneWidget() {
     const centerX = 360;
 
     if (index < 90) {
-      const layer = Math.floor(index / 15);
-      const pos = index % 15;
-      const angle = (pos / 15) * Math.PI * 2;
-      const radius = 18 + layer * 10;
+      const row = Math.floor(index / 18);
+      const pos = index % 18;
 
       return {
-        pileX:
-          centerX +
-          Math.cos(angle) * radius * (0.9 + Math.random() * 0.35) +
-          (Math.random() * 18 - 9),
-        pileY:
-          36 + layer * 8 + Math.sin(angle) * radius * 0.16 + Math.random() * 8,
-        pileScale: 0.85 + Math.random() * 0.35,
-        z: 22 + layer,
+        pileX: 170 + pos * 22 + (Math.random() * 18 - 9),
+        pileY: 36 + row * 8 + Math.random() * 10,
+        pileScale: 0.8 + Math.random() * 0.35,
+        z: 22 + row,
       };
     }
 
@@ -124,7 +118,7 @@ export default function GiftPlaneWidget() {
           image: giftImage,
           name: gift.giftName,
           size: 24 + Math.random() * 18,
-          startX: -330 + Math.random() * 660,
+          startX: -520 + Math.random() * 1040,
           startY: -380 - Math.random() * 220,
           rotate: -180 + Math.random() * 360,
           delay: Math.random() * 0.8,
