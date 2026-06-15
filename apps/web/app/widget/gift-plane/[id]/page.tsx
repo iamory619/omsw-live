@@ -15,14 +15,12 @@ type GiftPayload = {
 
 type DropGift = {
   id: number;
+  delay: number;
   size: number;
   image: string;
   name: string;
   rotate: number;
   drift: number;
-  startX: number;
-  startY: number;
-  fallY: number;
 };
 
 export default function GiftPlaneWidget() {
@@ -32,7 +30,6 @@ export default function GiftPlaneWidget() {
   const [showPlane, setShowPlane] = useState(false);
   const [message, setMessage] = useState("");
   const [drops, setDrops] = useState<DropGift[]>([]);
-  const [landedDrops, setLandedDrops] = useState<DropGift[]>([]);
 
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
@@ -41,32 +38,19 @@ export default function GiftPlaneWidget() {
 
     const dropCount = Math.min(gift.amount || 1, 30);
 
-    const newDrops = Array.from({ length: dropCount }).map((_, index) => {
-      const drift = -12 + Math.random() * 24;
+    const newDrops = Array.from({ length: dropCount }).map((_, index) => ({
+      id: Date.now() + index,
+      delay: index * 0.12,
+      size: 28 + Math.random() * 8,
+      image: gift.giftImage || "/assets/rose.png",
+      name: gift.giftName,
+      rotate: -80 + Math.random() * 160,
+      drift: -25 + Math.random() * 50,
+    }));
 
-      return {
-        id: Date.now() + index,
-        size: 28 + Math.random() * 8,
-        image: gift.giftImage || "/assets/rose.png",
-        name: gift.giftName,
-        rotate: -70 + Math.random() * 140,
-        drift,
-       startX: 54 + Math.random() * 2,
-       startY: 17 + Math.random() * 2,
-       fallY: 50 + Math.random() * 3,
-      };
-    });
-
-    newDrops.forEach((drop, index) => {
-      setTimeout(() => {
-        setDrops((prev) => [...prev, drop]);
-      }, 500 + index * 120);
-
-      setTimeout(() => {
-        setDrops((prev) => prev.filter((item) => item.id !== drop.id));
-        setLandedDrops((prev) => [...prev, drop].slice(-120));
-      }, 3200 + index * 120);
-    });
+    setTimeout(() => {
+      setDrops(newDrops);
+    }, 300);
 
     setTimeout(() => {
       setShowPlane(false);
@@ -93,7 +77,6 @@ export default function GiftPlaneWidget() {
       setShowPlane(false);
       setMessage("");
       setDrops([]);
-      setLandedDrops([]);
     });
 
     return () => {
@@ -105,7 +88,7 @@ export default function GiftPlaneWidget() {
     <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
       {showPlane && (
         <div className="animate-plane fixed left-0 top-0 z-50">
-          <div className="relative h-[180px] w-[900px]">
+          <div className="relative h-[520px] w-[900px]">
             <div className="absolute left-[180px] top-[72px] z-20 w-[280px] rotate-[-3deg] rounded-full border-4 border-white bg-pink-500/90 px-4 py-2 text-center text-base font-black text-white shadow-2xl">
               {message || "Thank you!"}
             </div>
@@ -124,48 +107,30 @@ export default function GiftPlaneWidget() {
             <div className="animate-sparkle absolute left-[460px] top-[130px] text-2xl">
               ✨✨✨
             </div>
+
+            {drops.map((gift) => (
+              <div
+                key={gift.id}
+                className="animate-gift-drop absolute left-[545px] top-[125px] z-40 drop-shadow-xl"
+                style={{
+                  animationDelay: `${gift.delay}s`,
+                  ["--gift-drift" as string]: `${gift.drift}px`,
+                  ["--gift-rotate" as string]: `${gift.rotate}deg`,
+                }}
+              >
+                <img
+                  src={gift.image}
+                  alt={gift.name}
+                  style={{
+                    width: `${gift.size}px`,
+                    height: `${gift.size}px`,
+                  }}
+                />
+              </div>
+            ))}
           </div>
         </div>
       )}
-
-      {drops.map((gift) => (
-        <div
-          key={gift.id}
-          className="animate-gift-fall fixed z-[999] drop-shadow-xl"
-          style={{
-            left: `${gift.startX}vw`,
-            top: `${gift.startY}vh`,
-            ["--gift-drift" as string]: `${gift.drift}px`,
-            ["--gift-fall" as string]: `${gift.fallY}vh`,
-            ["--gift-rotate" as string]: `${gift.rotate}deg`,
-          }}
-        >
-          <img
-            src={gift.image}
-            alt={gift.name}
-            style={{
-              width: `${gift.size}px`,
-              height: `${gift.size}px`,
-            }}
-          />
-        </div>
-      ))}
-
-      {landedDrops.map((gift) => (
-        <img
-          key={`landed-${gift.id}`}
-          src={gift.image}
-          alt={gift.name}
-          className="fixed z-[998] drop-shadow-xl"
-          style={{
-            left: `calc(${gift.startX}vw + ${gift.drift}px)`,
-            top: `calc(${gift.startY}vh + ${gift.fallY}vh)`,
-            width: `${gift.size}px`,
-            height: `${gift.size}px`,
-            transform: `rotate(${gift.rotate}deg)`,
-          }}
-        />
-      ))}
 
       <style jsx>{`
         :global(html),
@@ -200,9 +165,9 @@ export default function GiftPlaneWidget() {
           }
         }
 
-        @keyframes giftFall {
+        @keyframes giftDrop {
           0% {
-            transform: translate3d(0, 0, 0) rotate(0deg) scale(0.7);
+            transform: translate(0, 0) rotate(0deg) scale(0.7);
             opacity: 0;
           }
 
@@ -210,9 +175,17 @@ export default function GiftPlaneWidget() {
             opacity: 1;
           }
 
+          75% {
+            transform: translate(calc(var(--gift-drift) * 0.7), 310px)
+              rotate(calc(var(--gift-rotate) * 0.7))
+              scale(0.95);
+            opacity: 1;
+          }
+
           100% {
-            transform: translate3d(var(--gift-drift), var(--gift-fall), 0)
-              rotate(var(--gift-rotate)) scale(1);
+            transform: translate(var(--gift-drift), 360px)
+              rotate(var(--gift-rotate))
+              scale(1);
             opacity: 1;
           }
         }
@@ -234,8 +207,9 @@ export default function GiftPlaneWidget() {
           animation: plane 5.5s ease-in-out forwards;
         }
 
-        .animate-gift-fall {
-          animation: giftFall 2.7s ease-in forwards;
+        .animate-gift-drop {
+          animation: giftDrop 2.8s ease-in forwards;
+          animation-fill-mode: forwards;
         }
 
         .animate-sparkle {
