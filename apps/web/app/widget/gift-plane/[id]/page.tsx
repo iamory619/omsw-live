@@ -42,7 +42,7 @@ export default function GiftPlaneWidget() {
       id: Date.now() + index,
       left: 25 + Math.random() * 45,
       delay: index * 0.08 + Math.random() * 0.4,
-      size: 30 + Math.random() * 18,
+      size: 40 + Math.random() * 20,
       image: gift.giftImage || "/assets/gift-box.png",
       name: gift.giftName,
       rotate: -180 + Math.random() * 360,
@@ -83,7 +83,7 @@ export default function GiftPlaneWidget() {
       {showPlane && (
         <div className="animate-plane fixed left-0 top-0 z-50">
           <div className="relative h-[180px] w-[900px]">
-            <div className="absolute left-[50px] top-[72px] z-20 w-[380px] rotate-[-3deg] rounded-full border-4 border-white bg-pink-500/90 px-6 py-3 text-center text-xl font-black text-white shadow-2xl">
+            <div className="absolute left-[50px] top-[72px] z-20 w-[280px] rotate-[-3deg] rounded-full border-4 border-white bg-pink-500/90 px-4 py-2 text-center text-base font-black text-white shadow-2xl">
               {message || "Thank you!"}
             </div>
 
@@ -138,7 +138,7 @@ export default function GiftPlaneWidget() {
 
         @keyframes plane {
           0% {
-            transform: translateX(-900px) translateY(10vh) rotate(-3deg);
+            transform: translateX(-900px) translateY(3vh) rotate(-2deg);
             opacity: 0;
           }
 
@@ -147,15 +147,15 @@ export default function GiftPlaneWidget() {
           }
 
           50% {
-            transform: translateX(20vw) translateY(12vh) rotate(-2deg);
+            transform: translateX(20vw) translateY(5vh) rotate(-1deg);
           }
 
           80% {
-            transform: translateX(55vw) translateY(8vh) rotate(2deg);
+            transform: translateX(55vw) translateY(3vh) rotate(1deg);
           }
 
           100% {
-            transform: translateX(120vw) translateY(10vh) rotate(3deg);
+            transform: translateX(120vw) translateY(4vh) rotate(2deg);
             opacity: 0;
           }
         }
