@@ -19,11 +19,11 @@ const BASKETS = [
     name: "Treasure Chest",
     image: "/assets/baskets/chest-1.png",
   },
-  {
-    id: "cat-basket",
-    name: "Cat Basket",
-    image: "/assets/baskets/cat-basket.png",
-  },
+  // {
+  //   id: "cat-basket",
+  //   name: "Cat Basket",
+  //   image: "/assets/baskets/cat-basket.png",
+  // },
 ];
 
 export default function DashboardPage() {
