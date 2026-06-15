@@ -50,8 +50,8 @@ export default function MagicLanternWidget() {
         size: 14 + Math.random() * 8,
 
         // ตำแหน่งกุหลาบในโหล
-        x: 245 + Math.random() * 210,
-        y: 360 + Math.random() * 210,
+        x: 80 + Math.random() * 160,
+        y: 70 + Math.random() * 190,
 
         rotate: -35 + Math.random() * 70,
         floatX: -20 + Math.random() * 40,
@@ -111,7 +111,8 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-60px] left-1/2 z-10 w-[950px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="absolute left-[230px] top-[700px] z-30 h-[330px] w-[320px] overflow-hidden rounded-[45%]">
+        <div className="absolute left-[260px] top-[300px] z-30 h-[330px] w-[260px] overflow-hidden rounded-[45%]">
+          {" "}
           {gifts.map((gift) => (
             <img
               key={gift.id}
@@ -119,8 +120,8 @@ export default function MagicLanternWidget() {
               alt={gift.name}
               className="animate-float-gift absolute drop-shadow-[0_0_6px_rgba(255,105,180,0.7)]"
               style={{
-                left: `${gift.x - 230}px`,
-                top: `${gift.y - 330}px`,
+                left: `${gift.x}px`,
+                top: `${gift.y}px`,
                 width: `${gift.size}px`,
                 height: `${gift.size}px`,
                 animationDelay: `${gift.delay}s`,
