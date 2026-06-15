@@ -89,16 +89,16 @@ export default function MagicLanternWidget() {
         </div>
       )}
 
-      <div className="fixed bottom-8 left-1/2 h-[560px] w-[360px] -translate-x-1/2">
+      <div className="fixed bottom-4 left-1/2 h-[900px] w-[600px] -translate-x-1/2">
         <div className="absolute bottom-8 left-1/2 z-0 h-[360px] w-[260px] -translate-x-1/2 rounded-full bg-purple-500/25 blur-3xl" />
 
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
-          width={360}
-          height={560}
+          width={600}
+          height={900}
           priority
-          className="absolute bottom-0 left-0 z-10 w-[360px]"
+          className="absolute bottom-0 left-0 z-10 w-[600px]"
         />
 
         {gifts.map((gift) => (
@@ -121,10 +121,10 @@ export default function MagicLanternWidget() {
         <Image
           src="/assets/lantern/lantern-front.png"
           alt="Magic lantern front"
-          width={360}
-          height={560}
+          width={600}
+          height={900}
           priority
-          className="absolute bottom-0 left-0 z-30 w-[360px]"
+          className="absolute bottom-0 left-0 z-30 w-[600px]"
         />
 
         <div className="animate-glow absolute bottom-[110px] left-1/2 z-40 h-[220px] w-[170px] -translate-x-1/2 rounded-full border border-purple-300/20 bg-white/5 blur-sm" />
