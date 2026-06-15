@@ -42,8 +42,7 @@ export default function GiftPlaneWidget() {
 
     const dropCount = Math.min(gift.amount || 1, 30);
 
-    const driftRange =
-      gift.amount <= 1 ? 18 : gift.amount <= 10 ? 60 : 120;
+    const driftRange = gift.amount <= 1 ? 18 : gift.amount <= 10 ? 60 : 120;
 
     const newDrops = Array.from({ length: dropCount }).map((_, index) => ({
       id: Date.now() + index,
@@ -53,20 +52,26 @@ export default function GiftPlaneWidget() {
       name: gift.giftName,
       rotate: -90 + Math.random() * 180,
       drift: -driftRange / 2 + Math.random() * driftRange,
-      startX: 58 + Math.random() * 2,
-      startY: 24 + Math.random() * 2,
-      fallY: 38 + Math.random() * 4,
+      startX: 56 + Math.random() * 3,
+      startY: 16 + Math.random() * 2,
+      fallY: 55 + Math.random() * 5,
     }));
 
     newDrops.forEach((drop, index) => {
-      setTimeout(() => {
-        setDrops((prev) => [...prev, drop]);
-      }, 900 + index * 120);
+      setTimeout(
+        () => {
+          setDrops((prev) => [...prev, drop]);
+        },
+        500 + index * 120,
+      );
 
-      setTimeout(() => {
-        setLandedDrops((prev) => [...prev, drop].slice(-120));
-        setDrops((prev) => prev.filter((item) => item.id !== drop.id));
-      }, 4300 + index * 120);
+      setTimeout(
+        () => {
+          setLandedDrops((prev) => [...prev, drop].slice(-120));
+          setDrops((prev) => prev.filter((item) => item.id !== drop.id));
+        },
+        3600 + index * 120,
+      );
     });
 
     setTimeout(() => {
@@ -213,7 +218,11 @@ export default function GiftPlaneWidget() {
           }
 
           45% {
-            transform: translate3d(calc(var(--gift-drift) * 0.45), calc(var(--gift-fall) * 0.5), 0)
+            transform: translate3d(
+                calc(var(--gift-drift) * 0.45),
+                calc(var(--gift-fall) * 0.5),
+                0
+              )
               rotate(calc(var(--gift-rotate) * 0.45)) scale(0.9);
           }
 
