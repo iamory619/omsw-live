@@ -200,7 +200,7 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="mb-4 overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950">
-                    <iframe src={widget.url} className="h-56 w-full" />
+                    <iframe src={widget.url} className="h-[450px] w-full" />
                   </div>
 
                   <input
