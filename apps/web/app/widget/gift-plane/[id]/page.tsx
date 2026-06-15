@@ -40,18 +40,18 @@ export default function GiftPlaneWidget() {
 
     const newDrops = Array.from({ length: dropCount }).map((_, index) => ({
       id: Date.now() + index,
-      left: 25 + Math.random() * 45,
-      delay: index * 0.08 + Math.random() * 0.4,
-      size: 40 + Math.random() * 20,
+      left: 62 + Math.random() * 6,
+      delay: index * 0.18 + Math.random() * 0.25,
+      size: 32 + Math.random() * 16,
       image: gift.giftImage || "/assets/gift-box.png",
       name: gift.giftName,
-      rotate: -180 + Math.random() * 360,
-      drift: -80 + Math.random() * 160,
+      rotate: -160 + Math.random() * 320,
+      drift: -120 + Math.random() * 240,
     }));
 
     setTimeout(() => {
       setDrops((prev) => [...prev, ...newDrops].slice(-120));
-    }, 1200);
+    }, 1000);
 
     setTimeout(() => {
       setShowPlane(false);
@@ -162,17 +162,22 @@ export default function GiftPlaneWidget() {
 
         @keyframes giftFall {
           0% {
-            transform: translate3d(0, 12vh, 0) rotate(0deg) scale(0.75);
+            transform: translate3d(0, 10vh, 0) rotate(0deg) scale(0.7);
             opacity: 0;
           }
 
-          12% {
+          10% {
             opacity: 1;
           }
 
-          45% {
-            transform: translate3d(calc(var(--gift-drift) * 0.4), 45vh, 0)
-              rotate(calc(var(--gift-rotate) * 0.4)) scale(0.95);
+          35% {
+            transform: translate3d(calc(var(--gift-drift) * 0.25), 35vh, 0)
+              rotate(calc(var(--gift-rotate) * 0.35)) scale(0.9);
+          }
+
+          70% {
+            transform: translate3d(calc(var(--gift-drift) * 0.7), 68vh, 0)
+              rotate(calc(var(--gift-rotate) * 0.75)) scale(1);
           }
 
           100% {
@@ -201,8 +206,8 @@ export default function GiftPlaneWidget() {
 
         .animate-gift-fall {
           animation-name: giftFall;
-          animation-duration: 4.2s;
-          animation-timing-function: ease-in;
+          animation-duration: 4.5s;
+          animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
           animation-fill-mode: forwards;
         }
 
