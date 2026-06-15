@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from "next/navigation";
 import Image from "next/image";
@@ -15,7 +15,6 @@ type GiftPayload = {
 
 type DropGift = {
   id: number;
-  delay: number;
   size: number;
   image: string;
   name: string;
@@ -30,10 +29,44 @@ export default function GiftPlaneWidget() {
   const params = useParams();
   const overlayId = params.id as string;
 
+  const dropPointRef = useRef<HTMLDivElement | null>(null);
+
   const [showPlane, setShowPlane] = useState(false);
   const [message, setMessage] = useState("");
   const [drops, setDrops] = useState<DropGift[]>([]);
   const [landedDrops, setLandedDrops] = useState<DropGift[]>([]);
+
+  const createDrop = (gift: GiftPayload, index: number) => {
+    const point = dropPointRef.current;
+    if (!point) return;
+
+    const rect = point.getBoundingClientRect();
+
+    const size = 26 + Math.random() * 10;
+    const drift = -18 + Math.random() * 36;
+    const startX = rect.left + Math.random() * 12;
+    const startY = rect.top + Math.random() * 8;
+    const fallY = Math.max(120, window.innerHeight - startY - 70);
+
+    const drop: DropGift = {
+      id: Date.now() + index,
+      size,
+      image: gift.giftImage || "/assets/gift-box.png",
+      name: gift.giftName,
+      rotate: -90 + Math.random() * 180,
+      drift,
+      startX,
+      startY,
+      fallY,
+    };
+
+    setDrops((prev) => [...prev, drop]);
+
+    setTimeout(() => {
+      setDrops((prev) => prev.filter((item) => item.id !== drop.id));
+      setLandedDrops((prev) => [...prev, drop].slice(-120));
+    }, 2800);
+  };
 
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
@@ -42,36 +75,10 @@ export default function GiftPlaneWidget() {
 
     const dropCount = Math.min(gift.amount || 1, 30);
 
-    const driftRange = gift.amount <= 1 ? 18 : gift.amount <= 10 ? 60 : 120;
-
-    const newDrops = Array.from({ length: dropCount }).map((_, index) => ({
-      id: Date.now() + index,
-      delay: index * 0.12 + Math.random() * 0.15,
-      size: 26 + Math.random() * 10,
-      image: gift.giftImage || "/assets/gift-box.png",
-      name: gift.giftName,
-      rotate: -90 + Math.random() * 180,
-      drift: -driftRange / 2 + Math.random() * driftRange,
-      startX: 60 + Math.random() * 2,
-      startY: 28 + Math.random() * 2,
-      fallY: 43 + Math.random() * 4,
-    }));
-
-    newDrops.forEach((drop, index) => {
-      setTimeout(
-        () => {
-          setDrops((prev) => [...prev, drop]);
-        },
-        350 + index * 120,
-      );
-
-      setTimeout(
-        () => {
-          setLandedDrops((prev) => [...prev, drop].slice(-120));
-          setDrops((prev) => prev.filter((item) => item.id !== drop.id));
-        },
-        3600 + index * 120,
-      );
+    Array.from({ length: dropCount }).forEach((_, index) => {
+      setTimeout(() => {
+        createDrop(gift, index);
+      }, 700 + index * 140);
     });
 
     setTimeout(() => {
@@ -116,7 +123,7 @@ export default function GiftPlaneWidget() {
               {message || "Thank you!"}
             </div>
 
-            <div className="absolute left-[420px] top-[112px] z-10 h-[3px] w-[95px] bg-white/80" />
+            <div className="absolute left-[420px] top-[112px] z-10 h-[95px] w-[95px] border-t-[3px] border-white/80" />
 
             <Image
               src="/assets/plane.png"
@@ -125,6 +132,11 @@ export default function GiftPlaneWidget() {
               height={150}
               priority
               className="absolute left-[450px] top-[30px] z-50 w-[260px]"
+            />
+
+            <div
+              ref={dropPointRef}
+              className="absolute left-[560px] top-[135px] z-50 h-3 w-3 rounded-full"
             />
 
             <div className="animate-sparkle absolute left-[460px] top-[130px] text-2xl">
@@ -139,12 +151,11 @@ export default function GiftPlaneWidget() {
           key={gift.id}
           className="animate-gift-fall fixed z-10 drop-shadow-xl"
           style={{
-            left: `${gift.startX}vw`,
-            top: `${gift.startY}vh`,
-            animationDelay: `${gift.delay}s`,
+            left: `${gift.startX}px`,
+            top: `${gift.startY}px`,
             ["--gift-rotate" as string]: `${gift.rotate}deg`,
             ["--gift-drift" as string]: `${gift.drift}px`,
-            ["--gift-fall" as string]: `${gift.fallY}vh`,
+            ["--gift-fall" as string]: `${gift.fallY}px`,
           }}
         >
           <img
@@ -165,8 +176,8 @@ export default function GiftPlaneWidget() {
           alt={gift.name}
           className="fixed z-20 drop-shadow-xl"
           style={{
-            left: `calc(${gift.startX}vw + ${gift.drift}px)`,
-            top: `calc(${gift.startY}vh + ${gift.fallY}vh)`,
+            left: `${gift.startX + gift.drift}px`,
+            top: `${gift.startY + gift.fallY}px`,
             width: `${gift.size}px`,
             height: `${gift.size}px`,
             transform: `rotate(${gift.rotate}deg)`,
@@ -213,17 +224,13 @@ export default function GiftPlaneWidget() {
             opacity: 0;
           }
 
-          10% {
+          15% {
             opacity: 1;
           }
 
-          45% {
-            transform: translate3d(
-                calc(var(--gift-drift) * 0.45),
-                calc(var(--gift-fall) * 0.5),
-                0
-              )
-              rotate(calc(var(--gift-rotate) * 0.45)) scale(0.9);
+          60% {
+            transform: translate3d(calc(var(--gift-drift) * 0.5), calc(var(--gift-fall) * 0.65), 0)
+              rotate(calc(var(--gift-rotate) * 0.5)) scale(0.9);
           }
 
           100% {
@@ -252,7 +259,7 @@ export default function GiftPlaneWidget() {
 
         .animate-gift-fall {
           animation-name: giftFall;
-          animation-duration: 3.3s;
+          animation-duration: 2.8s;
           animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
           animation-fill-mode: forwards;
         }
