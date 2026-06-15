@@ -53,11 +53,10 @@ export default function GiftPlaneWidget() {
     }, 300);
 
     setTimeout(() => {
-      setShowPlane(false);
-      setMessage("");
-      setDrops([]);
-    }, 5600);
-  };
+  setShowPlane(false);
+  setMessage("");
+  setDrops([]);
+}, 9000);
 
   useEffect(() => {
     if (!overlayId) return;
@@ -182,12 +181,12 @@ export default function GiftPlaneWidget() {
             opacity: 1;
           }
 
-          100% {
-            transform: translate(var(--gift-drift), 360px)
-              rotate(var(--gift-rotate))
-              scale(1);
-            opacity: 1;
-          }
+       100% {
+  transform: translate(var(--gift-drift), 360px)
+    rotate(var(--gift-rotate))
+    scale(1);
+  opacity: 1;
+}
         }
 
         @keyframes sparkle {
