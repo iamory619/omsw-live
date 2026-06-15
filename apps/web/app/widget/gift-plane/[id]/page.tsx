@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from "next/navigation";
 import Image from "next/image";
@@ -28,11 +28,40 @@ type DropGift = {
 export default function GiftPlaneWidget() {
   const params = useParams();
   const overlayId = params.id as string;
+  const dropPointRef = useRef<HTMLDivElement | null>(null);
 
   const [showPlane, setShowPlane] = useState(false);
   const [message, setMessage] = useState("");
   const [drops, setDrops] = useState<DropGift[]>([]);
   const [landedDrops, setLandedDrops] = useState<DropGift[]>([]);
+
+  const createDrop = (gift: GiftPayload, index: number) => {
+    const point = dropPointRef.current;
+    if (!point) return;
+
+    const rect = point.getBoundingClientRect();
+    const drift = -18 + Math.random() * 36;
+    const size = 26 + Math.random() * 10;
+
+    const drop: DropGift = {
+      id: Date.now() + index,
+      size,
+      image: gift.giftImage || "/assets/gift-box.png",
+      name: gift.giftName,
+      rotate: -90 + Math.random() * 180,
+      drift,
+      startX: rect.left + Math.random() * 8,
+      startY: rect.top + Math.random() * 6,
+      fallY: Math.max(180, window.innerHeight - rect.top - 90),
+    };
+
+    setDrops((prev) => [...prev, drop]);
+
+    setTimeout(() => {
+      setDrops((prev) => prev.filter((item) => item.id !== drop.id));
+      setLandedDrops((prev) => [...prev, drop].slice(-120));
+    }, 2700);
+  };
 
   const playEffect = (text: string, gift: GiftPayload) => {
     setMessage(text);
@@ -41,31 +70,10 @@ export default function GiftPlaneWidget() {
 
     const dropCount = Math.min(gift.amount || 1, 30);
 
-    const newDrops = Array.from({ length: dropCount }).map((_, index) => {
-      const drift = -18 + Math.random() * 36;
-
-      return {
-        id: Date.now() + index,
-        size: 26 + Math.random() * 10,
-        image: gift.giftImage || "/assets/gift-box.png",
-        name: gift.giftName,
-        rotate: -90 + Math.random() * 180,
-        drift,
-        startX: 63 + Math.random() * 3,
-        startY: 26 + Math.random() * 2,
-        fallY: 42 + Math.random() * 4,
-      };
-    });
-
-    newDrops.forEach((drop, index) => {
+    Array.from({ length: dropCount }).forEach((_, index) => {
       setTimeout(() => {
-        setDrops((prev) => [...prev, drop]);
-      }, 900 + index * 120);
-
-      setTimeout(() => {
-        setDrops((prev) => prev.filter((item) => item.id !== drop.id));
-        setLandedDrops((prev) => [...prev, drop].slice(-120));
-      }, 3600 + index * 120);
+        createDrop(gift, index);
+      }, 700 + index * 130);
     });
 
     setTimeout(() => {
@@ -121,6 +129,11 @@ export default function GiftPlaneWidget() {
               className="absolute left-[450px] top-[30px] z-50 w-[260px]"
             />
 
+            <div
+              ref={dropPointRef}
+              className="absolute left-[560px] top-[128px] z-50 h-3 w-3"
+            />
+
             <div className="animate-sparkle absolute left-[460px] top-[130px] text-2xl">
               ✨✨✨
             </div>
@@ -133,10 +146,10 @@ export default function GiftPlaneWidget() {
           key={gift.id}
           className="animate-gift-fall fixed z-40 drop-shadow-xl"
           style={{
-            left: `${gift.startX}vw`,
-            top: `${gift.startY}vh`,
+            left: `${gift.startX}px`,
+            top: `${gift.startY}px`,
             ["--gift-drift" as string]: `${gift.drift}px`,
-            ["--gift-fall" as string]: `${gift.fallY}vh`,
+            ["--gift-fall" as string]: `${gift.fallY}px`,
             ["--gift-rotate" as string]: `${gift.rotate}deg`,
           }}
         >
@@ -158,8 +171,8 @@ export default function GiftPlaneWidget() {
           alt={gift.name}
           className="fixed z-30 drop-shadow-xl"
           style={{
-            left: `calc(${gift.startX}vw + ${gift.drift}px)`,
-            top: `calc(${gift.startY}vh + ${gift.fallY}vh)`,
+            left: `${gift.startX + gift.drift}px`,
+            top: `${gift.startY + gift.fallY}px`,
             width: `${gift.size}px`,
             height: `${gift.size}px`,
             transform: `rotate(${gift.rotate}deg)`,
