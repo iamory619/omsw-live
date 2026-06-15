@@ -3,10 +3,34 @@
 import { useMemo, useState } from "react";
 import { io } from "socket.io-client";
 
+const BASKETS = [
+  {
+    id: "basket-1",
+    name: "Basket 1",
+    image: "/assets/baskets/basket-1.png",
+  },
+  {
+    id: "basket-2",
+    name: "Basket 2",
+    image: "/assets/baskets/basket-2.png",
+  },
+  {
+    id: "chest-1",
+    name: "Treasure Chest",
+    image: "/assets/baskets/chest-1.png",
+  },
+  {
+    id: "cat-basket",
+    name: "Cat Basket",
+    image: "/assets/baskets/cat-basket.png",
+  },
+];
+
 export default function DashboardPage() {
   const [username, setUsername] = useState("");
   const [overlayId, setOverlayId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedBasket, setSelectedBasket] = useState("basket-1");
 
   const socket = useMemo(() => {
     return io("https://server-production-b88b.up.railway.app");
@@ -25,13 +49,16 @@ export default function DashboardPage() {
     try {
       setLoading(true);
 
-      const res = await fetch("https://server-production-b88b.up.railway.app/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const res = await fetch(
+        "https://server-production-b88b.up.railway.app/connect",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username }),
         },
-        body: JSON.stringify({ username }),
-      });
+      );
 
       const data = await res.json();
 
@@ -77,10 +104,11 @@ export default function DashboardPage() {
           active: true,
         },
         {
-          name: "✈️ Gift Plane",
-          description: "เครื่องบินบินผ่านและโปรยของขวัญเต็มจอ",
-          url: `${window.location.origin}/widget/gift-plane/${overlayId}`,
+          name: "🧺 Gift Basket",
+          description: "ของขวัญตกลงตะกร้าและกองสะสมบนจอ",
+          url: `${window.location.origin}/widget/gift-plane/${overlayId}?basket=${selectedBasket}`,
           active: true,
+          basketPicker: true,
         },
         {
           name: "🐱 Evolution Pet",
@@ -199,8 +227,42 @@ export default function DashboardPage() {
                     )}
                   </div>
 
+                  {widget.basketPicker && (
+                    <div className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                      <div className="mb-3 font-bold">เลือกตะกร้า</div>
+
+                      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                        {BASKETS.map((basket) => (
+                          <button
+                            key={basket.id}
+                            onClick={() => setSelectedBasket(basket.id)}
+                            className={`rounded-2xl border p-3 transition ${
+                              selectedBasket === basket.id
+                                ? "border-pink-500 bg-pink-500/20"
+                                : "border-zinc-700 bg-zinc-900 hover:bg-zinc-800"
+                            }`}
+                          >
+                            <img
+                              src={basket.image}
+                              alt={basket.name}
+                              className="mx-auto mb-2 h-20 object-contain"
+                            />
+
+                            <div className="text-sm font-bold">
+                              {basket.name}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="mb-4 overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950">
-                    <iframe src={widget.url} className="h-[560px] w-full" />
+                    <iframe
+                      key={widget.url}
+                      src={widget.url}
+                      className="h-[560px] w-full"
+                    />
                   </div>
 
                   <input

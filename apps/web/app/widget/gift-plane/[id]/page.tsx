@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 type GiftPayload = {
@@ -33,7 +33,10 @@ type Sparkle = {
 
 export default function GiftPlaneWidget() {
   const params = useParams();
+  const searchParams = useSearchParams();
+
   const overlayId = params.id as string;
+  const basket = searchParams.get("basket") || "basket-1";
 
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
@@ -54,17 +57,17 @@ export default function GiftPlaneWidget() {
         image: giftImage,
         name: gift.giftName,
         size: 28 + Math.random() * 24,
-        x: -260 + Math.random() * 520,
+        x: -220 + Math.random() * 440,
         y: -20 - Math.random() * 180,
         rotate: -120 + Math.random() * 240,
-        delay: Math.random() * 0.45,
+        delay: Math.random() * 0.35,
       }),
     );
 
     const newSparkles: Sparkle[] = Array.from({ length: 22 }).map(
       (_, index) => ({
         id: Date.now() + 10000 + index,
-        x: -260 + Math.random() * 520,
+        x: -240 + Math.random() * 480,
         y: -250 + Math.random() * 260,
         delay: Math.random() * 1.2,
       }),
@@ -137,8 +140,8 @@ export default function GiftPlaneWidget() {
         {pileGifts.map((gift, index) => {
           const row = Math.floor(index / 12);
           const col = index % 12;
-          const xJitter = ((index * 37) % 22) - 11;
-          const yJitter = ((index * 19) % 12) - 6;
+          const xJitter = ((index * 37) % 12) - 6;
+          const yJitter = ((index * 19) % 8) - 4;
 
           return (
             <img
@@ -158,7 +161,7 @@ export default function GiftPlaneWidget() {
         })}
 
         <Image
-          src="/assets/gift-basket.png"
+          src={`/assets/baskets/${basket}.png`}
           alt="Gift basket"
           width={260}
           height={160}
@@ -224,10 +227,7 @@ export default function GiftPlaneWidget() {
 
           75% {
             opacity: 1;
-            transform: translate(
-                calc(var(--gift-x) * 0.25),
-                130px
-              )
+            transform: translate(calc(var(--gift-x) * 0.25), 130px)
               rotate(calc(var(--gift-rotate) * 0.6)) scale(1);
           }
 
