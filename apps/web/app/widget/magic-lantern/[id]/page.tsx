@@ -48,11 +48,8 @@ export default function MagicLanternWidget() {
         image: giftImage,
         name: gift.giftName,
         size: 11 + Math.random() * 5,
-
-        // ตำแหน่งในโหล
         x: 35 + Math.random() * 105,
-        y: 45 + Math.random() * 120,
-
+        y: 30 + Math.random() * 125,
         rotate: -40 + Math.random() * 80,
         floatX: -4 + Math.random() * 8,
         floatY: -4 + Math.random() * 8,
@@ -99,8 +96,6 @@ export default function MagicLanternWidget() {
       )}
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
-        <div className="absolute left-[372px] top-[390px] z-0 h-[210px] w-[170px] rounded-full bg-purple-500/22 blur-3xl" />
-
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
@@ -110,8 +105,14 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="absolute left-[365px] top-[405px] z-30 h-[205px] w-[165px] overflow-hidden rounded-full">
-          <div className="absolute inset-0 rounded-full bg-purple-400/10 blur-xl" />
+        <div
+          className="absolute left-[358px] top-[650px] z-30 h-[210px] w-[180px] overflow-hidden"
+          style={{
+            clipPath:
+              "polygon(50% 0%, 66% 28%, 96% 35%, 74% 56%, 80% 96%, 50% 76%, 20% 96%, 26% 56%, 4% 35%, 34% 28%)",
+          }}
+        >
+          <div className="absolute inset-0 bg-purple-400/10 blur-xl" />
 
           {gifts.map((gift) => (
             <img
@@ -143,7 +144,7 @@ export default function MagicLanternWidget() {
           className="absolute bottom-[-50px] left-1/2 z-40 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="animate-glow pointer-events-none absolute left-[380px] top-[420px] z-50 h-[165px] w-[145px] rounded-full bg-white/5 blur-sm" />
+        <div className="animate-glow pointer-events-none absolute left-[378px] top-[670px] z-50 h-[150px] w-[140px] rounded-full bg-white/5 blur-sm" />
       </div>
 
       <style jsx>{`
