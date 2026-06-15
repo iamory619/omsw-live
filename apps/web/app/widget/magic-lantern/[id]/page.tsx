@@ -45,8 +45,8 @@ export default function MagicLanternWidget() {
         image: giftImage,
         name: gift.giftName,
         size: 18 + Math.random() * 20,
-        x: 95 + Math.random() * 135,
-        y: 150 + Math.random() * 210,
+        x: 230 + Math.random() * 130,
+        y: 260 + Math.random() * 230,
         rotate: -35 + Math.random() * 70,
         delay: Math.random() * 0.8,
       }),
@@ -106,7 +106,7 @@ export default function MagicLanternWidget() {
             key={gift.id}
             src={gift.image}
             alt={gift.name}
-            className="animate-float-gift absolute z-20 drop-shadow-[0_0_12px_rgba(168,85,247,0.9)]"
+            className="animate-float-gift absolute z-40 drop-shadow-[0_0_12px_rgba(168,85,247,0.9)]"
             style={{
               left: `${gift.x}px`,
               top: `${gift.y}px`,
@@ -124,7 +124,7 @@ export default function MagicLanternWidget() {
           width={600}
           height={900}
           priority
-          className="absolute bottom-0 left-0 z-30 w-[600px]"
+          className="absolute bottom-0 left-0 z-50 w-[600px]"
         />
 
         <div className="animate-glow absolute bottom-[110px] left-1/2 z-40 h-[220px] w-[170px] -translate-x-1/2 rounded-full border border-purple-300/20 bg-white/5 blur-sm" />
