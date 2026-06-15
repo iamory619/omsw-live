@@ -52,9 +52,9 @@ export default function GiftPlaneWidget() {
       name: gift.giftName,
       rotate: -90 + Math.random() * 180,
       drift: -driftRange / 2 + Math.random() * driftRange,
-      startX: 56 + Math.random() * 3,
-      startY: 16 + Math.random() * 2,
-      fallY: 55 + Math.random() * 5,
+      startX: 60 + Math.random() * 2,
+      startY: 28 + Math.random() * 2,
+      fallY: 43 + Math.random() * 4,
     }));
 
     newDrops.forEach((drop, index) => {
@@ -62,7 +62,7 @@ export default function GiftPlaneWidget() {
         () => {
           setDrops((prev) => [...prev, drop]);
         },
-        500 + index * 120,
+        350 + index * 120,
       );
 
       setTimeout(
