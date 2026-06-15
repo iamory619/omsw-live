@@ -47,16 +47,14 @@ export default function MagicLanternWidget() {
         id: Date.now() + index,
         image: giftImage,
         name: gift.giftName,
-        size: 24 + Math.random() * 18,
+        size: 26 + Math.random() * 20,
 
-        // ตำแหน่งในโหล
-        x: 250 + Math.random() * 180,
-        y: 260 + Math.random() * 240,
+        // ตำแหน่งกุหลาบในโหล
+        x: 245 + Math.random() * 210,
+        y: 360 + Math.random() * 210,
 
         rotate: -35 + Math.random() * 70,
-
-        // ระยะลอยไปมา
-        floatX: -18 + Math.random() * 36,
+        floatX: -20 + Math.random() * 40,
         floatY: -18 + Math.random() * 36,
 
         delay: Math.random() * 0.8,
@@ -101,28 +99,19 @@ export default function MagicLanternWidget() {
         </div>
       )}
 
-      <div className="fixed bottom-0 left-1/2 h-[900px] w-[700px] -translate-x-1/2">
-        <div className="absolute bottom-[160px] left-1/2 z-0 h-[430px] w-[360px] -translate-x-1/2 rounded-full bg-purple-500/30 blur-3xl" />
+      <div className="fixed bottom-[-40px] left-1/2 h-[980px] w-[780px] -translate-x-1/2">
+        <div className="absolute bottom-[170px] left-1/2 z-0 h-[500px] w-[430px] -translate-x-1/2 rounded-full bg-purple-500/30 blur-3xl" />
 
         <Image
           src="/assets/lantern/lantern-back.png"
           alt="Magic lantern back"
-          width={900}
-          height={1100}
+          width={980}
+          height={1200}
           priority
-          className="
-    absolute
-    bottom-[-40px]
-    left-1/2
-    z-10
-    w-[850px]
-    -translate-x-1/2
-    pointer-events-none
-  "
+          className="absolute bottom-[-60px] left-1/2 z-10 w-[950px] -translate-x-1/2 pointer-events-none"
         />
 
-        <div className="absolute left-[235px] top-[280px] z-30 h-[230px] w-[230px] overflow-hidden rounded-[45%]">
-          {" "}
+        <div className="absolute left-[230px] top-[330px] z-30 h-[330px] w-[320px] overflow-hidden rounded-[45%]">
           {gifts.map((gift) => (
             <img
               key={gift.id}
@@ -130,8 +119,8 @@ export default function MagicLanternWidget() {
               alt={gift.name}
               className="animate-float-gift absolute drop-shadow-[0_0_12px_rgba(255,105,180,0.95)]"
               style={{
-                left: `${gift.x - 235}px`,
-                top: `${gift.y - 280}px`,
+                left: `${gift.x - 230}px`,
+                top: `${gift.y - 330}px`,
                 width: `${gift.size}px`,
                 height: `${gift.size}px`,
                 animationDelay: `${gift.delay}s`,
@@ -147,20 +136,13 @@ export default function MagicLanternWidget() {
         <Image
           src="/assets/lantern/lantern-front.png"
           alt="Magic lantern front"
-          width={900}
-          height={1100}
+          width={980}
+          height={1200}
           priority
-          className="
-    absolute
-    bottom-[-40px]
-    left-1/2
-    z-40
-    w-[850px]
-    -translate-x-1/2
-    pointer-events-none
-  "
+          className="absolute bottom-[-60px] left-1/2 z-40 w-[950px] -translate-x-1/2 pointer-events-none"
         />
-        <div className="animate-glow pointer-events-none absolute left-[250px] top-[190px] z-50 h-[320px] w-[210px] rounded-full bg-white/5 blur-sm" />
+
+        <div className="animate-glow pointer-events-none absolute left-[270px] top-[360px] z-50 h-[280px] w-[240px] rounded-full bg-white/5 blur-sm" />
       </div>
 
       <style jsx>{`
@@ -196,7 +178,7 @@ export default function MagicLanternWidget() {
         @keyframes floatGift {
           0% {
             opacity: 0;
-            transform: translateY(24px) scale(0.5) rotate(0deg);
+            transform: translateY(18px) scale(0.6) rotate(0deg);
           }
 
           20% {
@@ -205,7 +187,7 @@ export default function MagicLanternWidget() {
 
           50% {
             transform: translate(var(--gift-float-x), var(--gift-float-y))
-              scale(1.05) rotate(var(--gift-rotate));
+              scale(1.08) rotate(var(--gift-rotate));
           }
 
           100% {
