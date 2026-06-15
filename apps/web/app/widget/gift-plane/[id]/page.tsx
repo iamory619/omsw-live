@@ -64,10 +64,7 @@ export default function GiftPlaneWidget() {
           Math.cos(angle) * radius * (0.9 + Math.random() * 0.45) +
           (Math.random() * 18 - 9),
         pileY:
-          38 +
-          layer * 9 +
-          Math.sin(angle) * radius * 0.16 +
-          Math.random() * 8,
+          38 + layer * 9 + Math.sin(angle) * radius * 0.16 + Math.random() * 8,
         pileScale: 0.85 + Math.random() * 0.38,
         z: 22 + layer,
       };
@@ -81,9 +78,7 @@ export default function GiftPlaneWidget() {
       const pos = overflowIndex % 12;
 
       return {
-        pileX:
-          centerX +
-          side * (42 + pos * 11 + Math.random() * 12),
+        pileX: centerX + side * (42 + pos * 11 + Math.random() * 12),
         pileY: 28 + row * 7 + Math.random() * 12,
         pileScale: 0.78 + Math.random() * 0.25,
         z: 32 + row,
@@ -97,9 +92,7 @@ export default function GiftPlaneWidget() {
     const pos = groundIndex % 18;
 
     return {
-      pileX:
-        centerX +
-        side * (78 + pos * 17 + Math.random() * 18),
+      pileX: centerX + side * (78 + pos * 17 + Math.random() * 18),
       pileY: 2 + row * 5 + Math.random() * 8,
       pileScale: 0.68 + Math.random() * 0.22,
       z: 12 + row,
@@ -287,20 +280,35 @@ export default function GiftPlaneWidget() {
           0% {
             opacity: 0;
             transform: translate(var(--gift-x), var(--gift-y)) rotate(0deg)
-              scale(0.55);
+              scale(0.45);
           }
 
-          15% {
+          12% {
             opacity: 1;
+          }
+
+          35% {
+            transform: translate(
+                calc(var(--gift-target-x) * 0.25),
+                calc(var(--gift-target-y) * 0.3)
+              )
+              rotate(calc(var(--gift-rotate) * 0.25)) scale(0.8);
           }
 
           70% {
-            opacity: 1;
             transform: translate(
-                calc(var(--gift-target-x) * 0.65),
-                calc(var(--gift-target-y) * 0.75)
+                calc(var(--gift-target-x) * 0.78),
+                calc(var(--gift-target-y) * 0.86)
               )
-              rotate(calc(var(--gift-rotate) * 0.65)) scale(1);
+              rotate(calc(var(--gift-rotate) * 0.75)) scale(1.05);
+          }
+
+          86% {
+            transform: translate(
+                calc(var(--gift-target-x) * 0.96),
+                calc(var(--gift-target-y) * 1.02)
+              )
+              rotate(calc(var(--gift-rotate) * 0.95)) scale(0.96);
           }
 
           100% {
@@ -309,7 +317,6 @@ export default function GiftPlaneWidget() {
               rotate(var(--gift-rotate)) scale(1);
           }
         }
-
         @keyframes pop {
           0% {
             opacity: 0;
@@ -340,7 +347,7 @@ export default function GiftPlaneWidget() {
         }
 
         .animate-fall {
-          animation: fall 1.45s cubic-bezier(0.18, 0.82, 0.28, 1) forwards;
+          animation: fall 1.75s cubic-bezier(0.22, 0.9, 0.28, 1) forwards;
         }
 
         .animate-pop {
