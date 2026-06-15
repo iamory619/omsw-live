@@ -68,7 +68,7 @@ export default function DashboardPage() {
         } else {
           setStatus("server-error");
         }
- 
+
         return;
       }
 
@@ -101,6 +101,12 @@ export default function DashboardPage() {
           name: "🎁 Gift Goal",
           description: "เป้าหมายของขวัญ เช่น Rose 0/100",
           url: `${window.location.origin}/widget/gift-goal/${overlayId}`,
+          active: true,
+        },
+        {
+          name: "🔮 Magic Lantern",
+          description: "ของขวัญลอยสะสมในโคมเวทมนตร์",
+          url: `${window.location.origin}/widget/magic-lantern/${overlayId}`,
           active: true,
         },
         {
