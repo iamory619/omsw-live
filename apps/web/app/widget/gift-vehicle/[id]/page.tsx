@@ -13,20 +13,7 @@ type GiftPayload = {
   giftImage: string;
 };
 
-type DropGift = {
-  id: number;
-  image: string;
-  name: string;
-  size: number;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-  rotate: number;
-  delay: number;
-};
-
-type PileGift = {
+type RoadGift = {
   id: number;
   image: string;
   name: string;
@@ -34,6 +21,7 @@ type PileGift = {
   x: number;
   y: number;
   rotate: number;
+  delay: number;
 };
 
 const VEHICLES: Record<string, string> = {
@@ -53,71 +41,38 @@ export default function GiftVehicleWidget() {
 
   const [message, setMessage] = useState("");
   const [showVehicle, setShowVehicle] = useState(false);
-  const [drops, setDrops] = useState<DropGift[]>([]);
-  const [pile, setPile] = useState<PileGift[]>([]);
+  const [road, setRoad] = useState<RoadGift[]>([]);
 
   const playEffect = (gift: GiftPayload) => {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
-    setShowVehicle(true);
-    setDrops([]);
 
     const giftImage = gift.giftImage || "/assets/rose.png";
-    const count = Math.min(Math.max(gift.amount || 1, 1), 80);
+    const count = Math.min(Math.max(gift.amount || 1, 8), 80);
 
-    const newDrops: DropGift[] = Array.from({ length: count }).map(
+    const newRoad: RoadGift[] = Array.from({ length: count }).map(
       (_, index) => {
-        const progress = count <= 1 ? 0.5 : index / (count - 1);
-
-        // ให้ของขวัญออกจากท้ายรถ ไม่ใช่หน้ารถ
-        const startX = 0 + progress * 500 + Math.random() * 18;
-        const startY = 165 + Math.random() * 20;
-
-        const endX = startX - 35 + Math.random() * 70;
-        const endY = 265 + Math.random() * 35;
+        const progress = count <= 1 ? 0 : index / (count - 1);
 
         return {
           id: Date.now() + index,
           image: giftImage,
           name: gift.giftName,
-          size: 22 + Math.random() * 12,
-          startX,
-          startY,
-          endX,
-          endY,
-          rotate: -100 + Math.random() * 200,
-          delay: 0.65 + index * 0.055,
+          size: 26 + Math.random() * 10,
+          x: 40 + progress * 880,
+          y: 255 + Math.sin(progress * Math.PI * 3) * 18 + Math.random() * 10,
+          rotate: -35 + Math.random() * 70,
+          delay: index * 0.025,
         };
       },
     );
 
-    setTimeout(() => {
-      setDrops(newDrops);
-    }, 350);
-
-    newDrops.forEach((item) => {
-      setTimeout(() => {
-        setPile((prev) =>
-          [
-            ...prev,
-            {
-              id: item.id,
-              image: item.image,
-              name: item.name,
-              size: item.size,
-              x: item.endX,
-              y: item.endY,
-              rotate: item.rotate,
-            },
-          ].slice(-180),
-        );
-      }, (item.delay + 1.25) * 1000);
-    });
+    setRoad(newRoad);
+    setShowVehicle(true);
 
     setTimeout(() => {
       setShowVehicle(false);
-      setDrops([]);
       setMessage("");
-    }, 5800);
+    }, 6000);
   };
 
   useEffect(() => {
@@ -134,8 +89,7 @@ export default function GiftVehicleWidget() {
     socket.on("reset-gift", () => {
       setMessage("");
       setShowVehicle(false);
-      setDrops([]);
-      setPile([]);
+      setRoad([]);
     });
 
     return () => {
@@ -152,10 +106,27 @@ export default function GiftVehicleWidget() {
       )}
 
       <div className="fixed bottom-[70px] left-1/2 h-[430px] w-[980px] -translate-x-1/2">
-        <div className="absolute bottom-[10px] left-1/2 z-0 h-[70px] w-[760px] -translate-x-1/2 rounded-full bg-yellow-500/15 blur-2xl" />
+        <div className="absolute bottom-[35px] left-1/2 z-0 h-[90px] w-[900px] -translate-x-1/2 rounded-full bg-yellow-500/15 blur-2xl" />
+
+        {road.map((gift) => (
+          <img
+            key={gift.id}
+            src={gift.image}
+            alt={gift.name}
+            className="animate-road-gift absolute z-20 drop-shadow-[0_0_10px_rgba(255,105,180,0.85)]"
+            style={{
+              left: `${gift.x}px`,
+              top: `${gift.y}px`,
+              width: `${gift.size}px`,
+              height: `${gift.size}px`,
+              transform: `rotate(${gift.rotate}deg)`,
+              animationDelay: `${gift.delay}s`,
+            }}
+          />
+        ))}
 
         {showVehicle && (
-          <div className="animate-vehicle absolute bottom-[82px] left-0 z-40">
+          <div className="animate-vehicle absolute bottom-[68px] left-0 z-40">
             <Image
               src={vehicleImage}
               alt="Gift vehicle"
@@ -166,41 +137,6 @@ export default function GiftVehicleWidget() {
             />
           </div>
         )}
-
-        {drops.map((gift) => (
-          <img
-            key={`drop-${gift.id}`}
-            src={gift.image}
-            alt={gift.name}
-            className="animate-drop absolute z-30 drop-shadow-[0_0_10px_rgba(255,105,180,0.85)]"
-            style={{
-              left: `${gift.startX}px`,
-              top: `${gift.startY}px`,
-              width: `${gift.size}px`,
-              height: `${gift.size}px`,
-              animationDelay: `${gift.delay}s`,
-              ["--gift-x" as string]: `${gift.endX - gift.startX}px`,
-              ["--gift-y" as string]: `${gift.endY - gift.startY}px`,
-              ["--gift-rotate" as string]: `${gift.rotate}deg`,
-            }}
-          />
-        ))}
-
-        {pile.map((gift) => (
-          <img
-            key={`pile-${gift.id}`}
-            src={gift.image}
-            alt={gift.name}
-            className="absolute z-20 drop-shadow-[0_0_8px_rgba(255,105,180,0.75)]"
-            style={{
-              left: `${gift.x}px`,
-              top: `${gift.y}px`,
-              width: `${gift.size}px`,
-              height: `${gift.size}px`,
-              transform: `rotate(${gift.rotate}deg)`,
-            }}
-          />
-        ))}
       </div>
 
       <style>{`
@@ -233,29 +169,15 @@ export default function GiftVehicleWidget() {
           }
         }
 
-        @keyframes drop {
+        @keyframes roadGift {
           0% {
             opacity: 0;
-            transform: translate(0, 0) scale(0.55) rotate(0deg);
-          }
-
-          12% {
-            opacity: 1;
-          }
-
-          65% {
-            opacity: 1;
-            transform: translate(
-                calc(var(--gift-x) * 0.7),
-                calc(var(--gift-y) * 0.75)
-              )
-              scale(1) rotate(calc(var(--gift-rotate) * 0.75));
+            transform: translateY(18px) scale(0.5);
           }
 
           100% {
             opacity: 1;
-            transform: translate(var(--gift-x), var(--gift-y)) scale(1)
-              rotate(var(--gift-rotate));
+            transform: translateY(0) scale(1);
           }
         }
 
@@ -281,12 +203,12 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-vehicle {
-          animation: vehicle 5.4s ease-in-out forwards;
+          animation: vehicle 5.8s ease-in-out forwards;
         }
 
-        .animate-drop {
-  animation: drop 1.55s cubic-bezier(0.16, 0.8, 0.28, 1) forwards;
-}
+        .animate-road-gift {
+          animation: roadGift 0.45s ease-out forwards;
+        }
 
         .animate-message {
           animation: message 3.2s ease-in-out forwards;
