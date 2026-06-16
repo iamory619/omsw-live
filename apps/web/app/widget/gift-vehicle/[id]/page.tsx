@@ -68,11 +68,12 @@ export default function GiftVehicleWidget() {
       (_, index) => {
         const progress = count <= 1 ? 0.5 : index / (count - 1);
 
-        const startX = 140 + progress * 620 + Math.random() * 24;
-        const startY = 130 + Math.random() * 26;
+        // ให้ของขวัญออกจากท้ายรถ ไม่ใช่หน้ารถ
+        const startX = 0 + progress * 500 + Math.random() * 18;
+        const startY = 165 + Math.random() * 20;
 
-        const endX = startX - 50 + Math.random() * 100;
-        const endY = 250 + Math.random() * 38;
+        const endX = startX - 35 + Math.random() * 70;
+        const endY = 265 + Math.random() * 35;
 
         return {
           id: Date.now() + index,
@@ -284,8 +285,8 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-drop {
-          animation: drop 1.35s cubic-bezier(0.16, 0.8, 0.28, 1) forwards;
-        }
+  animation: drop 1.55s cubic-bezier(0.16, 0.8, 0.28, 1) forwards;
+}
 
         .animate-message {
           animation: message 3.2s ease-in-out forwards;
