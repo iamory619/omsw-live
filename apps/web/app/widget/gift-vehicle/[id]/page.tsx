@@ -47,26 +47,32 @@ export default function GiftVehicleWidget() {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
 
     const giftImage = gift.giftImage || "/assets/rose.png";
-    const count = Math.min(Math.max(gift.amount || 1, 8), 80);
+    const baseCount = Math.min(Math.max(gift.amount || 1, 8), 80);
+    const roadCount = Math.min(baseCount * 5, 220);
 
-    const newRoad: RoadGift[] = Array.from({ length: count }).map(
+    const newRoad: RoadGift[] = Array.from({ length: roadCount }).map(
       (_, index) => {
-        const progress = count <= 1 ? 0 : index / (count - 1);
+        const progress = roadCount <= 1 ? 0 : index / (roadCount - 1);
+        const row = index % 5;
 
         return {
           id: Date.now() + index,
           image: giftImage,
           name: gift.giftName,
-          size: 26 + Math.random() * 10,
-          x: 40 + progress * 880,
-          y: 255 + Math.sin(progress * Math.PI * 3) * 18 + Math.random() * 10,
-          rotate: -35 + Math.random() * 70,
-          delay: index * 0.025,
+          size: 24 + Math.random() * 12,
+          x: 20 + progress * 930 + (Math.random() * 24 - 12),
+          y:
+            230 +
+            row * 18 +
+            Math.sin(progress * Math.PI * 4) * 10 +
+            (Math.random() * 14 - 7),
+          rotate: -45 + Math.random() * 90,
+          delay: index * 0.01,
         };
       },
     );
 
-    setRoad(newRoad);
+    setRoad((prev) => [...prev, ...newRoad].slice(-350));
     setShowVehicle(true);
 
     setTimeout(() => {
@@ -106,7 +112,7 @@ export default function GiftVehicleWidget() {
       )}
 
       <div className="fixed bottom-[70px] left-1/2 h-[430px] w-[980px] -translate-x-1/2">
-        <div className="absolute bottom-[35px] left-1/2 z-0 h-[90px] w-[900px] -translate-x-1/2 rounded-full bg-yellow-500/15 blur-2xl" />
+        <div className="absolute bottom-[35px] left-1/2 z-0 h-[120px] w-[940px] -translate-x-1/2 rounded-full bg-yellow-500/15 blur-2xl" />
 
         {road.map((gift) => (
           <img
