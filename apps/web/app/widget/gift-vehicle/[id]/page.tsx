@@ -57,26 +57,30 @@ export default function GiftVehicleWidget() {
     const baseCount = Math.min(Math.max(gift.amount || 1, 8), 80);
     const roadCount = Math.min(baseCount * 12, 600);
 
-    const newRoad: RoadGift[] = Array.from({ length: roadCount }).map(
-      (_, index) => {
-        const progress = roadCount <= 1 ? 0 : index / (roadCount - 1);
-        const row = index % 8;
-        const wave = Math.sin(progress * Math.PI * 5) * 8;
+    const roadWidth = 900;
+    const roadHeight = 130;
 
-        return {
-          id: Date.now() + index,
-          image: giftImage,
-          name: gift.giftName,
-          size: 12 + Math.random() * 10,
-          x: 10 + progress * 960 + (Math.random() * 22 - 11),
-          y: 238 + row * 13 + wave + (Math.random() * 10 - 5),
-          rotate: -80 + Math.random() * 160,
-          delay: index * 0.004,
-        };
-      },
+    const newRoad: RoadGift[] = Array.from(
+      { length: roadCount },
+      (_, index) => ({
+        id: Date.now() + index,
+
+        image: giftImage,
+        name: gift.giftName,
+
+        size: 10 + Math.random() * 8,
+
+        x: 40 + Math.random() * roadWidth,
+
+        y: 250 + Math.random() * roadHeight,
+
+        rotate: Math.random() * 360,
+
+        delay: index * 0.002,
+      }),
     );
 
-    setRoad((prev) => [...prev, ...newRoad].slice(-900));
+    setRoad((prev) => [...prev, ...newRoad].slice(-2500));
     setShowVehicle(true);
 
     setTimeout(() => {
@@ -116,10 +120,21 @@ export default function GiftVehicleWidget() {
       )}
 
       <div className="fixed bottom-[70px] left-1/2 h-[430px] w-[980px] -translate-x-1/2">
-        <div className="absolute bottom-[18px] left-1/2 z-0 h-[170px] w-[980px] -translate-x-1/2 rounded-full bg-pink-500/20 blur-[70px]" />
-
+        <div
+          className="
+    absolute
+    bottom-[15px]
+    left-1/2
+    h-[180px]
+    w-[980px]
+    -translate-x-1/2
+    rounded-full
+    bg-pink-500/15
+    blur-[90px]
+    z-0
+  "
+        />{" "}
         <div className="absolute bottom-[26px] left-1/2 z-0 h-[90px] w-[920px] -translate-x-1/2 rounded-full bg-yellow-400/15 blur-[45px]" />
-
         {road.map((gift) => (
           <img
             key={gift.id}
@@ -136,7 +151,6 @@ export default function GiftVehicleWidget() {
             }}
           />
         ))}
-
         {showVehicle && (
           <div className="animate-vehicle absolute bottom-[72px] left-0 z-40">
             <Image
