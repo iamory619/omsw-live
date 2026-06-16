@@ -48,23 +48,21 @@ export default function GiftVehicleWidget() {
   const playEffect = (gift: GiftPayload) => {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
 
-    const petalImage = "/assets/rose-petal.png";
-    const fallbackImage = gift.giftImage || "/assets/rose.png";
-    const image = petalImage || fallbackImage;
+    const image = "/assets/rose-petal.png";
 
     const baseCount = Math.min(Math.max(gift.amount || 1, 8), 80);
-    const roadCount = Math.min(baseCount * 16, 900);
-    const fallCount = Math.min(baseCount * 5, 260);
+    const roadCount = Math.min(baseCount * 28, 1800);
+    const fallCount = Math.min(baseCount * 7, 360);
 
     const newRoad: Petal[] = Array.from({ length: roadCount }).map(
       (_, index) => ({
         id: Date.now() + index,
         image,
-        size: 10 + Math.random() * 12,
+        size: 18 + Math.random() * 18,
         x: Math.random() * 980,
-        y: 245 + Math.random() * 135,
+        y: 215 + Math.random() * 190,
         rotate: Math.random() * 360,
-        delay: Math.random() * 0.8,
+        delay: Math.random() * 0.7,
         fallX: 0,
         fallY: 0,
       }),
@@ -74,17 +72,17 @@ export default function GiftVehicleWidget() {
       (_, index) => ({
         id: Date.now() + 10000 + index,
         image,
-        size: 16 + Math.random() * 22,
+        size: 18 + Math.random() * 26,
         x: Math.random() * 980,
-        y: -80 - Math.random() * 220,
+        y: -120 - Math.random() * 260,
         rotate: Math.random() * 360,
-        delay: Math.random() * 2.8,
-        fallX: -80 + Math.random() * 160,
-        fallY: 360 + Math.random() * 180,
+        delay: Math.random() * 3,
+        fallX: -120 + Math.random() * 240,
+        fallY: 420 + Math.random() * 220,
       }),
     );
 
-    setRoad((prev) => [...prev, ...newRoad].slice(-1800));
+    setRoad((prev) => [...prev, ...newRoad].slice(-2600));
     setFalling(newFalling);
     setShowVehicle(true);
 
@@ -92,7 +90,7 @@ export default function GiftVehicleWidget() {
       setShowVehicle(false);
       setMessage("");
       setFalling([]);
-    }, 7000);
+    }, 7500);
   };
 
   useEffect(() => {
@@ -126,16 +124,39 @@ export default function GiftVehicleWidget() {
         </div>
       )}
 
-      <div className="fixed bottom-[60px] left-1/2 h-[520px] w-[980px] -translate-x-1/2">
-        <div className="absolute bottom-[20px] left-1/2 z-0 h-[190px] w-[1080px] -translate-x-1/2 rounded-full bg-pink-500/25 blur-[90px]" />
-        <div className="absolute bottom-[40px] left-1/2 z-0 h-[90px] w-[960px] -translate-x-1/2 rounded-full bg-yellow-400/20 blur-[55px]" />
+      <div className="fixed bottom-[55px] left-1/2 h-[560px] w-[980px] -translate-x-1/2">
+        <div className="absolute bottom-[0px] left-1/2 z-0 h-[260px] w-[1150px] -translate-x-1/2 rounded-full bg-pink-500/35 blur-[95px]" />
+        <div className="absolute bottom-[35px] left-1/2 z-0 h-[130px] w-[1000px] -translate-x-1/2 rounded-full bg-yellow-400/20 blur-[55px]" />
+
+        {road.map((petal) => (
+          <img
+            key={`road-${petal.id}`}
+            src={petal.image}
+            alt="petal"
+            onError={(e) => {
+              e.currentTarget.src = "/assets/rose.png";
+            }}
+            className="animate-road-petal absolute z-20 drop-shadow-[0_0_14px_rgba(255,105,180,1)]"
+            style={{
+              left: `${petal.x}px`,
+              top: `${petal.y}px`,
+              width: `${petal.size}px`,
+              height: `${petal.size}px`,
+              transform: `rotate(${petal.rotate}deg)`,
+              animationDelay: `${petal.delay}s`,
+            }}
+          />
+        ))}
 
         {falling.map((petal) => (
           <img
             key={`fall-${petal.id}`}
             src={petal.image}
             alt="petal"
-            className="animate-falling-petal absolute z-30 drop-shadow-[0_0_12px_rgba(255,105,180,0.9)]"
+            onError={(e) => {
+              e.currentTarget.src = "/assets/rose.png";
+            }}
+            className="animate-falling-petal absolute z-30 drop-shadow-[0_0_16px_rgba(255,105,180,1)]"
             style={{
               left: `${petal.x}px`,
               top: `${petal.y}px`,
@@ -149,25 +170,8 @@ export default function GiftVehicleWidget() {
           />
         ))}
 
-        {road.map((petal) => (
-          <img
-            key={`road-${petal.id}`}
-            src={petal.image}
-            alt="petal"
-            className="animate-road-petal absolute z-20 drop-shadow-[0_0_8px_rgba(255,105,180,0.85)]"
-            style={{
-              left: `${petal.x}px`,
-              top: `${petal.y}px`,
-              width: `${petal.size}px`,
-              height: `${petal.size}px`,
-              transform: `rotate(${petal.rotate}deg)`,
-              animationDelay: `${petal.delay}s`,
-            }}
-          />
-        ))}
-
         {showVehicle && (
-          <div className="animate-vehicle absolute bottom-[100px] left-0 z-40">
+          <div className="animate-vehicle absolute bottom-[115px] left-0 z-40">
             <Image
               src={vehicleImage}
               alt="Gift vehicle"
@@ -282,7 +286,7 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-falling-petal {
-          animation: fallingPetal 4.8s cubic-bezier(0.16, 0.75, 0.28, 1)
+          animation: fallingPetal 5s cubic-bezier(0.16, 0.75, 0.28, 1)
             forwards;
         }
 
