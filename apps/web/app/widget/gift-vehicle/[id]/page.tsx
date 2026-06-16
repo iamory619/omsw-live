@@ -120,7 +120,7 @@ export default function GiftVehicleWidget() {
               width={360}
               height={220}
               priority
-              className="w-[340px] drop-shadow-[0_0_22px_rgba(250,204,21,0.8)]"
+              className="w-[420px]  scale-x-[-1] drop-shadow-[0_0_22px_rgba(250,204,21,0.8)]"
             />
           </div>
         )}
