@@ -13,15 +13,16 @@ type GiftPayload = {
   giftImage: string;
 };
 
-type RoadGift = {
+type Petal = {
   id: number;
   image: string;
-  name: string;
   size: number;
   x: number;
   y: number;
   rotate: number;
   delay: number;
+  fallX: number;
+  fallY: number;
 };
 
 const VEHICLES: Record<string, string> = {
@@ -41,52 +42,57 @@ export default function GiftVehicleWidget() {
 
   const [message, setMessage] = useState("");
   const [showVehicle, setShowVehicle] = useState(false);
-  const [road, setRoad] = useState<RoadGift[]>([]);
+  const [road, setRoad] = useState<Petal[]>([]);
+  const [falling, setFalling] = useState<Petal[]>([]);
 
   const playEffect = (gift: GiftPayload) => {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
 
-    /*
-      ถ้ามีรูปกลีบกุหลาบ แนะนำวางไว้ที่:
-      /public/assets/rose-petal.png
-      แล้วเปลี่ยนบรรทัดนี้เป็น:
-      const giftImage = "/assets/rose-petal.png";
-    */
-    const giftImage = gift.giftImage || "/assets/rose.png";
+    const petalImage = "/assets/rose-petal.png";
+    const fallbackImage = gift.giftImage || "/assets/rose.png";
+    const image = petalImage || fallbackImage;
 
     const baseCount = Math.min(Math.max(gift.amount || 1, 8), 80);
-    const roadCount = Math.min(baseCount * 12, 600);
+    const roadCount = Math.min(baseCount * 16, 900);
+    const fallCount = Math.min(baseCount * 5, 260);
 
-    const roadWidth = 900;
-    const roadHeight = 130;
-
-    const newRoad: RoadGift[] = Array.from(
-      { length: roadCount },
+    const newRoad: Petal[] = Array.from({ length: roadCount }).map(
       (_, index) => ({
         id: Date.now() + index,
-
-        image: giftImage,
-        name: gift.giftName,
-
-        size: 10 + Math.random() * 8,
-
-        x: 40 + Math.random() * roadWidth,
-
-        y: 250 + Math.random() * roadHeight,
-
+        image,
+        size: 10 + Math.random() * 12,
+        x: Math.random() * 980,
+        y: 245 + Math.random() * 135,
         rotate: Math.random() * 360,
-
-        delay: index * 0.002,
+        delay: Math.random() * 0.8,
+        fallX: 0,
+        fallY: 0,
       }),
     );
 
-    setRoad((prev) => [...prev, ...newRoad].slice(-2500));
+    const newFalling: Petal[] = Array.from({ length: fallCount }).map(
+      (_, index) => ({
+        id: Date.now() + 10000 + index,
+        image,
+        size: 16 + Math.random() * 22,
+        x: Math.random() * 980,
+        y: -80 - Math.random() * 220,
+        rotate: Math.random() * 360,
+        delay: Math.random() * 2.8,
+        fallX: -80 + Math.random() * 160,
+        fallY: 360 + Math.random() * 180,
+      }),
+    );
+
+    setRoad((prev) => [...prev, ...newRoad].slice(-1800));
+    setFalling(newFalling);
     setShowVehicle(true);
 
     setTimeout(() => {
       setShowVehicle(false);
       setMessage("");
-    }, 6500);
+      setFalling([]);
+    }, 7000);
   };
 
   useEffect(() => {
@@ -104,6 +110,7 @@ export default function GiftVehicleWidget() {
       setMessage("");
       setShowVehicle(false);
       setRoad([]);
+      setFalling([]);
     });
 
     return () => {
@@ -114,52 +121,60 @@ export default function GiftVehicleWidget() {
   return (
     <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
       {showVehicle && (
-        <div className="animate-message fixed left-1/2 top-[8vh] z-50 -translate-x-1/2 rounded-3xl border-4 border-yellow-200 bg-yellow-500/90 px-8 py-4 text-center text-2xl font-black text-white shadow-[0_0_35px_rgba(234,179,8,0.9)]">
+        <div className="animate-message fixed left-1/2 top-[7vh] z-50 -translate-x-1/2 rounded-3xl border-4 border-yellow-200 bg-yellow-500/90 px-8 py-4 text-center text-2xl font-black text-white shadow-[0_0_35px_rgba(234,179,8,0.95)]">
           {message}
         </div>
       )}
 
-      <div className="fixed bottom-[70px] left-1/2 h-[430px] w-[980px] -translate-x-1/2">
-        <div
-          className="
-    absolute
-    bottom-[15px]
-    left-1/2
-    h-[180px]
-    w-[980px]
-    -translate-x-1/2
-    rounded-full
-    bg-pink-500/15
-    blur-[90px]
-    z-0
-  "
-        />{" "}
-        <div className="absolute bottom-[26px] left-1/2 z-0 h-[90px] w-[920px] -translate-x-1/2 rounded-full bg-yellow-400/15 blur-[45px]" />
-        {road.map((gift) => (
+      <div className="fixed bottom-[60px] left-1/2 h-[520px] w-[980px] -translate-x-1/2">
+        <div className="absolute bottom-[20px] left-1/2 z-0 h-[190px] w-[1080px] -translate-x-1/2 rounded-full bg-pink-500/25 blur-[90px]" />
+        <div className="absolute bottom-[40px] left-1/2 z-0 h-[90px] w-[960px] -translate-x-1/2 rounded-full bg-yellow-400/20 blur-[55px]" />
+
+        {falling.map((petal) => (
           <img
-            key={gift.id}
-            src={gift.image}
-            alt={gift.name}
-            className="animate-road-gift absolute z-20 drop-shadow-[0_0_8px_rgba(255,105,180,0.8)]"
+            key={`fall-${petal.id}`}
+            src={petal.image}
+            alt="petal"
+            className="animate-falling-petal absolute z-30 drop-shadow-[0_0_12px_rgba(255,105,180,0.9)]"
             style={{
-              left: `${gift.x}px`,
-              top: `${gift.y}px`,
-              width: `${gift.size}px`,
-              height: `${gift.size}px`,
-              transform: `rotate(${gift.rotate}deg)`,
-              animationDelay: `${gift.delay}s`,
+              left: `${petal.x}px`,
+              top: `${petal.y}px`,
+              width: `${petal.size}px`,
+              height: `${petal.size}px`,
+              animationDelay: `${petal.delay}s`,
+              ["--petal-x" as string]: `${petal.fallX}px`,
+              ["--petal-y" as string]: `${petal.fallY}px`,
+              ["--petal-rotate" as string]: `${petal.rotate}deg`,
             }}
           />
         ))}
+
+        {road.map((petal) => (
+          <img
+            key={`road-${petal.id}`}
+            src={petal.image}
+            alt="petal"
+            className="animate-road-petal absolute z-20 drop-shadow-[0_0_8px_rgba(255,105,180,0.85)]"
+            style={{
+              left: `${petal.x}px`,
+              top: `${petal.y}px`,
+              width: `${petal.size}px`,
+              height: `${petal.size}px`,
+              transform: `rotate(${petal.rotate}deg)`,
+              animationDelay: `${petal.delay}s`,
+            }}
+          />
+        ))}
+
         {showVehicle && (
-          <div className="animate-vehicle absolute bottom-[72px] left-0 z-40">
+          <div className="animate-vehicle absolute bottom-[100px] left-0 z-40">
             <Image
               src={vehicleImage}
               alt="Gift vehicle"
-              width={520}
-              height={320}
+              width={540}
+              height={330}
               priority
-              className="w-[440px] scale-x-[-1] drop-shadow-[0_0_30px_rgba(250,204,21,0.9)]"
+              className="w-[460px] scale-x-[-1] drop-shadow-[0_0_35px_rgba(250,204,21,0.95)]"
             />
           </div>
         )}
@@ -176,7 +191,7 @@ export default function GiftVehicleWidget() {
 
         @keyframes vehicle {
           0% {
-            transform: translateX(-470px) translateY(0) rotate(-1deg);
+            transform: translateX(-500px) translateY(0) rotate(-1deg);
             opacity: 0;
           }
 
@@ -189,7 +204,7 @@ export default function GiftVehicleWidget() {
           }
 
           50% {
-            transform: translateX(42vw) translateY(4px) rotate(-0.5deg);
+            transform: translateX(42vw) translateY(5px) rotate(-0.5deg);
           }
 
           75% {
@@ -198,12 +213,12 @@ export default function GiftVehicleWidget() {
           }
 
           100% {
-            transform: translateX(1080px) translateY(0) rotate(-1deg);
+            transform: translateX(1100px) translateY(0) rotate(-1deg);
             opacity: 0;
           }
         }
 
-        @keyframes roadGift {
+        @keyframes roadPetal {
           0% {
             opacity: 0;
             transform: translateY(18px) scale(0.35);
@@ -217,6 +232,23 @@ export default function GiftVehicleWidget() {
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes fallingPetal {
+          0% {
+            opacity: 0;
+            transform: translate(0, 0) rotate(0deg) scale(0.55);
+          }
+
+          12% {
+            opacity: 1;
+          }
+
+          100% {
+            opacity: 1;
+            transform: translate(var(--petal-x), var(--petal-y))
+              rotate(var(--petal-rotate)) scale(1);
           }
         }
 
@@ -242,11 +274,16 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-vehicle {
-          animation: vehicle 6.2s ease-in-out forwards;
+          animation: vehicle 6.5s ease-in-out forwards;
         }
 
-        .animate-road-gift {
-          animation: roadGift 0.5s ease-out forwards;
+        .animate-road-petal {
+          animation: roadPetal 0.5s ease-out forwards;
+        }
+
+        .animate-falling-petal {
+          animation: fallingPetal 4.8s cubic-bezier(0.16, 0.75, 0.28, 1)
+            forwards;
         }
 
         .animate-message {
