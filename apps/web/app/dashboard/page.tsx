@@ -110,6 +110,12 @@ export default function DashboardPage() {
           active: true,
         },
         {
+          name: "🛺 Gift Vehicle",
+          description: "รถวิ่งผ่านและปล่อยของขวัญตามจำนวนที่ส่ง",
+          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=tuktuk`,
+          active: true,
+        },
+        {
           name: "🧺 Gift Basket",
           description: "ของขวัญตกลงตะกร้าและกองสะสมบนจอ",
           url: `${window.location.origin}/widget/gift-plane/${overlayId}?basket=${selectedBasket}`,
