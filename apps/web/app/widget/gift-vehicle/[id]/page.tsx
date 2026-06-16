@@ -46,39 +46,43 @@ export default function GiftVehicleWidget() {
   const playEffect = (gift: GiftPayload) => {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
 
+    /*
+      ถ้ามีรูปกลีบกุหลาบ แนะนำวางไว้ที่:
+      /public/assets/rose-petal.png
+      แล้วเปลี่ยนบรรทัดนี้เป็น:
+      const giftImage = "/assets/rose-petal.png";
+    */
     const giftImage = gift.giftImage || "/assets/rose.png";
+
     const baseCount = Math.min(Math.max(gift.amount || 1, 8), 80);
-    const roadCount = Math.min(baseCount * 5, 220);
+    const roadCount = Math.min(baseCount * 12, 600);
 
     const newRoad: RoadGift[] = Array.from({ length: roadCount }).map(
       (_, index) => {
         const progress = roadCount <= 1 ? 0 : index / (roadCount - 1);
-        const row = index % 5;
+        const row = index % 8;
+        const wave = Math.sin(progress * Math.PI * 5) * 8;
 
         return {
           id: Date.now() + index,
           image: giftImage,
           name: gift.giftName,
-          size: 24 + Math.random() * 12,
-          x: 20 + progress * 930 + (Math.random() * 24 - 12),
-          y:
-            230 +
-            row * 18 +
-            Math.sin(progress * Math.PI * 4) * 10 +
-            (Math.random() * 14 - 7),
-          rotate: -45 + Math.random() * 90,
-          delay: index * 0.01,
+          size: 12 + Math.random() * 10,
+          x: 10 + progress * 960 + (Math.random() * 22 - 11),
+          y: 238 + row * 13 + wave + (Math.random() * 10 - 5),
+          rotate: -80 + Math.random() * 160,
+          delay: index * 0.004,
         };
       },
     );
 
-    setRoad((prev) => [...prev, ...newRoad].slice(-350));
+    setRoad((prev) => [...prev, ...newRoad].slice(-900));
     setShowVehicle(true);
 
     setTimeout(() => {
       setShowVehicle(false);
       setMessage("");
-    }, 6000);
+    }, 6500);
   };
 
   useEffect(() => {
@@ -112,14 +116,16 @@ export default function GiftVehicleWidget() {
       )}
 
       <div className="fixed bottom-[70px] left-1/2 h-[430px] w-[980px] -translate-x-1/2">
-        <div className="absolute bottom-[35px] left-1/2 z-0 h-[120px] w-[940px] -translate-x-1/2 rounded-full bg-yellow-500/15 blur-2xl" />
+        <div className="absolute bottom-[18px] left-1/2 z-0 h-[170px] w-[980px] -translate-x-1/2 rounded-full bg-pink-500/20 blur-[70px]" />
+
+        <div className="absolute bottom-[26px] left-1/2 z-0 h-[90px] w-[920px] -translate-x-1/2 rounded-full bg-yellow-400/15 blur-[45px]" />
 
         {road.map((gift) => (
           <img
             key={gift.id}
             src={gift.image}
             alt={gift.name}
-            className="animate-road-gift absolute z-20 drop-shadow-[0_0_10px_rgba(255,105,180,0.85)]"
+            className="animate-road-gift absolute z-20 drop-shadow-[0_0_8px_rgba(255,105,180,0.8)]"
             style={{
               left: `${gift.x}px`,
               top: `${gift.y}px`,
@@ -132,14 +138,14 @@ export default function GiftVehicleWidget() {
         ))}
 
         {showVehicle && (
-          <div className="animate-vehicle absolute bottom-[68px] left-0 z-40">
+          <div className="animate-vehicle absolute bottom-[72px] left-0 z-40">
             <Image
               src={vehicleImage}
               alt="Gift vehicle"
-              width={500}
-              height={300}
+              width={520}
+              height={320}
               priority
-              className="w-[430px] scale-x-[-1] drop-shadow-[0_0_28px_rgba(250,204,21,0.85)]"
+              className="w-[440px] scale-x-[-1] drop-shadow-[0_0_30px_rgba(250,204,21,0.9)]"
             />
           </div>
         )}
@@ -156,7 +162,7 @@ export default function GiftVehicleWidget() {
 
         @keyframes vehicle {
           0% {
-            transform: translateX(-460px) translateY(0) rotate(-1deg);
+            transform: translateX(-470px) translateY(0) rotate(-1deg);
             opacity: 0;
           }
 
@@ -164,8 +170,16 @@ export default function GiftVehicleWidget() {
             opacity: 1;
           }
 
+          25% {
+            transform: translateX(18vw) translateY(-5px) rotate(1deg);
+          }
+
           50% {
-            transform: translateX(36vw) translateY(-6px) rotate(1deg);
+            transform: translateX(42vw) translateY(4px) rotate(-0.5deg);
+          }
+
+          75% {
+            transform: translateX(66vw) translateY(-4px) rotate(1deg);
             opacity: 1;
           }
 
@@ -178,7 +192,12 @@ export default function GiftVehicleWidget() {
         @keyframes roadGift {
           0% {
             opacity: 0;
-            transform: translateY(18px) scale(0.5);
+            transform: translateY(18px) scale(0.35);
+          }
+
+          70% {
+            opacity: 1;
+            transform: translateY(-2px) scale(1.08);
           }
 
           100% {
@@ -209,11 +228,11 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-vehicle {
-          animation: vehicle 5.8s ease-in-out forwards;
+          animation: vehicle 6.2s ease-in-out forwards;
         }
 
         .animate-road-gift {
-          animation: roadGift 0.45s ease-out forwards;
+          animation: roadGift 0.5s ease-out forwards;
         }
 
         .animate-message {
