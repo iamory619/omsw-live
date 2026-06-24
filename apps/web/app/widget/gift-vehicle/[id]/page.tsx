@@ -77,13 +77,13 @@ export default function GiftVehicleWidget() {
       (_, index) => ({
         id: Date.now() + 10000 + index,
         image: PETAL_IMAGE,
-        size: 24 + Math.random() * 34,
+        size: 18 + Math.random() * 32,
         x: Math.random() * 980,
-        y: -120 - Math.random() * 260,
-        rotate: Math.random() * 360,
-        delay: Math.random() * 2.8,
-        fallX: -140 + Math.random() * 280,
-        fallY: 430 + Math.random() * 240,
+        y: -180 - Math.random() * 360,
+        rotate: Math.random() * 720,
+        delay: Math.random() * 2.2,
+        fallX: -220 + Math.random() * 440,
+        fallY: 520 + Math.random() * 260,
       }),
     );
 
@@ -238,21 +238,37 @@ export default function GiftVehicleWidget() {
           }
         }
 
-        @keyframes fallingPetal {
-          0% {
+     @keyframes fallingPetal {
+        0% {
             opacity: 0;
-            transform: translate(0, 0) rotate(0deg) scale(0.55);
-          }
+            transform: translate(0, 0) rotate(0deg) scale(0.5);
+        }
 
-          12% {
+        10% {
             opacity: 1;
-          }
+        }
 
-          100% {
-            opacity: 1;
+        35% {
+            transform: translate(
+                calc(var(--petal-x) * 0.35),
+                calc(var(--petal-y) * 0.35)
+            )
+            rotate(calc(var(--petal-rotate) * 0.35)) scale(0.85);
+        }
+
+        65% {
+            transform: translate(
+                calc(var(--petal-x) * -0.2),
+                calc(var(--petal-y) * 0.68)
+            )
+            rotate(calc(var(--petal-rotate) * 0.7)) scale(1);
+        }
+
+        100% {
+            opacity: 0.95;
             transform: translate(var(--petal-x), var(--petal-y))
-              rotate(var(--petal-rotate)) scale(1);
-          }
+            rotate(var(--petal-rotate)) scale(0.9);
+        }
         }
 
         @keyframes message {
@@ -285,8 +301,8 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-falling-petal {
-          animation: fallingPetal 5s cubic-bezier(0.16, 0.75, 0.28, 1) forwards;
-        }
+  animation: fallingPetal 6.2s cubic-bezier(0.22, 0.75, 0.25, 1) forwards;
+}
 
         .animate-message {
           animation: message 3.2s ease-in-out forwards;
