@@ -25,6 +25,21 @@ type Item = {
   fallY: number;
 };
 
+type Petal = {
+  id: number;
+  image: string;
+  size: number;
+  x: number;
+  y: number;
+  rotate: number;
+  delay: number;
+  fallX: number;
+  fallY: number;
+  spin: number;
+  sway: number;
+  swayDir: number;
+};
+
 const VEHICLES: Record<string, string> = {
   tuktuk: "/assets/vehicles/tuktuk.png",
   pickup: "/assets/vehicles/pickup.png",
@@ -46,17 +61,13 @@ export default function GiftVehicleWidget() {
   const [message, setMessage] = useState("");
   const [showVehicle, setShowVehicle] = useState(false);
   const [road, setRoad] = useState<Item[]>([]);
-  const [falling, setFalling] = useState<Item[]>([]);
+  const [falling, setFalling] = useState<Petal[]>([]);
 
   const playEffect = (gift: GiftPayload) => {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
 
     const baseCount = Math.min(Math.max(gift.amount || 1, 8), 80);
-
-    // ถนนใช้ดอกกุหลาบเต็มดอก
     const roadCount = Math.min(baseCount * 8, 700);
-
-    // กลีบโปรยใช้รูป petal.png
     const fallCount = Math.min(baseCount * 6, 320);
 
     const newRoad: Item[] = Array.from({ length: roadCount }).map(
@@ -73,17 +84,20 @@ export default function GiftVehicleWidget() {
       }),
     );
 
-    const newFalling: Item[] = Array.from({ length: fallCount }).map(
+    const newFalling: Petal[] = Array.from({ length: fallCount }).map(
       (_, index) => ({
         id: Date.now() + 10000 + index,
         image: PETAL_IMAGE,
-        size: 18 + Math.random() * 26,
+        size: 24 + Math.random() * 28,
         x: Math.random() * 980,
-        y: -120 - Math.random() * 220,
+        y: -100 - Math.random() * 300,
         rotate: Math.random() * 360,
-        delay: Math.random() * 1.8,
+        delay: Math.random() * 2,
         fallX: -120 + Math.random() * 240,
-        fallY: 520 + Math.random() * 220,
+        fallY: 500 + Math.random() * 250,
+        spin: 360 + Math.random() * 720,
+        sway: 40 + Math.random() * 70,
+        swayDir: Math.random() > 0.5 ? 1 : -1,
       }),
     );
 
@@ -150,21 +164,23 @@ export default function GiftVehicleWidget() {
           />
         ))}
 
-        {falling.map((item) => (
+        {falling.map((petal) => (
           <img
-            key={`fall-${item.id}`}
-            src={item.image}
+            key={`fall-${petal.id}`}
+            src={petal.image}
             alt="petal"
             className="animate-falling-petal absolute z-30 drop-shadow-[0_0_18px_rgba(255,105,180,1)]"
             style={{
-              left: `${item.x}px`,
-              top: `${item.y}px`,
-              width: `${item.size}px`,
-              height: `${item.size}px`,
-              animationDelay: `${item.delay}s`,
-              ["--petal-x" as string]: `${item.fallX}px`,
-              ["--petal-y" as string]: `${item.fallY}px`,
-              ["--petal-rotate" as string]: `${item.rotate}deg`,
+              left: `${petal.x}px`,
+              top: `${petal.y}px`,
+              width: `${petal.size}px`,
+              height: `${petal.size}px`,
+              animationDelay: `${petal.delay}s`,
+              ["--petal-x" as string]: `${petal.fallX}px`,
+              ["--petal-y" as string]: `${petal.fallY}px`,
+              ["--petal-rotate" as string]: `${petal.rotate}deg`,
+              ["--petal-spin" as string]: `${petal.spin}deg`,
+              ["--petal-sway" as string]: `${petal.sway * petal.swayDir}px`,
             }}
           />
         ))}
@@ -238,50 +254,55 @@ export default function GiftVehicleWidget() {
           }
         }
 
-    @keyframes fallingPetal {
-  0% {
-    opacity: 0;
-    transform: translate(0, -60px) rotate(0deg) scale(0.6);
-  }
+        @keyframes fallingPetal {
+          0% {
+            opacity: 0;
+            transform: translate3d(0, -20px, 0) rotate(0deg) scale(0.4);
+          }
 
-  8% {
-    opacity: 1;
-  }
+          10% {
+            opacity: 1;
+          }
 
-  22% {
-    transform: translate(
-        calc(var(--petal-x) * -0.35),
-        calc(var(--petal-y) * 0.2)
-      )
-      rotate(90deg)
-      scale(0.85);
-  }
+          20% {
+            transform: translate3d(
+                calc(var(--petal-x) * -0.3),
+                calc(var(--petal-y) * 0.15),
+                0
+              )
+              rotate(calc(var(--petal-spin) * 0.2))
+              translateX(var(--petal-sway))
+              scale(0.9);
+          }
 
-  45% {
-    transform: translate(
-        calc(var(--petal-x) * 0.45),
-        calc(var(--petal-y) * 0.45)
-      )
-      rotate(210deg)
-      scale(1);
-  }
+          45% {
+            transform: translate3d(
+                calc(var(--petal-x) * 0.4),
+                calc(var(--petal-y) * 0.35),
+                0
+              )
+              rotate(calc(var(--petal-spin) * 0.5))
+              translateX(calc(var(--petal-sway) * -1))
+              scale(1);
+          }
 
-  70% {
-    transform: translate(
-        calc(var(--petal-x) * -0.15),
-        calc(var(--petal-y) * 0.72)
-      )
-      rotate(330deg)
-      scale(0.95);
-  }
+          70% {
+            transform: translate3d(
+                calc(var(--petal-x) * -0.15),
+                calc(var(--petal-y) * 0.7),
+                0
+              )
+              rotate(calc(var(--petal-spin) * 0.8))
+              translateX(calc(var(--petal-sway) * 0.7))
+              scale(0.95);
+          }
 
-  100% {
-    opacity: 0.9;
-    transform: translate(var(--petal-x), var(--petal-y))
-      rotate(calc(var(--petal-rotate) + 520deg))
-      scale(0.85);
-  }
-}
+          100% {
+            opacity: 0.85;
+            transform: translate3d(var(--petal-x), var(--petal-y), 0)
+              rotate(var(--petal-spin)) translateX(0) scale(0.8);
+          }
+        }
 
         @keyframes message {
           0% {
@@ -313,8 +334,9 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-falling-petal {
-  animation: fallingPetal 3.0s cubic-bezier(0.22, 0.72, 0.25, 1) forwards;
-}
+          animation: fallingPetal 3.2s cubic-bezier(0.22, 0.72, 0.25, 1)
+            forwards;
+        }
 
         .animate-message {
           animation: message 3.2s ease-in-out forwards;
