@@ -110,9 +110,27 @@ export default function DashboardPage() {
           active: true,
         },
         {
-          name: "🛺 Gift Vehicle",
-          description: "รถวิ่งผ่านและปล่อยของขวัญตามจำนวนที่ส่ง",
+          name: "🛺 Gift Vehicle - Tuk Tuk",
+          description: "รถตุ๊กตุ๊กวิ่งบนถนนกุหลาบ",
           url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=tuktuk`,
+          active: true,
+        },
+        {
+          name: "🚚 Gift Vehicle - Pickup",
+          description: "รถกระบะวิ่งบนถนนกุหลาบ",
+          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=pickup`,
+          active: true,
+        },
+        {
+          name: "🚗 Gift Vehicle - Car",
+          description: "รถเก๋งวิ่งบนถนนกุหลาบ",
+          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=car`,
+          active: true,
+        },
+        {
+          name: "🛵 Gift Vehicle - Saleng",
+          description: "ซาเล้งวิ่งบนถนนกุหลาบ",
+          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=saleng`,
           active: true,
         },
         {
