@@ -301,7 +301,7 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-falling-petal {
-  animation: fallingPetal 6.2s cubic-bezier(0.22, 0.75, 0.25, 1) forwards;
+  animation: fallingPetal 3.2s cubic-bezier(0.22, 0.75, 0.25, 1) forwards;
 }
 
         .animate-message {
