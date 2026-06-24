@@ -26,11 +26,35 @@ const BASKETS = [
   // },
 ];
 
+const VEHICLES = [
+  {
+    id: "tuktuk",
+    name: "Tuk Tuk",
+    image: "/assets/vehicles/tuktuk.png",
+  },
+  {
+    id: "pickup",
+    name: "Pickup",
+    image: "/assets/vehicles/pickup.png",
+  },
+  {
+    id: "car",
+    name: "Car",
+    image: "/assets/vehicles/car.png",
+  },
+  {
+    id: "saleng",
+    name: "Saleng",
+    image: "/assets/vehicles/saleng.png",
+  },
+];
+
 export default function DashboardPage() {
   const [username, setUsername] = useState("");
   const [overlayId, setOverlayId] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedBasket, setSelectedBasket] = useState("basket-1");
+  const [selectedVehicle, setSelectedVehicle] = useState("tuktuk");
 
   const socket = useMemo(() => {
     return io("https://server-production-b88b.up.railway.app");
@@ -110,28 +134,11 @@ export default function DashboardPage() {
           active: true,
         },
         {
-          name: "🛺 Gift Vehicle - Tuk Tuk",
-          description: "รถตุ๊กตุ๊กวิ่งบนถนนกุหลาบ",
-          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=tuktuk`,
+          name: "🛺 Gift Vehicle",
+          description: "รถวิ่งผ่านบนพรมกุหลาบ",
+          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=${selectedVehicle}`,
           active: true,
-        },
-        {
-          name: "🚚 Gift Vehicle - Pickup",
-          description: "รถกระบะวิ่งบนถนนกุหลาบ",
-          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=pickup`,
-          active: true,
-        },
-        {
-          name: "🚗 Gift Vehicle - Car",
-          description: "รถเก๋งวิ่งบนถนนกุหลาบ",
-          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=car`,
-          active: true,
-        },
-        {
-          name: "🛵 Gift Vehicle - Saleng",
-          description: "ซาเล้งวิ่งบนถนนกุหลาบ",
-          url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=saleng`,
-          active: true,
+          vehiclePicker: true,
         },
         {
           name: "🧺 Gift Basket",
@@ -280,6 +287,36 @@ export default function DashboardPage() {
 
                             <div className="text-sm font-bold">
                               {basket.name}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {widget.vehiclePicker && (
+                    <div className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                      <div className="mb-3 font-bold">เลือกรถ</div>
+
+                      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                        {VEHICLES.map((vehicle) => (
+                          <button
+                            key={vehicle.id}
+                            onClick={() => setSelectedVehicle(vehicle.id)}
+                            className={`rounded-2xl border p-3 transition ${
+                              selectedVehicle === vehicle.id
+                                ? "border-yellow-500 bg-yellow-500/20"
+                                : "border-zinc-700 bg-zinc-900 hover:bg-zinc-800"
+                            }`}
+                          >
+                            <img
+                              src={vehicle.image}
+                              alt={vehicle.name}
+                              className="mx-auto mb-2 h-20 object-contain"
+                            />
+
+                            <div className="text-sm font-bold">
+                              {vehicle.name}
                             </div>
                           </button>
                         ))}
