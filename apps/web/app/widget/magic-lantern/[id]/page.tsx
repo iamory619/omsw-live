@@ -115,7 +115,7 @@ export default function MagicLanternWidget() {
         />
 
         <Image
-          src="/assets/lantern/lantern-back.png"
+          src="/assets/lantern/lantern-back.gif"
           alt="Magic lantern back"
           width={900}
           height={1100} 
@@ -160,7 +160,7 @@ export default function MagicLanternWidget() {
         </div>
 
         <Image
-          src="/assets/lantern/lantern-front.png"
+          src="/assets/lantern/lantern-front.gif"
           alt="Magic lantern front"
           width={900}
           height={1100}
