@@ -29,7 +29,7 @@ const VEHICLES: Record<string, string> = {
   tuktuk: "/assets/vehicles/tuktuk.png",
   pickup: "/assets/vehicles/pickup.png",
   car: "/assets/vehicles/car.png",
-  saleng: "/assets/vehicles/saleng.png",
+  vespa: "/assets/vehicles/vespa.png",
 };
 
 const ROSE_IMAGE = "/assets/rose.png";

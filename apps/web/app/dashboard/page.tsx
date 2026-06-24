@@ -43,9 +43,9 @@ const VEHICLES = [
     image: "/assets/vehicles/car.png",
   },
   {
-    id: "saleng",
-    name: "Saleng",
-    image: "/assets/vehicles/saleng.png",
+    id: "vespa",
+    name: "vespa",
+    image: "/assets/vehicles/vespa.png",
   },
 ];
 
