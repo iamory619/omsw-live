@@ -77,13 +77,13 @@ export default function GiftVehicleWidget() {
       (_, index) => ({
         id: Date.now() + 10000 + index,
         image: PETAL_IMAGE,
-        size: 20 + Math.random() * 24,
+        size: 18 + Math.random() * 26,
         x: Math.random() * 980,
-        y: -80 - Math.random() * 180,
-        rotate: 180 + Math.random() * 540,
-        delay: Math.random() * 1.6,
-        fallX: -180 + Math.random() * 360,
-        fallY: 520 + Math.random() * 180,
+        y: -120 - Math.random() * 220,
+        rotate: Math.random() * 360,
+        delay: Math.random() * 1.8,
+        fallX: -120 + Math.random() * 240,
+        fallY: 520 + Math.random() * 220,
       }),
     );
 
@@ -238,38 +238,48 @@ export default function GiftVehicleWidget() {
           }
         }
 
-     @keyframes fallingPetal {
+    @keyframes fallingPetal {
   0% {
     opacity: 0;
-    transform: translate(0, -40px) rotate(0deg) scale(0.55);
+    transform: translate(0, -60px) rotate(0deg) scale(0.6);
   }
 
-  10% {
+  8% {
     opacity: 1;
   }
 
-  30% {
+  22% {
     transform: translate(
-        calc(var(--petal-x) * 0.25),
-        calc(var(--petal-y) * 0.28)
+        calc(var(--petal-x) * -0.35),
+        calc(var(--petal-y) * 0.2)
       )
-      rotate(calc(var(--petal-rotate) * 0.25))
-      scale(0.8);
+      rotate(90deg)
+      scale(0.85);
   }
 
-  60% {
+  45% {
     transform: translate(
-        calc(var(--petal-x) * -0.12),
-        calc(var(--petal-y) * 0.62)
+        calc(var(--petal-x) * 0.45),
+        calc(var(--petal-y) * 0.45)
       )
-      rotate(calc(var(--petal-rotate) * 0.65))
+      rotate(210deg)
       scale(1);
   }
 
+  70% {
+    transform: translate(
+        calc(var(--petal-x) * -0.15),
+        calc(var(--petal-y) * 0.72)
+      )
+      rotate(330deg)
+      scale(0.95);
+  }
+
   100% {
-    opacity: 0.95;
+    opacity: 0.9;
     transform: translate(var(--petal-x), var(--petal-y))
-      rotate(var(--petal-rotate)) scale(0.9);
+      rotate(calc(var(--petal-rotate) + 520deg))
+      scale(0.85);
   }
 }
 
@@ -303,7 +313,7 @@ export default function GiftVehicleWidget() {
         }
 
         .animate-falling-petal {
-  animation: fallingPetal 3.6s cubic-bezier(0.22, 0.72, 0.25, 1) forwards;
+  animation: fallingPetal 3.0s cubic-bezier(0.22, 0.72, 0.25, 1) forwards;
 }
 
         .animate-message {
