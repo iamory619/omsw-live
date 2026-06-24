@@ -65,7 +65,7 @@ export default function GiftVehicleWidget() {
         image: gift.giftImage || ROSE_IMAGE,
         size: 22 + Math.random() * 18,
         x: Math.random() * 980,
-        y: 235 + Math.random() * 145,
+        y: 280 + Math.random() * 145,
         rotate: Math.random() * 360,
         delay: Math.random() * 0.7,
         fallX: 0,
