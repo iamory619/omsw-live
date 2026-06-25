@@ -140,6 +140,7 @@ export default function DashboardPage() {
           description: "ของขวัญลอยสะสมในโคมเวทมนตร์",
           url: `${window.location.origin}/widget/magic-lantern/${overlayId}`,
           active: true,
+          lanternPicker: true,
         },
         {
           name: "🛺 Gift Vehicle",
@@ -159,8 +160,7 @@ export default function DashboardPage() {
           name: "🙏🏻 Sathu 99",
           description: "ส่งของขวัญ 99 เหรียญขึ้นไป เพื่อรับคำทำนาย",
           url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
-          active: true,
-          lanternPicker: true,
+          active: true,         
         },
         // {
         //   name: "🐱 Evolution Pet",
