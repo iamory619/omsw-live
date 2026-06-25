@@ -148,17 +148,24 @@ export default function DashboardPage() {
           basketPicker: true,
         },
         {
-          name: "🐱 Evolution Pet",
-          description: "สัตว์เลี้ยงโตตามจำนวนของขวัญ",
-          url: `${window.location.origin}/widget/pet/${overlayId}`,
-          active: false,
+          name: "🔮 Fortune Stick",
+          description: "ส่งของขวัญรับคำทำนาย",
+          url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
+          active: true,
+          basketPicker: true,
         },
-        {
-          name: "🏆 Top Gifter",
-          description: "จัดอันดับคนส่งของขวัญสูงสุด",
-          url: `${window.location.origin}/widget/top-gifter/${overlayId}`,
-          active: false,
-        },
+        // {
+        //   name: "🐱 Evolution Pet",
+        //   description: "สัตว์เลี้ยงโตตามจำนวนของขวัญ",
+        //   url: `${window.location.origin}/widget/pet/${overlayId}`,
+        //   active: false,
+        // },
+        // {
+        //   name: "🏆 Top Gifter",
+        //   description: "จัดอันดับคนส่งของขวัญสูงสุด",
+        //   url: `${window.location.origin}/widget/top-gifter/${overlayId}`,
+        //   active: false,
+        // },
       ]
     : [];
 
