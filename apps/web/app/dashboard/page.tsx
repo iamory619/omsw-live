@@ -148,8 +148,8 @@ export default function DashboardPage() {
           basketPicker: true,
         },
         {
-          name: "🔮 Fortune Stick",
-          description: "ส่งของขวัญรับคำทำนาย",
+          name: "🙏🏻 Sathu 99",
+          description: "ส่งของขวัญ 99 เหรียญขึ้นไป เพื่อรับคำทำนาย",
           url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
           active: true,
           //basketPicker: true,
