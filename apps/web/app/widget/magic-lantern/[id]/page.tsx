@@ -30,10 +30,12 @@ type FloatingGift = {
 export default function MagicLanternWidget() {
   const params = useParams();
   const searchParams = useSearchParams();
+
   const overlayId = params.id as string;
-  const lantern =   searchParams.get("lantern") || "phoenix";
+  const lantern = searchParams.get("lantern") || "phoenix";
+
   const lanternBack = `/assets/lantern/${lantern}-back.png`;
-  const lanternFront = `/assets/lantern/${lantern}-front.gif`; 
+  const lanternFront = `/assets/lantern/${lantern}-front.gif`;
 
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
@@ -53,8 +55,8 @@ export default function MagicLanternWidget() {
         name: gift.giftName,
         size: 11 + Math.random() * 5,
 
-        x: 30 + Math.random() * 150,
-        y: 40 + Math.random() * 170,
+        x: 45 + Math.random() * 120,
+        y: 42 + Math.random() * 145,
 
         rotate: -40 + Math.random() * 80,
         floatX: -5 + Math.random() * 10,
@@ -91,7 +93,7 @@ export default function MagicLanternWidget() {
     return () => {
       socket.disconnect();
     };
-  }, [overlayId]);
+  }, [overlayId, lantern]);
 
   return (
     <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
@@ -103,18 +105,18 @@ export default function MagicLanternWidget() {
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
         <div
-          className="absolute left-[320px] top-[500px] z-0 h-[300px] w-[270px] rounded-[40px] blur-[70px] pointer-events-none"
+          className="absolute left-[365px] top-[260px] z-0 h-[300px] w-[245px] rounded-[42px] blur-[50px] pointer-events-none"
           style={{
             background:
-              "radial-gradient(circle at 50% 35%, rgba(236,72,153,0.28) 0%, rgba(168,85,247,0.5) 28%, rgba(79,70,229,0.35) 62%, transparent 100%)",
+              "radial-gradient(circle at 50% 35%, rgba(236,72,153,0.3) 0%, rgba(168,85,247,0.45) 34%, rgba(79,70,229,0.32) 68%, transparent 100%)",
           }}
         />
 
         <div
-          className="absolute left-[350px] top-[575px] z-0 h-[170px] w-[210px] rounded-full blur-[45px] pointer-events-none"
+          className="absolute left-[370px] top-[470px] z-0 h-[160px] w-[230px] rounded-full blur-[50px] pointer-events-none"
           style={{
             background:
-              "radial-gradient(circle, rgba(59,130,246,0.55) 0%, rgba(168,85,247,0.25) 48%, transparent 75%)",
+              "radial-gradient(circle, rgba(59,130,246,0.55) 0%, rgba(168,85,247,0.25) 45%, transparent 75%)",
           }}
         />
 
@@ -122,16 +124,16 @@ export default function MagicLanternWidget() {
           src={lanternBack}
           alt="Magic lantern back"
           width={900}
-          height={1100} 
+          height={1100}
           priority
           className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
         />
 
         <div
-          className="absolute left-[350px] top-[510px] z-30 h-[235px] w-[220px] overflow-hidden rounded-[34px]"
+          className="absolute left-[380px] top-[285px] z-30 h-[260px] w-[210px] overflow-hidden rounded-[34px]"
           style={{
             clipPath:
-              "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)", 
+              "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)",
           }}
         >
           <div
@@ -173,7 +175,7 @@ export default function MagicLanternWidget() {
         />
 
         <div
-          className="animate-glow pointer-events-none absolute left-[360px] top-[515px] z-50 h-[220px] w-[200px] rounded-[34px] blur-xl"
+          className="animate-glow pointer-events-none absolute left-[390px] top-[305px] z-50 h-[220px] w-[190px] rounded-[34px] blur-xl"
           style={{
             background:
               "radial-gradient(circle at 50% 55%, rgba(255,255,255,0.08) 0%, rgba(168,85,247,0.08) 50%, transparent 76%)",
