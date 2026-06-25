@@ -138,7 +138,7 @@ export default function DashboardPage() {
         {
           name: "🧙🏻‍♀️ Magic Lantern",
           description: "ของขวัญลอยสะสมในโคมเวทมนตร์",
-          url: `${window.location.origin}/widget/magic-lantern/${overlayId}`,
+          url: `${window.location.origin}/widget/magic-lantern/${overlayId}?lantern=${selectedLantern}`,
           active: true,
           lanternPicker: true,
         },
