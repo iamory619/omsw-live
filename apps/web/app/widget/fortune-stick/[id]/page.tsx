@@ -29,7 +29,7 @@ export default function FortuneStickWidget() {
   const [showFortune, setShowFortune] = useState(false);
 
   const showRandomFortune = (gift: GiftPayload) => {
-    if ((gift.diamond || 0) < 50) return;
+    if ((gift.diamond || 0) < 1) return;
 
     const random = fortunes[Math.floor(Math.random() * fortunes.length)];
 
