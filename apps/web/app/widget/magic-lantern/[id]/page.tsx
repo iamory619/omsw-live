@@ -55,8 +55,8 @@ export default function MagicLanternWidget() {
         name: gift.giftName,
         size: 11 + Math.random() * 5,
 
-        x: 45 + Math.random() * 120,
-        y: 42 + Math.random() * 145,
+        x: 35 + Math.random() * 135,
+        y: 80 + Math.random() * 125,
 
         rotate: -40 + Math.random() * 80,
         floatX: -5 + Math.random() * 10,
@@ -105,7 +105,7 @@ export default function MagicLanternWidget() {
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
         <div
-          className="absolute left-[365px] top-[260px] z-0 h-[300px] w-[245px] rounded-[42px] blur-[50px] pointer-events-none"
+          className="absolute left-[365px] top-[320px] z-0 h-[300px] w-[245px] rounded-[42px] blur-[50px] pointer-events-none"
           style={{
             background:
               "radial-gradient(circle at 50% 35%, rgba(236,72,153,0.3) 0%, rgba(168,85,247,0.45) 34%, rgba(79,70,229,0.32) 68%, transparent 100%)",
@@ -130,7 +130,7 @@ export default function MagicLanternWidget() {
         />
 
         <div
-          className="absolute left-[380px] top-[285px] z-30 h-[260px] w-[210px] overflow-hidden rounded-[34px]"
+          className="absolute left-[380px] top-[345px] z-30 h-[260px] w-[210px] overflow-hidden rounded-[34px]"
           style={{
             clipPath:
               "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)",
@@ -175,7 +175,7 @@ export default function MagicLanternWidget() {
         />
 
         <div
-          className="animate-glow pointer-events-none absolute left-[390px] top-[305px] z-50 h-[220px] w-[190px] rounded-[34px] blur-xl"
+          className="animate-glow pointer-events-none absolute left-[390px] top-[365px] z-50 h-[220px] w-[190px] rounded-[34px] blur-xl"
           style={{
             background:
               "radial-gradient(circle at 50% 55%, rgba(255,255,255,0.08) 0%, rgba(168,85,247,0.08) 50%, transparent 76%)",
