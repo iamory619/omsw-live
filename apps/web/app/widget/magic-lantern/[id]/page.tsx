@@ -131,7 +131,7 @@ export default function MagicLanternWidget() {
           className="absolute left-[350px] top-[510px] z-30 h-[235px] w-[220px] overflow-hidden rounded-[34px]"
           style={{
             clipPath:
-              "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)",
+              "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)", 
           }}
         >
           <div
