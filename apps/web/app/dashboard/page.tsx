@@ -152,7 +152,7 @@ export default function DashboardPage() {
           description: "ส่งของขวัญรับคำทำนาย",
           url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
           active: true,
-          basketPicker: true,
+          //basketPicker: true,
         },
         // {
         //   name: "🐱 Evolution Pet",
