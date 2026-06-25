@@ -36,6 +36,13 @@ type Dust = {
   duration: number;
 };
 
+const JAR = {
+  left: 378,
+  top: 455,
+  width: 214,
+  height: 150,
+};
+
 export default function MagicLanternWidget() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -63,22 +70,24 @@ export default function MagicLanternWidget() {
         id: Date.now() + index,
         image: giftImage,
         name: gift.giftName,
-        size: 11 + Math.random() * 5,
-        x: 35 + Math.random() * 135,
-        y: 80 + Math.random() * 125,
+        size: 10 + Math.random() * 5,
+
+        x: 28 + Math.random() * 150,
+        y: 18 + Math.random() * 95,
+
         rotate: -40 + Math.random() * 80,
-        floatX: -5 + Math.random() * 10,
-        floatY: -5 + Math.random() * 10,
+        floatX: -4 + Math.random() * 8,
+        floatY: -4 + Math.random() * 8,
         delay: Math.random() * 0.5,
         duration: 2.8 + Math.random() * 1.6,
       }),
     );
 
-    const newDusts: Dust[] = Array.from({ length: 140 }).map((_, index) => ({
+    const newDusts: Dust[] = Array.from({ length: 90 }).map((_, index) => ({
       id: Date.now() + 5000 + index,
-      x: 25 + Math.random() * 165,
-      y: 70 + Math.random() * 120,
-      size: 1.5 + Math.random() * 3,
+      x: 20 + Math.random() * 170,
+      y: 12 + Math.random() * 112,
+      size: 1.3 + Math.random() * 2.4,
       delay: Math.random() * 1.8,
       duration: 2 + Math.random() * 2.5,
     }));
@@ -124,18 +133,26 @@ export default function MagicLanternWidget() {
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
         <div
-          className="absolute left-[375px] top-[400px] z-0 h-[190px] w-[220px] rounded-[38px] blur-[45px] pointer-events-none"
+          className="absolute z-0 rounded-[38px] blur-[42px] pointer-events-none"
           style={{
+            left: `${JAR.left - 6}px`,
+            top: `${JAR.top + 2}px`,
+            width: `${JAR.width + 10}px`,
+            height: `${JAR.height}px`,
             background:
-              "radial-gradient(circle at 50% 45%, rgba(236,72,153,0.22) 0%, rgba(168,85,247,0.38) 38%, rgba(79,70,229,0.22) 70%, transparent 100%)",
+              "radial-gradient(circle at 50% 52%, rgba(236,72,153,0.18) 0%, rgba(168,85,247,0.34) 42%, rgba(79,70,229,0.18) 72%, transparent 100%)",
           }}
         />
 
         <div
-          className="absolute left-[365px] top-[500px] z-0 h-[120px] w-[245px] rounded-full blur-[45px] pointer-events-none"
+          className="absolute z-0 rounded-full blur-[42px] pointer-events-none"
           style={{
+            left: `${JAR.left - 10}px`,
+            top: `${JAR.top + 78}px`,
+            width: `${JAR.width + 30}px`,
+            height: "92px",
             background:
-              "radial-gradient(circle, rgba(59,130,246,0.5) 0%, rgba(168,85,247,0.22) 48%, transparent 76%)",
+              "radial-gradient(circle, rgba(59,130,246,0.45) 0%, rgba(168,85,247,0.18) 48%, transparent 76%)",
           }}
         />
 
@@ -149,8 +166,12 @@ export default function MagicLanternWidget() {
         />
 
         <div
-  className="absolute left-[380px] top-[395px] z-30 h-[210px] w-[210px] overflow-hidden rounded-[34px]"
-            style={{
+          className="absolute z-30 overflow-hidden rounded-[34px]"
+          style={{
+            left: `${JAR.left}px`,
+            top: `${JAR.top}px`,
+            width: `${JAR.width}px`,
+            height: `${JAR.height}px`,
             clipPath:
               "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)",
           }}
@@ -159,7 +180,7 @@ export default function MagicLanternWidget() {
             className="absolute inset-0 blur-xl"
             style={{
               background:
-                "radial-gradient(circle at 50% 60%, rgba(168,85,247,0.18), transparent 72%)",
+                "radial-gradient(circle at 50% 62%, rgba(168,85,247,0.14), transparent 72%)",
             }}
           />
 
@@ -209,10 +230,14 @@ export default function MagicLanternWidget() {
         />
 
         <div
-          className="animate-glow pointer-events-none absolute left-[392px] top-[420px] z-50 h-[160px] w-[185px]"
+          className="animate-glow pointer-events-none absolute z-50 rounded-[34px] blur-xl"
           style={{
+            left: `${JAR.left + 16}px`,
+            top: `${JAR.top + 12}px`,
+            width: `${JAR.width - 34}px`,
+            height: `${JAR.height - 20}px`,
             background:
-              "radial-gradient(circle at 50% 58%, rgba(255,255,255,0.08) 0%, rgba(168,85,247,0.08) 50%, transparent 76%)",
+              "radial-gradient(circle at 50% 62%, rgba(255,255,255,0.07) 0%, rgba(168,85,247,0.07) 52%, transparent 76%)",
           }}
         />
       </div>
@@ -266,7 +291,7 @@ export default function MagicLanternWidget() {
             opacity: 1;
             transform: translate(
                 calc(var(--gift-float-x) * -0.6),
-                calc(var(--gift-float-y) * -0.6)
+                calc(var(--gift-y) * -0.6)
               )
               scale(0.95) rotate(calc(var(--gift-rotate) * -0.5));
           }
@@ -275,7 +300,7 @@ export default function MagicLanternWidget() {
         @keyframes magicDust {
           0% {
             opacity: 0;
-            transform: translateY(14px) scale(0.5);
+            transform: translateY(10px) scale(0.5);
           }
 
           35% {
@@ -283,20 +308,20 @@ export default function MagicLanternWidget() {
           }
 
           100% {
-            opacity: 0.28;
-            transform: translateY(-34px) scale(1);
+            opacity: 0.25;
+            transform: translateY(-18px) scale(1);
           }
         }
 
         @keyframes glow {
           0%,
           100% {
-            opacity: 0.3;
+            opacity: 0.25;
             scale: 0.95;
           }
 
           50% {
-            opacity: 0.6;
+            opacity: 0.55;
             scale: 1.03;
           }
         }
