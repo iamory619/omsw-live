@@ -77,7 +77,7 @@ export default function MagicLanternWidget() {
     const newDusts: Dust[] = Array.from({ length: 140 }).map((_, index) => ({
       id: Date.now() + 5000 + index,
       x: 25 + Math.random() * 165,
-      y: 35 + Math.random() * 200,
+      y: 70 + Math.random() * 120,
       size: 1.5 + Math.random() * 3,
       delay: Math.random() * 1.8,
       duration: 2 + Math.random() * 2.5,
@@ -124,7 +124,7 @@ export default function MagicLanternWidget() {
 
       <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
         <div
-          className="absolute left-[375px] top-[360px] z-0 h-[230px] w-[220px] rounded-[38px] blur-[45px] pointer-events-none"
+          className="absolute left-[375px] top-[400px] z-0 h-[190px] w-[220px] rounded-[38px] blur-[45px] pointer-events-none"
           style={{
             background:
               "radial-gradient(circle at 50% 45%, rgba(236,72,153,0.22) 0%, rgba(168,85,247,0.38) 38%, rgba(79,70,229,0.22) 70%, transparent 100%)",
@@ -149,8 +149,8 @@ export default function MagicLanternWidget() {
         />
 
         <div
-          className="absolute left-[380px] top-[345px] z-30 h-[260px] w-[210px] overflow-hidden rounded-[34px]"
-          style={{
+  className="absolute left-[380px] top-[395px] z-30 h-[210px] w-[210px] overflow-hidden rounded-[34px]"
+            style={{
             clipPath:
               "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)",
           }}
@@ -209,7 +209,7 @@ export default function MagicLanternWidget() {
         />
 
         <div
-          className="animate-glow pointer-events-none absolute left-[392px] top-[385px] z-50 h-[190px] w-[185px] rounded-[34px] blur-xl"
+          className="animate-glow pointer-events-none absolute left-[392px] top-[420px] z-50 h-[160px] w-[185px]"
           style={{
             background:
               "radial-gradient(circle at 50% 58%, rgba(255,255,255,0.08) 0%, rgba(168,85,247,0.08) 50%, transparent 76%)",
