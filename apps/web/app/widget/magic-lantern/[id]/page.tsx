@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 type GiftPayload = {
@@ -29,7 +29,11 @@ type FloatingGift = {
 
 export default function MagicLanternWidget() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const overlayId = params.id as string;
+  const lantern =   searchParams.get("lantern") || "phoenix";
+  const lanternBack = `/assets/lantern/${lantern}-back.png`;
+  const lanternFront = `/assets/lantern/${lantern}-front.gif`; 
 
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
@@ -115,7 +119,7 @@ export default function MagicLanternWidget() {
         />
 
         <Image
-          src="/assets/lantern/lantern-back.png"
+          src={lanternBack}
           alt="Magic lantern back"
           width={900}
           height={1100} 
@@ -160,7 +164,7 @@ export default function MagicLanternWidget() {
         </div>
 
         <Image
-          src="/assets/lantern/lantern-front.gif"
+          src={lanternFront}
           alt="Magic lantern front"
           width={900}
           height={1100}

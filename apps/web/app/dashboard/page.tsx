@@ -49,12 +49,20 @@ const VEHICLES = [
   },
 ];
 
+const LANTERNS = [
+  { id: "phoenix", name: "Phoenix", image: "/assets/lantern/phoenix-back.png" },
+  { id: "rat", name: "Rat", image: "/assets/lantern/rat-back.png" },
+  { id: "cat", name: "Cat", image: "/assets/lantern/cat-back.png" },
+  { id: "rabbit", name: "Rabbit", image: "/assets/lantern/rabbit-back.png" },
+];
+
 export default function DashboardPage() {
   const [username, setUsername] = useState("");
   const [overlayId, setOverlayId] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedBasket, setSelectedBasket] = useState("basket-1");
   const [selectedVehicle, setSelectedVehicle] = useState("tuktuk");
+  const [selectedLantern, setSelectedLantern] = useState("phoenix");
 
   const socket = useMemo(() => {
     return io("https://server-production-b88b.up.railway.app");
@@ -152,7 +160,7 @@ export default function DashboardPage() {
           description: "ส่งของขวัญ 99 เหรียญขึ้นไป เพื่อรับคำทำนาย",
           url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
           active: true,
-          //basketPicker: true,
+          lanternPicker: true,
         },
         // {
         //   name: "🐱 Evolution Pet",
@@ -324,6 +332,36 @@ export default function DashboardPage() {
 
                             <div className="text-sm font-bold">
                               {vehicle.name}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {widget.lanternPicker && (
+                    <div className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                      <div className="mb-3 font-bold">เลือกโคม</div>
+
+                      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                        {LANTERNS.map((lantern) => (
+                          <button
+                            key={lantern.id}
+                            onClick={() => setSelectedLantern(lantern.id)}
+                            className={`rounded-2xl border p-3 transition ${
+                              selectedLantern === lantern.id
+                                ? "border-purple-500 bg-purple-500/20"
+                                : "border-zinc-700 bg-zinc-900 hover:bg-zinc-800"
+                            }`}
+                          >
+                            <img
+                              src={lantern.image}
+                              alt={lantern.name}
+                              className="mx-auto mb-2 h-20 object-contain"
+                            />
+
+                            <div className="text-sm font-bold">
+                              {lantern.name}
                             </div>
                           </button>
                         ))}
