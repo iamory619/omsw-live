@@ -56,7 +56,7 @@ export default function MagicLanternWidget() {
   phoenix:
    "radial-gradient(circle at 50% 58%, rgba(147,51,234,0.42) 0%, rgba(168,85,247,0.26) 45%, rgba(216,180,254,0.16) 72%, transparent 100%)",
   rat:
-    "radial-gradient(circle at 50% 58%, rgba(254, 240, 138, 0.6) 0%, rgba(253, 230, 138, 0.35) 45%, rgba(254, 252, 232, 0.2) 72%, transparent 100%)",
+    "radial-gradient(circle at 50% 58%, rgba(253, 186, 116, 0.5) 0%, rgba(254, 215, 170, 0.3) 45%, rgba(255, 237, 213, 0.15) 72%, transparent 100%)",
   cat:
     "radial-gradient(circle at 50% 58%, rgba(236,72,153,0.42) 0%, rgba(244,114,182,0.26) 45%, rgba(168,85,247,0.16) 72%, transparent 100%)",
   rabbit:
