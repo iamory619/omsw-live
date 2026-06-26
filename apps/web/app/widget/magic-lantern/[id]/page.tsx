@@ -21,10 +21,10 @@ type FloatingGift = {
   x: number;
   y: number;
   rotate: number;
+  floatX: number;
+  floatY: number;
   delay: number;
   duration: number;
-  orbit: number;
-  depth: number;
 };
 
 type Dust = {
@@ -34,12 +34,11 @@ type Dust = {
   size: number;
   delay: number;
   duration: number;
-  orbit: number;
 };
 
 const JAR = {
-  left: 490,
-  top: 601,
+  left: 385,
+  top: 600,
   width: 214,
   height: 150,
 };
@@ -58,50 +57,42 @@ export default function MagicLanternWidget() {
   const [showMessage, setShowMessage] = useState(false);
   const [gifts, setGifts] = useState<FloatingGift[]>([]);
   const [dusts, setDusts] = useState<Dust[]>([]);
-  const [power, setPower] = useState(0);
 
   const playEffect = (gift: GiftPayload) => {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
     setShowMessage(true);
 
-    const count = Math.min(Math.max((gift.amount || 1) * 3, 8), 80);
+    const count = Math.min(Math.max((gift.amount || 1) * 4, 10), 80);
     const giftImage = gift.giftImage || "/assets/rose.png";
 
     const newGifts: FloatingGift[] = Array.from({ length: count }).map(
-      (_, index) => {
-        const row = index % 5;
-        const col = Math.floor(index / 5) % 8;
+      (_, index) => ({
+        id: Date.now() + index,
+        image: giftImage,
+        name: gift.giftName,
+        size: 10 + Math.random() * 5,
 
-        return {
-          id: Date.now() + index,
-          image: giftImage,
-          name: gift.giftName,
-          size: 11 + Math.random() * 6,
+        x: 28 + Math.random() * 150,
+       y: 70 + Math.random() * 55,
 
-          x: 32 + col * 18 + Math.random() * 8,
-          y: 74 + row * 13 + Math.random() * 8,
-
-          rotate: -35 + Math.random() * 70,
-          delay: Math.random() * 0.8,
-          duration: 3 + Math.random() * 2,
-          orbit: 6 + Math.random() * 10,
-          depth: 0.85 + Math.random() * 0.25,
-        };
-      },
+        rotate: -40 + Math.random() * 80,
+        floatX: -4 + Math.random() * 8,
+        floatY: -4 + Math.random() * 8,
+        delay: Math.random() * 0.5,
+        duration: 2.8 + Math.random() * 1.6,
+      }),
     );
 
-    const newDusts: Dust[] = Array.from({ length: 120 }).map((_, index) => ({
+    const newDusts: Dust[] = Array.from({ length: 90 }).map((_, index) => ({
       id: Date.now() + 5000 + index,
-      x: 40 + Math.random() * 130,
-      y: 35 + Math.random() * 95,
-      size: 1.2 + Math.random() * 2.8,
-      delay: Math.random() * 2,
-      duration: 2.4 + Math.random() * 2.4,
-      orbit: 8 + Math.random() * 18,
+      x: 20 + Math.random() * 170,
+      y: 55 + Math.random() * 65,
+      size: 1.3 + Math.random() * 2.4,
+      delay: Math.random() * 1.8,
+      duration: 2 + Math.random() * 2.5,
     }));
 
-    setPower((prev) => Math.min(prev + count, 220));
-    setGifts((prev) => [...prev, ...newGifts].slice(-220));
+    setGifts((prev) => [...prev, ...newGifts].slice(-160));
     setDusts(newDusts);
 
     setTimeout(() => {
@@ -125,7 +116,6 @@ export default function MagicLanternWidget() {
       setShowMessage(false);
       setGifts([]);
       setDusts([]);
-      setPower(0);
     });
 
     return () => {
@@ -145,25 +135,24 @@ export default function MagicLanternWidget() {
         <div
           className="absolute z-0 rounded-[38px] blur-[42px] pointer-events-none"
           style={{
-            left: `${JAR.left - 8}px`,
-            top: `${JAR.top + 4}px`,
-            width: `${JAR.width + 16}px`,
+            left: `${JAR.left - 6}px`,
+            top: `${JAR.top + 2}px`,
+            width: `${JAR.width + 10}px`,
             height: `${JAR.height}px`,
-            opacity: 0.45 + Math.min(power / 300, 0.35),
             background:
-              "radial-gradient(circle at 50% 58%, rgba(236,72,153,0.18) 0%, rgba(168,85,247,0.42) 42%, rgba(79,70,229,0.22) 72%, transparent 100%)",
+              "radial-gradient(circle at 50% 52%, rgba(236,72,153,0.18) 0%, rgba(168,85,247,0.34) 42%, rgba(79,70,229,0.18) 72%, transparent 100%)",
           }}
         />
 
         <div
-          className="absolute z-0 rounded-full blur-[38px] pointer-events-none"
+          className="absolute z-0 rounded-full blur-[42px] pointer-events-none"
           style={{
-            left: `${JAR.left - 4}px`,
-            top: `${JAR.top + 88}px`,
-            width: `${JAR.width + 20}px`,
-            height: "72px",
+            left: `${JAR.left - 10}px`,
+            top: `${JAR.top + 78}px`,
+            width: `${JAR.width + 30}px`,
+            height: "92px",
             background:
-              "radial-gradient(circle, rgba(59,130,246,0.42) 0%, rgba(168,85,247,0.18) 48%, transparent 76%)",
+              "radial-gradient(circle, rgba(59,130,246,0.45) 0%, rgba(168,85,247,0.18) 48%, transparent 76%)",
           }}
         />
 
@@ -188,17 +177,17 @@ export default function MagicLanternWidget() {
           }}
         >
           <div
-            className="animate-breath absolute inset-0 blur-xl"
+            className="absolute inset-0 blur-xl"
             style={{
               background:
-                "radial-gradient(circle at 50% 68%, rgba(168,85,247,0.2), transparent 72%)",
+                "radial-gradient(circle at 50% 62%, rgba(168,85,247,0.14), transparent 72%)",
             }}
           />
 
           {dusts.map((dust) => (
             <span
               key={dust.id}
-              className="animate-orbit-dust absolute rounded-full bg-yellow-200 shadow-[0_0_12px_rgba(250,204,21,0.95)]"
+              className="animate-magic-dust absolute rounded-full bg-yellow-200 shadow-[0_0_10px_rgba(250,204,21,0.9)]"
               style={{
                 left: `${dust.x}px`,
                 top: `${dust.y}px`,
@@ -206,7 +195,6 @@ export default function MagicLanternWidget() {
                 height: `${dust.size}px`,
                 animationDelay: `${dust.delay}s`,
                 animationDuration: `${dust.duration}s`,
-                ["--dust-orbit" as string]: `${dust.orbit}px`,
               }}
             />
           ))}
@@ -216,7 +204,7 @@ export default function MagicLanternWidget() {
               key={gift.id}
               src={gift.image}
               alt={gift.name}
-              className="animate-orbit-gift absolute drop-shadow-[0_0_7px_rgba(255,105,180,0.85)]"
+              className="animate-float-gift absolute drop-shadow-[0_0_6px_rgba(255,105,180,0.75)]"
               style={{
                 left: `${gift.x}px`,
                 top: `${gift.y}px`,
@@ -224,9 +212,9 @@ export default function MagicLanternWidget() {
                 height: `${gift.size}px`,
                 animationDelay: `${gift.delay}s`,
                 animationDuration: `${gift.duration}s`,
+                ["--gift-float-x" as string]: `${gift.floatX}px`,
+                ["--gift-float-y" as string]: `${gift.floatY}px`,
                 ["--gift-rotate" as string]: `${gift.rotate}deg`,
-                ["--gift-orbit" as string]: `${gift.orbit}px`,
-                ["--gift-depth" as string]: `${gift.depth}`,
               }}
             />
           ))}
@@ -245,11 +233,11 @@ export default function MagicLanternWidget() {
           className="animate-glow pointer-events-none absolute z-50 rounded-[34px] blur-xl"
           style={{
             left: `${JAR.left + 16}px`,
-            top: `${JAR.top + 18}px`,
+            top: `${JAR.top + 12}px`,
             width: `${JAR.width - 34}px`,
-            height: `${JAR.height - 32}px`,
+            height: `${JAR.height - 20}px`,
             background:
-              "radial-gradient(circle at 50% 65%, rgba(255,255,255,0.07) 0%, rgba(168,85,247,0.07) 52%, transparent 76%)",
+              "radial-gradient(circle at 50% 62%, rgba(255,255,255,0.07) 0%, rgba(168,85,247,0.07) 52%, transparent 76%)",
           }}
         />
       </div>
@@ -284,10 +272,10 @@ export default function MagicLanternWidget() {
           }
         }
 
-        @keyframes orbitGift {
+        @keyframes floatGift {
           0% {
             opacity: 0;
-            transform: translateY(8px) scale(0.6) rotate(0deg);
+            transform: translateY(8px) scale(0.7) rotate(0deg);
           }
 
           20% {
@@ -295,27 +283,24 @@ export default function MagicLanternWidget() {
           }
 
           50% {
-            transform: translate(
-                var(--gift-orbit),
-                calc(var(--gift-orbit) * -0.45)
-              )
-              scale(var(--gift-depth)) rotate(var(--gift-rotate));
+            transform: translate(var(--gift-float-x), var(--gift-float-y))
+              scale(1) rotate(var(--gift-rotate));
           }
 
           100% {
             opacity: 1;
             transform: translate(
-                calc(var(--gift-orbit) * -0.8),
-                calc(var(--gift-orbit) * 0.35)
+                calc(var(--gift-float-x) * -0.6),
+                calc(var(--gift-y) * -0.6)
               )
               scale(0.95) rotate(calc(var(--gift-rotate) * -0.5));
           }
         }
 
-        @keyframes orbitDust {
+        @keyframes magicDust {
           0% {
             opacity: 0;
-            transform: translate(0, 8px) scale(0.5);
+            transform: translateY(10px) scale(0.5);
           }
 
           35% {
@@ -323,25 +308,8 @@ export default function MagicLanternWidget() {
           }
 
           100% {
-            opacity: 0.35;
-            transform: translate(
-                calc(var(--dust-orbit) * -0.7),
-                calc(var(--dust-orbit) * -1)
-              )
-              scale(1);
-          }
-        }
-
-        @keyframes breath {
-          0%,
-          100% {
-            opacity: 0.35;
-            scale: 0.95;
-          }
-
-          50% {
-            opacity: 0.75;
-            scale: 1.05;
+            opacity: 0.25;
+            transform: translateY(-18px) scale(1);
           }
         }
 
@@ -362,22 +330,18 @@ export default function MagicLanternWidget() {
           animation: message 3.2s ease-in-out forwards;
         }
 
-        .animate-orbit-gift {
-          animation-name: orbitGift;
+        .animate-float-gift {
+          animation-name: floatGift;
           animation-timing-function: ease-in-out;
           animation-iteration-count: infinite;
           animation-direction: alternate;
         }
 
-        .animate-orbit-dust {
-          animation-name: orbitDust;
+        .animate-magic-dust {
+          animation-name: magicDust;
           animation-timing-function: ease-in-out;
           animation-iteration-count: infinite;
           animation-direction: alternate;
-        }
-
-        .animate-breath {
-          animation: breath 2.6s ease-in-out infinite;
         }
 
         .animate-glow {
