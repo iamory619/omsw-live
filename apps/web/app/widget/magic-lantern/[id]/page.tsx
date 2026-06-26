@@ -62,7 +62,7 @@ export default function MagicLanternWidget() {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
     setShowMessage(true);
 
-    const count = Math.min(Math.max((gift.amount || 1) * 4, 10), 80);
+    const count = Math.min(Math.max((gift.amount || 1) * 2, 5), 45);
     const giftImage = gift.giftImage || "/assets/rose.png";
 
     const newGifts: FloatingGift[] = Array.from({ length: count }).map(
@@ -70,18 +70,22 @@ export default function MagicLanternWidget() {
         id: Date.now() + index,
         image: giftImage,
         name: gift.giftName,
-        size: 10 + Math.random() * 5,
+        size: 9 + Math.random() * 5,
 
-        x: 28 + Math.random() * 150,
-       y: 70 + Math.random() * 55,
+        // กระจายกุหลาบในโหล ไม่เรียงเป็นกอง
+        x: 30 + Math.random() * 150,
+        y: 38 + Math.random() * 95,
 
-        rotate: -40 + Math.random() * 80,
+        rotate: -45 + Math.random() * 90,
         floatX: -4 + Math.random() * 8,
         floatY: -4 + Math.random() * 8,
-        delay: Math.random() * 0.5,
-        duration: 2.8 + Math.random() * 1.6,
+        delay: Math.random() * 0.8,
+        duration: 3 + Math.random() * 2,
+        orbit: 8 + Math.random() * 16,
       }),
     );
+
+    
 
     const newDusts: Dust[] = Array.from({ length: 90 }).map((_, index) => ({
       id: Date.now() + 5000 + index,
