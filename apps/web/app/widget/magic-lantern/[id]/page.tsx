@@ -27,14 +27,14 @@ type FloatingGift = {
   duration: number;
 };
 
-type Dust = {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  delay: number;
-  duration: number;
-};
+// type Dust = {
+//   id: number;
+//   x: number;
+//   y: number;
+//   size: number;
+//   delay: number;
+//   duration: number;
+// };
 
 const JAR = {
   left: 450,
@@ -56,7 +56,9 @@ export default function MagicLanternWidget() {
   phoenix:
    "radial-gradient(circle at 50% 58%, rgba(147,51,234,0.42) 0%, rgba(168,85,247,0.26) 45%, rgba(216,180,254,0.16) 72%, transparent 100%)",
   rat:
-    "radial-gradient(circle at 50% 58%, rgba(251,146,60,0.42) 0%, rgba(245,158,11,0.26) 45%, rgba(120,53,15,0.16) 72%, transparent 100%)",
+    "radial-gradient(circle at 50% 58%, rgba(147,51,234,0.42) 0%, rgba(168,85,247,0.26) 45%, rgba(216,180,254,0.16) 72%, transparent 100%)",
+
+    // "radial-gradient(circle at 50% 58%, rgba(251,146,60,0.42) 0%, rgba(245,158,11,0.26) 45%, rgba(120,53,15,0.16) 72%, transparent 100%)",
 
   cat:
     "radial-gradient(circle at 50% 58%, rgba(236,72,153,0.42) 0%, rgba(244,114,182,0.26) 45%, rgba(168,85,247,0.16) 72%, transparent 100%)",
@@ -90,7 +92,7 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
   const [gifts, setGifts] = useState<FloatingGift[]>([]);
-  const [dusts, setDusts] = useState<Dust[]>([]);
+  // const [dusts, setDusts] = useState<Dust[]>([]);
 
   const playEffect = (gift: GiftPayload) => {
     setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
@@ -120,17 +122,17 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
     ); 
     
 
-    const newDusts: Dust[] = Array.from({ length: 90 }).map((_, index) => ({
-      id: Date.now() + 5000 + index,
-      x: 20 + Math.random() * 170,
-      y: 55 + Math.random() * 65,
-      size: 1.3 + Math.random() * 2.4,
-      delay: Math.random() * 1.8,
-      duration: 2 + Math.random() * 2.5,
-    }));
+    // const newDusts: Dust[] = Array.from({ length: 90 }).map((_, index) => ({
+    //   id: Date.now() + 5000 + index,
+    //   x: 20 + Math.random() * 170,
+    //   y: 55 + Math.random() * 65,
+    //   size: 1.3 + Math.random() * 2.4,
+    //   delay: Math.random() * 1.8,
+    //   duration: 2 + Math.random() * 2.5,
+    // }));
 
     setGifts((prev) => [...prev, ...newGifts].slice(-160));
-    setDusts(newDusts);
+    // setDusts(newDusts);
 
     setTimeout(() => {
       setShowMessage(false);
@@ -151,8 +153,7 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
     socket.on("reset-gift", () => {
       setMessage("");
       setShowMessage(false);
-      setGifts([]);
-      setDusts([]);
+      setGifts([]);      
     });
 
     return () => {
@@ -219,7 +220,7 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
   }}
 />
 
-          {dusts.map((dust) => (
+          {/* {dusts.map((dust) => (
             <span
               key={dust.id}
               className="animate-magic-dust absolute rounded-full"              
@@ -234,7 +235,7 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
                   boxShadow: `0 0 10px ${dustColor}`,
               }}
             />
-          ))}
+          ))} */}
 
           {gifts.map((gift) => (
             <img
