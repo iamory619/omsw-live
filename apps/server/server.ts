@@ -150,7 +150,12 @@ io.on("connection", (socket) => {
   socket.on("test-lantern", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    console.log("🧙 Test Lantern");
+    if (!overlayId) {
+      console.log("⚠️ test-lantern missing overlayId:", payload);
+      return;
+    }
+
+    console.log("🧙 Test Lantern:", overlayId);
 
     const giftPayload = {
       user: "Mimi",
@@ -160,16 +165,28 @@ io.on("connection", (socket) => {
       giftImage: "/assets/rose.png",
     };
 
+    // ส่งหลายชื่อไว้ก่อน เผื่อหน้า Magic Lantern ฟัง event คนละชื่อ
     io.to(overlayId).emit("test-lantern", giftPayload);
     io.to(overlayId).emit("gift-lantern", giftPayload);
+    io.to(overlayId).emit("magic-lantern", giftPayload);
+    io.to(overlayId).emit("lantern-gift", giftPayload);
+    io.to(overlayId).emit("gift-alert", "🧙 Test Lantern: Rose x1");
   });
 
   socket.on("reset-lantern", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    console.log("🔄 Reset Lantern");
+    if (!overlayId) {
+      console.log("⚠️ reset-lantern missing overlayId:", payload);
+      return;
+    }
 
+    console.log("🔄 Reset Lantern:", overlayId);
+
+    // ส่งหลายชื่อไว้ก่อน เผื่อหน้า Magic Lantern ฟัง event คนละชื่อ
     io.to(overlayId).emit("reset-lantern");
+    io.to(overlayId).emit("lantern-reset");
+    io.to(overlayId).emit("reset-magic-lantern");
   });
 
   socket.on("test-vehicle", (payload: string | TestPayload) => {
