@@ -38,8 +38,8 @@ type Dust = {
 };
 
 const JAR = {
-  left: 400,
-  top: 650,
+  left: 550,
+  top: 600,
   width: 214,
   height: 150,
 };
