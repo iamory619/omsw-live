@@ -64,6 +64,10 @@ type WidgetItem = {
   active: boolean;
   testEvent: string;
   resetEvent: string;
+  testLabel: string;
+  resetLabel: string;
+  testButtonClass: string;
+  resetButtonClass: string;
   basketPicker?: boolean;
   vehiclePicker?: boolean;
   lanternPicker?: boolean;
@@ -148,7 +152,11 @@ export default function DashboardPage() {
           url: `${window.location.origin}/widget/gift-goal/${overlayId}`,
           active: true,
            testEvent: "test-goal",
-  resetEvent: "reset-goal",
+          resetEvent: "reset-goal",
+          testLabel: "🎯 Test Goal",
+          resetLabel: "🔄 Reset Goal",
+          testButtonClass: "bg-pink-600 hover:bg-pink-500",
+          resetButtonClass: "bg-red-600 hover:bg-red-500",
         },
         {
           name: "🧙🏻‍♀️ Magic Lantern",
@@ -157,7 +165,11 @@ export default function DashboardPage() {
           active: true,
           lanternPicker: true,
            testEvent: "test-lantern",
-            resetEvent: "reset-lantern",
+          resetEvent: "reset-lantern",
+          testLabel: "🧙 Test Lantern",
+          resetLabel: "🔄 Reset Lantern",
+          testButtonClass: "bg-purple-600 hover:bg-purple-500",
+          resetButtonClass: "bg-red-600 hover:bg-red-500",
         },
         {
           name: "🛺 Gift Vehicle",
@@ -166,7 +178,11 @@ export default function DashboardPage() {
           active: true,
           vehiclePicker: true,
             testEvent: "test-vehicle",
-  resetEvent: "reset-vehicle",
+          resetEvent: "reset-vehicle",
+          testLabel: "🛺 Test Vehicle",
+          resetLabel: "🔄 Reset Vehicle",
+          testButtonClass: "bg-yellow-600 hover:bg-yellow-500",
+          resetButtonClass: "bg-red-600 hover:bg-red-500",
         },
         {
           name: "🧺 Gift Basket",
@@ -175,7 +191,11 @@ export default function DashboardPage() {
           active: true,
           basketPicker: true,
             testEvent: "test-basket",
-  resetEvent: "reset-basket",
+          resetEvent: "reset-basket",
+          testLabel: "🧺 Test Basket",
+          resetLabel: "🔄 Reset Basket",
+          testButtonClass: "bg-emerald-600 hover:bg-emerald-500",
+          resetButtonClass: "bg-red-600 hover:bg-red-500",
         },
         {
           name: "🙏🏻 Sathu 99",
@@ -183,7 +203,11 @@ export default function DashboardPage() {
           url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
           active: true,   
            testEvent: "test-fortune",
-  resetEvent: "reset-fortune",      
+          resetEvent: "reset-fortune",
+          testLabel: "🙏 Test Fortune",
+          resetLabel: "🔄 Reset Fortune",
+          testButtonClass: "bg-orange-600 hover:bg-orange-500",
+          resetButtonClass: "bg-red-600 hover:bg-red-500",      
         },
         // {
         //   name: "🐱 Evolution Pet",
@@ -409,14 +433,14 @@ export default function DashboardPage() {
                   <div className="flex flex-wrap gap-3">
                     <button
                       onClick={() => copy(widget.url)}
-                      className="rounded-xl bg-purple-600 px-4 py-2"
+                      className="rounded-xl bg-purple-600 px-4 py-2 font-bold transition hover:bg-purple-500"
                     >
                       คัดลอก
                     </button>
 
                     <button
                       onClick={() => window.open(widget.url, "_blank")}
-                      className="rounded-xl bg-zinc-700 px-4 py-2"
+                      className="rounded-xl bg-zinc-700 px-4 py-2 font-bold transition hover:bg-zinc-600"
                     >
                       Preview
                     </button>
@@ -429,9 +453,9 @@ export default function DashboardPage() {
                               overlayId,
                             });
                           }}
-                          className="rounded-xl bg-pink-600 px-4 py-2 font-bold"
+                          className={`rounded-xl px-4 py-2 font-bold transition ${widget.testButtonClass}`}
                         >
-                          🧪 Test
+                          {widget.testLabel}
                         </button>
 
                         <button
@@ -440,9 +464,9 @@ export default function DashboardPage() {
                               overlayId,
                             });
                           }}
-                          className="rounded-xl bg-red-600 px-4 py-2"
+                          className={`rounded-xl px-4 py-2 font-bold transition ${widget.resetButtonClass}`}
                         >
-                          🔄 Reset
+                          {widget.resetLabel}
                         </button>
                       </>
                     )}
