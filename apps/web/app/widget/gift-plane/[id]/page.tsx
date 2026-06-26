@@ -181,16 +181,24 @@ export default function GiftPlaneWidget() {
 
     socket.emit("join-overlay", overlayId);
 
-    socket.on("gift-plane", (gift: GiftPayload) => {
+    // ปุ่ม Test Basket จาก Dashboard
+    socket.on("test-basket", (gift: GiftPayload) => {
       playEffect(gift);
     });
 
-    socket.on("reset-gift", () => {
+    // ของขวัญจริงจาก TikTok สำหรับ Basket
+    socket.on("basket-gift", (gift: GiftPayload) => {
+      playEffect(gift);
+    });
+
+    // Reset Basket
+    socket.on("reset-basket", () => {
       setMessage("");
       setShowMessage(false);
       setFallingGifts([]);
       setPileGifts([]);
       setSparkles([]);
+      setPetals([]);
     });
 
     return () => {
