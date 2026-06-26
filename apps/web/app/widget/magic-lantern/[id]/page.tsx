@@ -38,7 +38,7 @@ type Dust = {
 
 const JAR = {
   left: 378,
-  top: 455,
+  top: 470,
   width: 214,
   height: 150,
 };
@@ -73,7 +73,7 @@ export default function MagicLanternWidget() {
         size: 10 + Math.random() * 5,
 
         x: 28 + Math.random() * 150,
-        y: 18 + Math.random() * 95,
+       y: 70 + Math.random() * 55,
 
         rotate: -40 + Math.random() * 80,
         floatX: -4 + Math.random() * 8,
@@ -86,7 +86,7 @@ export default function MagicLanternWidget() {
     const newDusts: Dust[] = Array.from({ length: 90 }).map((_, index) => ({
       id: Date.now() + 5000 + index,
       x: 20 + Math.random() * 170,
-      y: 12 + Math.random() * 112,
+      y: 55 + Math.random() * 65,
       size: 1.3 + Math.random() * 2.4,
       delay: Math.random() * 1.8,
       duration: 2 + Math.random() * 2.5,
