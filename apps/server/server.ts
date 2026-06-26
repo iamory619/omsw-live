@@ -137,7 +137,44 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("❌ Client disconnected");
   });
+
+  socket.on("test-lantern", (overlayId) => {
+  io.to(overlayId).emit("test-lantern");
 });
+
+socket.on("reset-lantern", (overlayId) => {
+  io.to(overlayId).emit("reset-lantern");
+});
+
+socket.on("test-vehicle", (overlayId) => {
+  io.to(overlayId).emit("test-vehicle");
+});
+
+socket.on("reset-vehicle", (overlayId) => {
+  io.to(overlayId).emit("reset-vehicle");
+});
+
+socket.on("test-basket", (overlayId) => {
+  io.to(overlayId).emit("test-basket");
+});
+
+socket.on("reset-basket", (overlayId) => {
+  io.to(overlayId).emit("reset-basket");
+});
+
+socket.on("test-fortune", (overlayId) => {
+  io.to(overlayId).emit("test-fortune");
+});
+
+socket.on("reset-fortune", (overlayId) => {
+  io.to(overlayId).emit("reset-fortune");
+});
+
+
+
+});
+
+
 
 app.get("/", (_, res) => {
   res.json({

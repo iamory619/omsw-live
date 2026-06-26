@@ -56,6 +56,19 @@ const LANTERNS = [
   { id: "rabbit", name: "Rabbit", image: "/assets/lantern/rabbit-back.png" },
 ];
 
+
+type WidgetItem = {
+  name: string;
+  description: string;
+  url: string;
+  active: boolean;
+  testEvent: string;
+  resetEvent: string;
+  basketPicker?: boolean;
+  vehiclePicker?: boolean;
+  lanternPicker?: boolean;
+};
+
 export default function DashboardPage() {
   const [username, setUsername] = useState("");
   const [overlayId, setOverlayId] = useState("");
@@ -127,13 +140,15 @@ export default function DashboardPage() {
     alert("คัดลอก URL แล้ว");
   };
 
-  const widgets = overlayId
+  const widgets: WidgetItem[] = overlayId
     ? [
         {
           name: "🎁 Gift Goal",
           description: "เป้าหมายของขวัญ เช่น Rose 0/100",
           url: `${window.location.origin}/widget/gift-goal/${overlayId}`,
           active: true,
+           testEvent: "test-goal",
+  resetEvent: "reset-goal",
         },
         {
           name: "🧙🏻‍♀️ Magic Lantern",
@@ -141,6 +156,8 @@ export default function DashboardPage() {
           url: `${window.location.origin}/widget/magic-lantern/${overlayId}?lantern=${selectedLantern}`,
           active: true,
           lanternPicker: true,
+           testEvent: "test-lantern",
+            resetEvent: "reset-lantern",
         },
         {
           name: "🛺 Gift Vehicle",
@@ -148,6 +165,8 @@ export default function DashboardPage() {
           url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=${selectedVehicle}`,
           active: true,
           vehiclePicker: true,
+            testEvent: "test-vehicle",
+  resetEvent: "reset-vehicle",
         },
         {
           name: "🧺 Gift Basket",
@@ -155,12 +174,16 @@ export default function DashboardPage() {
           url: `${window.location.origin}/widget/gift-plane/${overlayId}?basket=${selectedBasket}`,
           active: true,
           basketPicker: true,
+            testEvent: "test-basket",
+  resetEvent: "reset-basket",
         },
         {
           name: "🙏🏻 Sathu 99",
           description: "ส่งของขวัญ 99 เหรียญขึ้นไป เพื่อรับคำทำนาย",
           url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
-          active: true,         
+          active: true,   
+           testEvent: "test-fortune",
+  resetEvent: "reset-fortune",      
         },
         // {
         //   name: "🐱 Evolution Pet",
@@ -402,16 +425,20 @@ export default function DashboardPage() {
                       <>
                         <button
                           onClick={() => {
-                            socket.emit("test-gift", overlayId);
+                            socket.emit(widget.testEvent, {
+                              overlayId,
+                            });
                           }}
                           className="rounded-xl bg-pink-600 px-4 py-2 font-bold"
                         >
-                          🌹 Test Rose
+                          🧪 Test
                         </button>
 
                         <button
                           onClick={() => {
-                            socket.emit("reset-gift", overlayId);
+                            socket.emit(widget.resetEvent, {
+                              overlayId,
+                            });
                           }}
                           className="rounded-xl bg-red-600 px-4 py-2"
                         >
