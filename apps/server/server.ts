@@ -75,29 +75,25 @@ app.post("/connect", async (req, res) => {
           "/assets/gift-box.png",
       };
 
-      /*
-        ของจริงจาก TikTok:
-        ส่ง event แยกเฉพาะ Widget
-        เพื่อให้แต่ละหน้าเลือกฟังของตัวเอง ไม่ไปติดทุกอัน
-      */
-      io.to(overlayId).emit("goal-gift", giftPayload);
-      io.to(overlayId).emit("lantern-gift", giftPayload);
-      io.to(overlayId).emit("vehicle-gift", giftPayload);
-      io.to(overlayId).emit("basket-gift", giftPayload);
-      io.to(overlayId).emit("fortune-gift", giftPayload);
+      io.to(overlayId).emit(
+        "gift-alert",
+        `🎁 ${giftPayload.user} sent ${giftPayload.giftName} x${giftPayload.amount}`,
+      );
+
+      // ของจริงจาก TikTok ยังส่งให้ Widget หลักตามเดิม
+      io.to(overlayId).emit("gift-plane", giftPayload);
+      io.to(overlayId).emit("gift-progress", giftPayload.amount);
     });
 
     tiktok.on("chat", (data: any) => {
-      io.to(overlayId).emit("chat-alert", {
-        user: data.nickname || "Someone",
-        comment: data.comment || "",
-      });
+      io.to(overlayId).emit(
+        "gift-alert",
+        `💬 ${data.nickname}: ${data.comment}`,
+      );
     });
 
     tiktok.on("follow", (data: any) => {
-      io.to(overlayId).emit("follow-alert", {
-        user: data.nickname || "Someone",
-      });
+      io.to(overlayId).emit("gift-alert", `❤️ ${data.nickname} followed`);
     });
 
     res.json({
@@ -130,13 +126,6 @@ io.on("connection", (socket) => {
     console.log(`📺 Overlay joined room: ${overlayId}`);
   });
 
-  /*
-    สำคัญ:
-    ปุ่ม Test / Reset แต่ละอันต้องยิง event เฉพาะของตัวเองเท่านั้น
-    ห้ามยิง gift-alert, gift-plane, gift-basket รวมกัน
-    เพราะจะทำให้ Widget อื่นติดไปด้วย
-  */
-
   socket.on("test-goal", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
@@ -149,7 +138,6 @@ io.on("connection", (socket) => {
 
     console.log("🎯 Test Goal:", overlayId, testRose);
 
-    io.to(overlayId).emit("goal-gift", createRosePayload(1));
     io.to(overlayId).emit("gift-progress", testRose);
   });
 
@@ -165,7 +153,6 @@ io.on("connection", (socket) => {
 
     console.log("🔄 Reset Goal:", overlayId);
 
-    io.to(overlayId).emit("reset-goal");
     io.to(overlayId).emit("gift-progress", 0);
   });
 
@@ -179,7 +166,8 @@ io.on("connection", (socket) => {
 
     console.log("🧙 Test Lantern:", overlayId);
 
-    io.to(overlayId).emit("lantern-gift", createRosePayload(1));
+    // ส่งเฉพาะ Lantern เท่านั้น
+    io.to(overlayId).emit("test-lantern", createRosePayload(1));
   });
 
   socket.on("reset-lantern", (payload: string | TestPayload) => {
@@ -205,7 +193,8 @@ io.on("connection", (socket) => {
 
     console.log("🛺 Test Vehicle:", overlayId);
 
-    io.to(overlayId).emit("vehicle-gift", createRosePayload(1));
+    // ส่งเฉพาะ Vehicle เท่านั้น
+    io.to(overlayId).emit("test-vehicle", createRosePayload(1));
   });
 
   socket.on("reset-vehicle", (payload: string | TestPayload) => {
@@ -231,7 +220,9 @@ io.on("connection", (socket) => {
 
     console.log("🧺 Test Basket:", overlayId);
 
-    io.to(overlayId).emit("basket-gift", createRosePayload(1));
+    // ส่งเฉพาะ Basket เท่านั้น
+    // ใช้ test-basket เป็นหลัก เพื่อไม่ให้ไปปลุก Widget อื่น
+    io.to(overlayId).emit("test-basket", createRosePayload(1));
   });
 
   socket.on("reset-basket", (payload: string | TestPayload) => {
@@ -257,7 +248,8 @@ io.on("connection", (socket) => {
 
     console.log("🙏 Test Fortune:", overlayId);
 
-    io.to(overlayId).emit("fortune-gift", createRosePayload(99));
+    // ส่งเฉพาะ Sathu 99 เท่านั้น
+    io.to(overlayId).emit("test-fortune", createRosePayload(99));
   });
 
   socket.on("reset-fortune", (payload: string | TestPayload) => {
