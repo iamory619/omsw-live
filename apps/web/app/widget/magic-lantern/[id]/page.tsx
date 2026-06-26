@@ -54,8 +54,7 @@ export default function MagicLanternWidget() {
   const lanternFront = `/assets/lantern/${lantern}-front.gif`;
   const LANTERN_GLOW: Record<string, string> = {
   phoenix:
-    "radial-gradient(circle at 50% 58%, rgba(249,115,22,0.42) 0%, rgba(239,68,68,0.26) 45%, rgba(168,85,247,0.16) 72%, transparent 100%)",
-
+   "radial-gradient(circle at 50% 58%, rgba(147,51,234,0.42) 0%, rgba(168,85,247,0.26) 45%, rgba(216,180,254,0.16) 72%, transparent 100%)",
   rat:
     "radial-gradient(circle at 50% 58%, rgba(251,146,60,0.42) 0%, rgba(245,158,11,0.26) 45%, rgba(120,53,15,0.16) 72%, transparent 100%)",
 
