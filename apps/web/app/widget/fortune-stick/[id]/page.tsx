@@ -52,11 +52,18 @@ export default function FortuneStickWidget() {
 
     socket.emit("join-overlay", overlayId);
 
-    socket.on("gift-plane", (gift: GiftPayload) => {
+    // ปุ่ม Test Fortune จาก Dashboard
+    socket.on("test-fortune", (gift: GiftPayload) => {
       showRandomFortune(gift);
     });
 
-    socket.on("reset-gift", () => {
+    // ของขวัญจริงจาก TikTok สำหรับ Fortune
+    socket.on("fortune-gift", (gift: GiftPayload) => {
+      showRandomFortune(gift);
+    });
+
+    // Reset Fortune
+    socket.on("reset-fortune", () => {
       setFortune(null);
       setShowFortune(false);
     });

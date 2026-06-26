@@ -119,11 +119,18 @@ export default function GiftVehicleWidget() {
 
     socket.emit("join-overlay", overlayId);
 
-    socket.on("gift-plane", (gift: GiftPayload) => {
+    // ใช้สำหรับปุ่ม Test Vehicle จาก Dashboard
+    socket.on("test-vehicle", (gift: GiftPayload) => {
       playEffect(gift);
     });
 
-    socket.on("reset-gift", () => {
+    // ใช้สำหรับของขวัญจริงจาก TikTok เฉพาะ Gift Vehicle
+    socket.on("vehicle-gift", (gift: GiftPayload) => {
+      playEffect(gift);
+    });
+
+    // ใช้สำหรับ Reset Vehicle จาก Dashboard
+    socket.on("reset-vehicle", () => {
       setMessage("");
       setShowVehicle(false);
       setRoad([]);
