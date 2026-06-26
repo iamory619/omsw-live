@@ -52,6 +52,41 @@ export default function MagicLanternWidget() {
 
   const lanternBack = `/assets/lantern/${lantern}-back.png`;
   const lanternFront = `/assets/lantern/${lantern}-front.gif`;
+  const LANTERN_GLOW: Record<string, string> = {
+  phoenix:
+    "radial-gradient(circle at 50% 58%, rgba(249,115,22,0.42) 0%, rgba(239,68,68,0.26) 45%, rgba(168,85,247,0.16) 72%, transparent 100%)",
+
+  rat:
+    "radial-gradient(circle at 50% 58%, rgba(251,146,60,0.42) 0%, rgba(245,158,11,0.26) 45%, rgba(120,53,15,0.16) 72%, transparent 100%)",
+
+  cat:
+    "radial-gradient(circle at 50% 58%, rgba(236,72,153,0.42) 0%, rgba(244,114,182,0.26) 45%, rgba(168,85,247,0.16) 72%, transparent 100%)",
+
+  rabbit:
+    "radial-gradient(circle at 50% 58%, rgba(56,189,248,0.42) 0%, rgba(14,165,233,0.26) 45%, rgba(99,102,241,0.16) 72%, transparent 100%)",
+};
+
+const lanternGlow =
+  LANTERN_GLOW[lantern] || LANTERN_GLOW.phoenix;
+
+ const DUST_COLOR: Record<string, string> = {
+  phoenix: "#FFD54A",
+  rat: "#FFB347",
+  cat: "#FF6FB5",
+  rabbit: "#66D9FF",
+};
+
+  const GIFT_GLOW: Record<string, string> = {
+  phoenix: "drop-shadow-[0_0_12px_rgba(255,180,0,.9)]",
+  rat: "drop-shadow-[0_0_10px_rgba(255,140,0,.9)]",
+  cat: "drop-shadow-[0_0_10px_rgba(255,90,180,.9)]",
+  rabbit: "drop-shadow-[0_0_10px_rgba(80,220,255,.9)]",
+};
+
+const giftGlow = GIFT_GLOW[lantern] || GIFT_GLOW.phoenix;
+
+
+const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
 
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
@@ -83,8 +118,7 @@ export default function MagicLanternWidget() {
         duration: 3 + Math.random() * 2,
         orbit: 8 + Math.random() * 16,
       }),
-    );
-
+    ); 
     
 
     const newDusts: Dust[] = Array.from({ length: 90 }).map((_, index) => ({
@@ -143,9 +177,7 @@ export default function MagicLanternWidget() {
             top: `${JAR.top + 2}px`,
             width: `${JAR.width + 10}px`,
             height: `${JAR.height}px`,
-            background:
-              "radial-gradient(circle at 50% 52%, rgba(236,72,153,0.18) 0%, rgba(168,85,247,0.34) 42%, rgba(79,70,229,0.18) 72%, transparent 100%)",
-          }}
+            background: lanternGlow,          }}
         />
 
         <div
@@ -155,9 +187,9 @@ export default function MagicLanternWidget() {
             top: `${JAR.top + 78}px`,
             width: `${JAR.width + 30}px`,
             height: "92px",
-            background:
-              "radial-gradient(circle, rgba(59,130,246,0.45) 0%, rgba(168,85,247,0.18) 48%, transparent 76%)",
-          }}
+            background: lanternGlow,
+            opacity: 0.25,
+                     }}
         />
 
         <Image
@@ -180,18 +212,18 @@ export default function MagicLanternWidget() {
               "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)",
           }}
         >
-          <div
-            className="absolute inset-0 blur-xl"
-            style={{
-              background:
-                "radial-gradient(circle at 50% 62%, rgba(168,85,247,0.14), transparent 72%)",
-            }}
-          />
+         <div
+  className="absolute inset-0 blur-xl"
+  style={{
+    background: lanternGlow,
+    opacity: 0.18,
+  }}
+/>
 
           {dusts.map((dust) => (
             <span
               key={dust.id}
-              className="animate-magic-dust absolute rounded-full bg-yellow-200 shadow-[0_0_10px_rgba(250,204,21,0.9)]"
+              className="animate-magic-dust absolute rounded-full"              
               style={{
                 left: `${dust.x}px`,
                 top: `${dust.y}px`,
@@ -199,6 +231,8 @@ export default function MagicLanternWidget() {
                 height: `${dust.size}px`,
                 animationDelay: `${dust.delay}s`,
                 animationDuration: `${dust.duration}s`,
+                 background: dustColor,
+                  boxShadow: `0 0 10px ${dustColor}`,
               }}
             />
           ))}
@@ -208,7 +242,8 @@ export default function MagicLanternWidget() {
               key={gift.id}
               src={gift.image}
               alt={gift.name}
-              className="animate-float-gift absolute drop-shadow-[0_0_6px_rgba(255,105,180,0.75)]"
+              className={`animate-float-gift absolute ${giftGlow}`}
+              //className="animate-float-gift absolute drop-shadow-[0_0_6px_rgba(255,105,180,0.75)]"
               style={{
                 left: `${gift.x}px`,
                 top: `${gift.y}px`,
@@ -240,9 +275,9 @@ export default function MagicLanternWidget() {
             top: `${JAR.top + 12}px`,
             width: `${JAR.width - 34}px`,
             height: `${JAR.height - 20}px`,
-            background:
-              "radial-gradient(circle at 50% 62%, rgba(255,255,255,0.07) 0%, rgba(168,85,247,0.07) 52%, transparent 76%)",
-          }}
+            background: lanternGlow,
+            opacity: 0.28,
+                    }}
         />
       </div>
 
@@ -294,9 +329,9 @@ export default function MagicLanternWidget() {
           100% {
             opacity: 1;
             transform: translate(
-                calc(var(--gift-float-x) * -0.6),
-                calc(var(--gift-y) * -0.6)
-              )
+    calc(var(--gift-float-x) * -0.6),
+    calc(var(--gift-float-y) * -0.6)
+)
               scale(0.95) rotate(calc(var(--gift-rotate) * -0.5));
           }
         }
