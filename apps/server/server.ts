@@ -31,7 +31,17 @@ const getOverlayId = (payload: string | TestPayload) => {
     return payload;
   }
 
-  return payload.overlayId;
+  return payload?.overlayId;
+};
+
+const createRosePayload = (amount = 1) => {
+  return {
+    user: "Mimi",
+    giftName: "Rose",
+    amount,
+    diamond: amount,
+    giftImage: "/assets/rose.png",
+  };
 };
 
 app.post("/connect", async (req, res) => {
@@ -65,26 +75,29 @@ app.post("/connect", async (req, res) => {
           "/assets/gift-box.png",
       };
 
-      io.to(overlayId).emit(
-        "gift-alert",
-        `🎁 ${giftPayload.user} sent ${giftPayload.giftName} x${giftPayload.amount}`,
-      );
-
-      io.to(overlayId).emit("gift-plane", giftPayload);
-      io.to(overlayId).emit("gift-basket", giftPayload);
-      io.to(overlayId).emit("gift-vehicle", giftPayload);
-      io.to(overlayId).emit("gift-lantern", giftPayload);
+      /*
+        ของจริงจาก TikTok:
+        ส่ง event แยกเฉพาะ Widget
+        เพื่อให้แต่ละหน้าเลือกฟังของตัวเอง ไม่ไปติดทุกอัน
+      */
+      io.to(overlayId).emit("goal-gift", giftPayload);
+      io.to(overlayId).emit("lantern-gift", giftPayload);
+      io.to(overlayId).emit("vehicle-gift", giftPayload);
+      io.to(overlayId).emit("basket-gift", giftPayload);
+      io.to(overlayId).emit("fortune-gift", giftPayload);
     });
 
     tiktok.on("chat", (data: any) => {
-      io.to(overlayId).emit(
-        "gift-alert",
-        `💬 ${data.nickname}: ${data.comment}`,
-      );
+      io.to(overlayId).emit("chat-alert", {
+        user: data.nickname || "Someone",
+        comment: data.comment || "",
+      });
     });
 
     tiktok.on("follow", (data: any) => {
-      io.to(overlayId).emit("gift-alert", `❤️ ${data.nickname} followed`);
+      io.to(overlayId).emit("follow-alert", {
+        user: data.nickname || "Someone",
+      });
     });
 
     res.json({
@@ -117,34 +130,43 @@ io.on("connection", (socket) => {
     console.log(`📺 Overlay joined room: ${overlayId}`);
   });
 
+  /*
+    สำคัญ:
+    ปุ่ม Test / Reset แต่ละอันต้องยิง event เฉพาะของตัวเองเท่านั้น
+    ห้ามยิง gift-alert, gift-plane, gift-basket รวมกัน
+    เพราะจะทำให้ Widget อื่นติดไปด้วย
+  */
+
   socket.on("test-goal", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
+    if (!overlayId) {
+      console.log("⚠️ test-goal missing overlayId:", payload);
+      return;
+    }
+
     testRose++;
 
-    console.log("🎯 Test Goal:", testRose);
+    console.log("🎯 Test Goal:", overlayId, testRose);
 
-    const giftPayload = {
-      user: "Mimi",
-      giftName: "Rose",
-      amount: 1,
-      diamond: 1,
-      giftImage: "/assets/rose.png",
-    };
-
-    io.to(overlayId).emit("gift-alert", "🎯 Test Goal: Rose x1");
+    io.to(overlayId).emit("goal-gift", createRosePayload(1));
     io.to(overlayId).emit("gift-progress", testRose);
   });
 
   socket.on("reset-goal", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
+    if (!overlayId) {
+      console.log("⚠️ reset-goal missing overlayId:", payload);
+      return;
+    }
+
     testRose = 0;
 
-    console.log("🔄 Reset Goal");
+    console.log("🔄 Reset Goal:", overlayId);
 
-    io.to(overlayId).emit("gift-progress", 0);
     io.to(overlayId).emit("reset-goal");
+    io.to(overlayId).emit("gift-progress", 0);
   });
 
   socket.on("test-lantern", (payload: string | TestPayload) => {
@@ -157,20 +179,7 @@ io.on("connection", (socket) => {
 
     console.log("🧙 Test Lantern:", overlayId);
 
-    const giftPayload = {
-      user: "Mimi",
-      giftName: "Rose",
-      amount: 1,
-      diamond: 1,
-      giftImage: "/assets/rose.png",
-    };
-
-    // ส่งหลายชื่อไว้ก่อน เผื่อหน้า Magic Lantern ฟัง event คนละชื่อ
-    io.to(overlayId).emit("test-lantern", giftPayload);
-    io.to(overlayId).emit("gift-lantern", giftPayload);
-    io.to(overlayId).emit("magic-lantern", giftPayload);
-    io.to(overlayId).emit("lantern-gift", giftPayload);
-    io.to(overlayId).emit("gift-alert", "🧙 Test Lantern: Rose x1");
+    io.to(overlayId).emit("lantern-gift", createRosePayload(1));
   });
 
   socket.on("reset-lantern", (payload: string | TestPayload) => {
@@ -183,33 +192,31 @@ io.on("connection", (socket) => {
 
     console.log("🔄 Reset Lantern:", overlayId);
 
-    // ส่งหลายชื่อไว้ก่อน เผื่อหน้า Magic Lantern ฟัง event คนละชื่อ
     io.to(overlayId).emit("reset-lantern");
-    io.to(overlayId).emit("lantern-reset");
-    io.to(overlayId).emit("reset-magic-lantern");
   });
 
   socket.on("test-vehicle", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    console.log("🛺 Test Vehicle");
+    if (!overlayId) {
+      console.log("⚠️ test-vehicle missing overlayId:", payload);
+      return;
+    }
 
-    const giftPayload = {
-      user: "Mimi",
-      giftName: "Rose",
-      amount: 1,
-      diamond: 1,
-      giftImage: "/assets/rose.png",
-    };
+    console.log("🛺 Test Vehicle:", overlayId);
 
-    io.to(overlayId).emit("test-vehicle", giftPayload);
-    io.to(overlayId).emit("gift-vehicle", giftPayload);
+    io.to(overlayId).emit("vehicle-gift", createRosePayload(1));
   });
 
   socket.on("reset-vehicle", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    console.log("🔄 Reset Vehicle");
+    if (!overlayId) {
+      console.log("⚠️ reset-vehicle missing overlayId:", payload);
+      return;
+    }
+
+    console.log("🔄 Reset Vehicle:", overlayId);
 
     io.to(overlayId).emit("reset-vehicle");
   });
@@ -217,25 +224,25 @@ io.on("connection", (socket) => {
   socket.on("test-basket", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    console.log("🧺 Test Basket");
+    if (!overlayId) {
+      console.log("⚠️ test-basket missing overlayId:", payload);
+      return;
+    }
 
-    const giftPayload = {
-      user: "Mimi",
-      giftName: "Rose",
-      amount: 1,
-      diamond: 1,
-      giftImage: "/assets/rose.png",
-    };
+    console.log("🧺 Test Basket:", overlayId);
 
-    io.to(overlayId).emit("test-basket", giftPayload);
-    io.to(overlayId).emit("gift-plane", giftPayload);
-    io.to(overlayId).emit("gift-basket", giftPayload);
+    io.to(overlayId).emit("basket-gift", createRosePayload(1));
   });
 
   socket.on("reset-basket", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    console.log("🔄 Reset Basket");
+    if (!overlayId) {
+      console.log("⚠️ reset-basket missing overlayId:", payload);
+      return;
+    }
+
+    console.log("🔄 Reset Basket:", overlayId);
 
     io.to(overlayId).emit("reset-basket");
   });
@@ -243,21 +250,25 @@ io.on("connection", (socket) => {
   socket.on("test-fortune", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    console.log("🙏 Test Fortune");
+    if (!overlayId) {
+      console.log("⚠️ test-fortune missing overlayId:", payload);
+      return;
+    }
 
-    io.to(overlayId).emit("test-fortune", {
-      user: "Mimi",
-      giftName: "Rose",
-      amount: 99,
-      diamond: 99,
-      giftImage: "/assets/rose.png",
-    });
+    console.log("🙏 Test Fortune:", overlayId);
+
+    io.to(overlayId).emit("fortune-gift", createRosePayload(99));
   });
 
   socket.on("reset-fortune", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    console.log("🔄 Reset Fortune");
+    if (!overlayId) {
+      console.log("⚠️ reset-fortune missing overlayId:", payload);
+      return;
+    }
+
+    console.log("🔄 Reset Fortune:", overlayId);
 
     io.to(overlayId).emit("reset-fortune");
   });
