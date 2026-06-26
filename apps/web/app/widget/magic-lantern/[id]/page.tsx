@@ -38,7 +38,7 @@ type Dust = {
 };
 
 const JAR = {
-  left: 550,
+  left: 530,
   top: 600,
   width: 214,
   height: 150,
