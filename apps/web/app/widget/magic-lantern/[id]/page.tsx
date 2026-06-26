@@ -131,14 +131,21 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
 
     socket.emit("join-overlay", overlayId);
 
-    socket.on("gift-plane", (gift: GiftPayload) => {
+    // ใช้สำหรับปุ่ม Test Lantern จาก Dashboard
+    socket.on("test-lantern", (gift: GiftPayload) => {
       playEffect(gift);
     });
 
-    socket.on("reset-gift", () => {
+    // ใช้สำหรับของขวัญจริงจาก TikTok เฉพาะ Magic Lantern
+    socket.on("lantern-gift", (gift: GiftPayload) => {
+      playEffect(gift);
+    });
+
+    // ใช้สำหรับ Reset Lantern จาก Dashboard
+    socket.on("reset-lantern", () => {
       setMessage("");
       setShowMessage(false);
-      setGifts([]);      
+      setGifts([]);
     });
 
     return () => {
