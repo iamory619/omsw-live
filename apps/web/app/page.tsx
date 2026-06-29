@@ -5,11 +5,11 @@ export default function HomePage() {
     <main className="min-h-screen bg-black text-white">
       <section className="mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 text-center">
         <span className="mb-4 rounded-full border border-pink-500/30 bg-pink-500/10 px-4 py-1 text-sm text-pink-300">
-          ✨ OMSW Live • TikTok Interactive Platform
+          ✨ OMSW Live • Interactive Live Streaming Platform
         </span>
 
         <h1 className="text-5xl font-bold md:text-7xl">
-          Make Every TikTok Live
+          Make Every Live Unforgettable.
           <br />
           More Interactive
         </h1>
@@ -54,7 +54,7 @@ export default function HomePage() {
 
         <div className="mt-16 grid gap-4 text-left md:grid-cols-2">
           <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-            ✅ รองรับ TikTok Live
+            ✅ Supports Live Streaming
           </div>
 
           <div className="rounded-xl border border-white/10 bg-white/5 p-4">

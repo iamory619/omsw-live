@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { WebcastPushConnection } from "tiktok-live-connector";
 import crypto from "crypto";
+import { createClient } from "@supabase/supabase-js";
 
 const app = express();
 
@@ -19,6 +20,23 @@ const io = new Server(httpServer, {
     origin: "*",
   },
 });
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabasePublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+
+if (!supabaseUrl || !supabasePublishableKey) {
+  console.warn("⚠️ Missing SUPABASE_URL or SUPABASE_PUBLISHABLE_KEY");
+}
+
+const createSupabaseForUser = (accessToken: string) => {
+  return createClient(supabaseUrl!, supabasePublishableKey!, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  });
+};
 
 let testRose = 0;
 
@@ -45,15 +63,66 @@ const createRosePayload = (amount = 1) => {
 };
 
 app.post("/connect", async (req, res) => {
-  const { username } = req.body;
+  const authHeader = req.headers.authorization || "";
+  const accessToken = authHeader.replace("Bearer ", "");
 
-  if (!username) {
-    return res.status(400).json({
-      error: "username required",
+  if (!accessToken) {
+    return res.status(401).json({
+      code: "NO_TOKEN",
+      error: "Missing access token",
     });
   }
 
-  const overlayId = crypto.randomUUID();
+  const supabase = createSupabaseForUser(accessToken);
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser(accessToken);
+
+  if (userError || !user) {
+    return res.status(401).json({
+      code: "INVALID_TOKEN",
+      error: "Invalid session",
+    });
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("id,email,display_name,tiktok_username,overlay_id")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || !profile) {
+    return res.status(404).json({
+      code: "PROFILE_NOT_FOUND",
+      error: "ไม่พบข้อมูลโปรไฟล์",
+    });
+  }
+
+  const username = profile.tiktok_username;
+
+  if (!username) {
+    return res.status(400).json({
+      code: "NO_TIKTOK_USERNAME",
+      error: "ยังไม่ได้ตั้งค่า Creator Account",
+    });
+  }
+
+  const overlayId = profile.overlay_id || crypto.randomUUID();
+
+  const oldConnection = connections.get(overlayId);
+
+  if (oldConnection) {
+    try {
+      oldConnection.disconnect();
+    } catch {
+      // Ignore disconnect errors.
+    }
+
+    connections.delete(overlayId);
+  }
+
   const tiktok = new WebcastPushConnection(username);
 
   try {
@@ -75,32 +144,34 @@ app.post("/connect", async (req, res) => {
           "/assets/gift-box.png",
       };
 
-      io.to(overlayId).emit(
-        "gift-alert",
-        `🎁 ${giftPayload.user} sent ${giftPayload.giftName} x${giftPayload.amount}`,
-      );
-
-      // ของจริงจาก TikTok ยังส่งให้ Widget หลักตามเดิม
-      io.to(overlayId).emit("gift-plane", giftPayload);
-      io.to(overlayId).emit("gift-progress", giftPayload.amount);
+      io.to(overlayId).emit("goal-gift", giftPayload);
+      io.to(overlayId).emit("lantern-gift", giftPayload);
+      io.to(overlayId).emit("vehicle-gift", giftPayload);
+      io.to(overlayId).emit("basket-gift", giftPayload);
+      io.to(overlayId).emit("fortune-gift", giftPayload);
     });
 
     tiktok.on("chat", (data: any) => {
-      io.to(overlayId).emit(
-        "gift-alert",
-        `💬 ${data.nickname}: ${data.comment}`,
-      );
+      io.to(overlayId).emit("chat-alert", {
+        user: data.nickname || "Someone",
+        comment: data.comment || "",
+      });
     });
 
     tiktok.on("follow", (data: any) => {
-      io.to(overlayId).emit("gift-alert", `❤️ ${data.nickname} followed`);
+      io.to(overlayId).emit("follow-alert", {
+        user: data.nickname || "Someone",
+      });
     });
 
     res.json({
       overlayId,
+      username,
+      displayName: profile.display_name,
+      status: "connected",
     });
   } catch (err: any) {
-    console.error("TikTok Connect Error:", err);
+    console.error("Account Connect Error:", err);
 
     const message = err?.message || "";
 
@@ -129,56 +200,38 @@ io.on("connection", (socket) => {
   socket.on("test-goal", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ test-goal missing overlayId:", payload);
-      return;
-    }
+    if (!overlayId) return;
 
     testRose++;
 
-    console.log("🎯 Test Goal:", overlayId, testRose);
-
     io.to(overlayId).emit("gift-progress", testRose);
+    io.to(overlayId).emit("goal-gift", createRosePayload(1));
   });
 
   socket.on("reset-goal", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ reset-goal missing overlayId:", payload);
-      return;
-    }
+    if (!overlayId) return;
 
     testRose = 0;
 
-    console.log("🔄 Reset Goal:", overlayId);
-
     io.to(overlayId).emit("gift-progress", 0);
+    io.to(overlayId).emit("reset-goal");
   });
 
   socket.on("test-lantern", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ test-lantern missing overlayId:", payload);
-      return;
-    }
+    if (!overlayId) return;
 
-    console.log("🧙 Test Lantern:", overlayId);
-
-    // ส่งเฉพาะ Lantern เท่านั้น
     io.to(overlayId).emit("test-lantern", createRosePayload(1));
+    io.to(overlayId).emit("lantern-gift", createRosePayload(1));
   });
 
   socket.on("reset-lantern", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ reset-lantern missing overlayId:", payload);
-      return;
-    }
-
-    console.log("🔄 Reset Lantern:", overlayId);
+    if (!overlayId) return;
 
     io.to(overlayId).emit("reset-lantern");
   });
@@ -186,26 +239,16 @@ io.on("connection", (socket) => {
   socket.on("test-vehicle", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ test-vehicle missing overlayId:", payload);
-      return;
-    }
+    if (!overlayId) return;
 
-    console.log("🛺 Test Vehicle:", overlayId);
-
-    // ส่งเฉพาะ Vehicle เท่านั้น
     io.to(overlayId).emit("test-vehicle", createRosePayload(1));
+    io.to(overlayId).emit("vehicle-gift", createRosePayload(1));
   });
 
   socket.on("reset-vehicle", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ reset-vehicle missing overlayId:", payload);
-      return;
-    }
-
-    console.log("🔄 Reset Vehicle:", overlayId);
+    if (!overlayId) return;
 
     io.to(overlayId).emit("reset-vehicle");
   });
@@ -213,27 +256,16 @@ io.on("connection", (socket) => {
   socket.on("test-basket", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ test-basket missing overlayId:", payload);
-      return;
-    }
+    if (!overlayId) return;
 
-    console.log("🧺 Test Basket:", overlayId);
-
-    // ส่งเฉพาะ Basket เท่านั้น
-    // ใช้ test-basket เป็นหลัก เพื่อไม่ให้ไปปลุก Widget อื่น
     io.to(overlayId).emit("test-basket", createRosePayload(1));
+    io.to(overlayId).emit("basket-gift", createRosePayload(1));
   });
 
   socket.on("reset-basket", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ reset-basket missing overlayId:", payload);
-      return;
-    }
-
-    console.log("🔄 Reset Basket:", overlayId);
+    if (!overlayId) return;
 
     io.to(overlayId).emit("reset-basket");
   });
@@ -241,26 +273,16 @@ io.on("connection", (socket) => {
   socket.on("test-fortune", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ test-fortune missing overlayId:", payload);
-      return;
-    }
+    if (!overlayId) return;
 
-    console.log("🙏 Test Fortune:", overlayId);
-
-    // ส่งเฉพาะ Sathu 99 เท่านั้น
     io.to(overlayId).emit("test-fortune", createRosePayload(99));
+    io.to(overlayId).emit("fortune-gift", createRosePayload(99));
   });
 
   socket.on("reset-fortune", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
 
-    if (!overlayId) {
-      console.log("⚠️ reset-fortune missing overlayId:", payload);
-      return;
-    }
-
-    console.log("🔄 Reset Fortune:", overlayId);
+    if (!overlayId) return;
 
     io.to(overlayId).emit("reset-fortune");
   });
