@@ -105,48 +105,48 @@ export default function OverlayUrlsPage() {
 
   const copy = async (url: string) => {
     if (!canCopy) {
-      alert("Trial ของคุณหมดแล้ว กรุณา Upgrade เพื่อคัดลอก Overlay URL");
+      alert("Your trial has ended. Become a Founder to copy overlay links.");
       return;
     }
 
     await navigator.clipboard.writeText(url);
-    alert("คัดลอก URL แล้ว");
+    alert("Overlay link copied successfully!");
   };
 
   return (
     <main className="min-h-screen bg-black p-6 text-white lg:p-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-black">Overlay URLs</h1>
+          <h1 className="text-4xl font-black">OBS Overlays</h1>
 
           <p className="mt-2 text-zinc-400">
-            รวมลิงก์ Overlay สำหรับเอาไปใส่ใน OBS
+            Your overlay links, ready to use in OBS.
           </p>
         </div>
 
         {trialExpired && subscription?.plan === "trial" && (
           <section className="mb-6 rounded-[2rem] border border-red-500 bg-red-500/10 p-6">
             <h2 className="text-2xl font-black text-red-200">
-              🔒 Trial หมดอายุแล้ว
+              🎁 Your Trial Has Ended
             </h2>
 
             <p className="mt-2 text-sm text-red-100/80">
-              Overlay URL ถูกซ่อนไว้ และปุ่ม Copy ถูกปิด กรุณา Upgrade
-              เพื่อใช้งานต่อ
+              Upgrade to Creator to unlock your overlay links and continue using
+              OMSW Live.
             </p>
 
             <Link
               href="/dashboard/billing"
               className="mt-4 inline-block rounded-xl bg-pink-600 px-5 py-3 font-bold transition hover:bg-pink-500"
             >
-              Upgrade Plan
+              Become a Founder
             </Link>
           </section>
         )}
 
         {loading && (
           <div className="rounded-[2rem] border border-white/10 bg-zinc-950 p-6 text-zinc-400">
-            Loading Overlay URLs...
+            Loading your overlays...
           </div>
         )}
 
@@ -169,7 +169,7 @@ export default function OverlayUrlsPage() {
                       </h2>
 
                       <div className="mt-3 break-all rounded-2xl bg-black p-4 text-sm text-zinc-300">
-                        {canCopy ? url : "🔒 Upgrade to view Overlay URL"}
+                        {canCopy ? url : "🔒 Become a Founder to unlock this overlay"}
                       </div>
                     </div>
 
@@ -180,7 +180,7 @@ export default function OverlayUrlsPage() {
                         disabled={!canCopy}
                         className="rounded-xl bg-purple-600 px-4 py-2 font-bold transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        {canCopy ? "Copy" : "🔒 Copy"}
+                        {canCopy ? "Copy Link" : "🔒 Copy Link"}
                       </button>
 
                       <Link
@@ -188,7 +188,7 @@ export default function OverlayUrlsPage() {
                         target="_blank"
                         className="rounded-xl bg-zinc-700 px-4 py-2 font-bold transition hover:bg-zinc-600"
                       >
-                        Preview
+                        Open Preview
                       </Link>
                     </div>
                   </div>

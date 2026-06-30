@@ -17,7 +17,6 @@ import {
   isSubscriptionExpired,
 } from "@/lib/core/subscriptions";
 
-
 const BASKETS = [
   {
     id: "basket-1",
@@ -59,7 +58,7 @@ const VEHICLES = [
   },
   {
     id: "vespa",
-    name: "vespa",
+    name: "Vespa",
     image: "/assets/vehicles/vespa.png",
   },
 ];
@@ -70,7 +69,6 @@ const LANTERNS = [
   { id: "cat", name: "Cat", image: "/assets/lantern/cat-back.png" },
   { id: "rabbit", name: "Rabbit", image: "/assets/lantern/rabbit-back.png" },
 ];
-
 
 type WidgetItem = {
   name: string;
@@ -111,6 +109,21 @@ type WidgetSettings = {
   lantern_enabled: boolean;
   fortune_enabled: boolean;
 };
+function getPlanLabel(plan?: string | null) {
+  switch (plan) {
+    case "trial":
+      return "🎁 Trial";
+    case "creator":
+      return "⭐ Creator";
+    case "pro":
+      return "💎 Pro";
+    case "premium":
+      return "💎 Premium";
+    default:
+      return "🎁 Trial";
+  }
+}
+
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -148,43 +161,44 @@ export default function DashboardPage() {
   const canReset = canResetWidget(subscription);
   const canSaveSettings = canSaveWidgetSettings(subscription);
 
- useEffect(() => {
-  const loadProfile = async () => {
-    setProfileLoading(true);
+  useEffect(() => {
+    const loadProfile = async () => {
+      setProfileLoading(true);
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-      router.replace("/login");
-      return;
-    }
+      if (userError || !user) {
+        router.replace("/login");
+        return;
+      }
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
-    if (error || !data) {
-      await supabase.auth.signOut();
-      router.replace("/login");
-      return;
-    }
+      if (error || !data) {
+        await supabase.auth.signOut();
+        router.replace("/login");
+        return;
+      }
 
       setUserId(user.id);
       setProfile(data);
       setOverlayId(data.overlay_id);
 
-      const { data: subscriptionData, error: subscriptionError } = await supabase
-        .from("subscriptions")
-        .select("id,user_id,plan,status,started_at,expires_at,created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
+      const { data: subscriptionData, error: subscriptionError } =
+        await supabase
+          .from("subscriptions")
+          .select("id,user_id,plan,status,started_at,expires_at,created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
 
       if (subscriptionError) {
         console.error("Load subscription error:", subscriptionError);
@@ -235,14 +249,14 @@ export default function DashboardPage() {
 
   const connectTikTok = async () => {
     if (!canConnect) {
-      alert("Trial ของคุณหมดแล้ว กรุณา Upgrade เพื่อใช้งานต่อ");
+      alert("Your trial has ended. Become a Founder to continue.");
       return;
     }
 
     const savedCreatorUsername = profile?.tiktok_username?.trim();
 
     if (!savedCreatorUsername) {
-      alert("ยังไม่ได้ตั้งค่า Creator Account กรุณาไปที่ My Profile");
+      alert("Creator Username not set. Please update it in My Profile.");
       return;
     }
 
@@ -293,7 +307,7 @@ export default function DashboardPage() {
 
   const createTestOverlay = () => {
     if (!canTest) {
-      alert("Trial ของคุณหมดแล้ว กรุณา Upgrade เพื่อใช้งานต่อ");
+      alert("Your trial has ended. Become a Founder to continue.");
       return;
     }
 
@@ -304,17 +318,19 @@ export default function DashboardPage() {
 
   const copy = async (url: string) => {
     if (!canCopy) {
-      alert("Trial ของคุณหมดแล้ว กรุณา Upgrade เพื่อคัดลอก Overlay URL");
+      alert("Your trial has ended. Become a Founder to unlock overlay links.");
       return;
     }
 
     await navigator.clipboard.writeText(url);
-    alert("คัดลอก URL แล้ว");
+    alert("Overlay link copied successfully!");
   };
 
   const saveWidgetSettings = async (settings: Partial<WidgetSettings>) => {
     if (!canSaveSettings) {
-      alert("Trial ของคุณหมดแล้ว กรุณา Upgrade เพื่อบันทึก Widget Settings");
+      alert(
+        "Your trial has ended. Become a Founder to save your widget preferences.",
+      );
       return;
     }
 
@@ -323,17 +339,15 @@ export default function DashboardPage() {
     try {
       setSavingSettings(true);
 
-      const { error } = await supabase
-        .from("widget_settings")
-        .upsert({
-          user_id: userId,
-          ...settings,
-          updated_at: new Date().toISOString(),
-        });
+      const { error } = await supabase.from("widget_settings").upsert({
+        user_id: userId,
+        ...settings,
+        updated_at: new Date().toISOString(),
+      });
 
       if (error) {
         console.error("Save widget settings error:", error);
-        alert("บันทึก Widget Settings ไม่สำเร็จ");
+        alert("Unable to save your widget preferences. Please try again.");
       }
     } finally {
       setSavingSettings(false);
@@ -359,10 +373,10 @@ export default function DashboardPage() {
     ? [
         {
           name: "🎁 Gift Goal",
-          description: "เป้าหมายของขวัญ เช่น Rose 0/100",
+          description: "Set a gift goal, such as Rose 0/100.",
           url: `${window.location.origin}/widget/gift-goal/${overlayId}`,
           active: true,
-           testEvent: "test-goal",
+          testEvent: "test-goal",
           resetEvent: "reset-goal",
           testLabel: "🎯 Test Goal",
           resetLabel: "🔄 Reset Goal",
@@ -371,11 +385,11 @@ export default function DashboardPage() {
         },
         {
           name: "🧙🏻‍♀️ Magic Lantern",
-          description: "ของขวัญลอยสะสมในโคมเวทมนตร์",
+          description: "Collect gifts inside a magical lantern.",
           url: `${window.location.origin}/widget/magic-lantern/${overlayId}?lantern=${selectedLantern}`,
           active: true,
           lanternPicker: true,
-           testEvent: "test-lantern",
+          testEvent: "test-lantern",
           resetEvent: "reset-lantern",
           testLabel: "🧙 Test Lantern",
           resetLabel: "🔄 Reset Lantern",
@@ -384,11 +398,11 @@ export default function DashboardPage() {
         },
         {
           name: "🛺 Gift Vehicle",
-          description: "รถวิ่งผ่านบนพรมกุหลาบ",
+          description: "A vehicle drives across a carpet of roses.",
           url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=${selectedVehicle}`,
           active: true,
           vehiclePicker: true,
-            testEvent: "test-vehicle",
+          testEvent: "test-vehicle",
           resetEvent: "reset-vehicle",
           testLabel: "🛺 Test Vehicle",
           resetLabel: "🔄 Reset Vehicle",
@@ -397,11 +411,11 @@ export default function DashboardPage() {
         },
         {
           name: "🧺 Gift Basket",
-          description: "ของขวัญตกลงตะกร้าและกองสะสมบนจอ",
+          description: "Watch gifts fall into a basket and pile up on screen.",
           url: `${window.location.origin}/widget/gift-plane/${overlayId}?basket=${selectedBasket}`,
           active: true,
           basketPicker: true,
-            testEvent: "test-basket",
+          testEvent: "test-basket",
           resetEvent: "reset-basket",
           testLabel: "🧺 Test Basket",
           resetLabel: "🔄 Reset Basket",
@@ -409,16 +423,16 @@ export default function DashboardPage() {
           resetButtonClass: "bg-red-600 hover:bg-red-500",
         },
         {
-          name: "🙏🏻 Sathu 99",
-          description: "ส่งของขวัญ 99 เหรียญขึ้นไป เพื่อรับคำทำนาย",
+          name: "🙏🏻 Fortune Reading",
+          description: "Send a 99-coin gift or higher to receive your fortune.",
           url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
-          active: true,   
-           testEvent: "test-fortune",
+          active: true,
+          testEvent: "test-fortune",
           resetEvent: "reset-fortune",
           testLabel: "🙏 Test Fortune",
           resetLabel: "🔄 Reset Fortune",
           testButtonClass: "bg-orange-600 hover:bg-orange-500",
-          resetButtonClass: "bg-red-600 hover:bg-red-500",      
+          resetButtonClass: "bg-red-600 hover:bg-red-500",
         },
         // {
         //   name: "🐱 Evolution Pet",
@@ -441,7 +455,7 @@ export default function DashboardPage() {
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <div className="mb-2 text-sm font-bold text-pink-400">
-              Ready to create an amazing live today?
+              Make Every Live Unforgettable.
             </div>
 
             <h1 className="text-4xl font-bold">
@@ -472,9 +486,9 @@ export default function DashboardPage() {
 
         <section className="mb-8 grid gap-4 md:grid-cols-5">
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-5">
-            <div className="text-sm text-zinc-400">Plan</div>
-            <div className="mt-2 text-2xl font-black capitalize text-pink-300">
-              {profileLoading ? "..." : subscription?.plan || "trial"}
+            <div className="text-sm text-zinc-400">Membership</div>
+            <div className="mt-2 text-2xl font-black text-pink-300">
+              {profileLoading ? "..." : getPlanLabel(subscription?.plan)}
             </div>
           </div>
 
@@ -490,7 +504,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-5">
-            <div className="text-sm text-zinc-400">TikTok</div>
+            <div className="text-sm text-zinc-400">Creator Username</div>
             <div className="mt-2 break-all text-2xl font-black text-yellow-300">
               {profileLoading
                 ? "..."
@@ -501,9 +515,11 @@ export default function DashboardPage() {
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-5 md:col-span-2">
-            <div className="text-sm text-zinc-400">Your Overlay ID</div>
+            <div className="text-sm text-zinc-400">Creator ID</div>
             <div className="mt-2 break-all rounded-xl bg-zinc-950 p-3 text-sm font-bold text-zinc-200">
-              {profileLoading ? "Loading..." : profile?.overlay_id || overlayId || "-"}
+              {profileLoading
+                ? "Loading Creator ID..."
+                : profile?.overlay_id || overlayId || "-"}
             </div>
           </div>
         </section>
@@ -513,12 +529,12 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-2xl font-black text-red-200">
-                  Trial ของคุณหมดอายุแล้ว
+                  🎁 Your Trial Has Ended
                 </h2>
 
                 <p className="mt-2 text-sm text-red-100/80">
-                  ตอนนี้ปุ่ม Connect และ Test Widget ถูกปิดไว้ชั่วคราว
-                  กรุณาอัปเกรดแพ็กเกจเพื่อใช้งาน OMSW Live ต่อ
+                  Become a Founder today and continue using all OMSW Live
+                  features.
                 </p>
               </div>
 
@@ -526,7 +542,7 @@ export default function DashboardPage() {
                 href="/pricing"
                 className="w-fit rounded-xl bg-pink-600 px-5 py-3 font-bold transition hover:bg-pink-500"
               >
-                Upgrade Plan
+                Become a Founder
               </a>
             </div>
           </section>
@@ -538,10 +554,10 @@ export default function DashboardPage() {
 
             <div className="text-sm text-zinc-400">
               {settingsLoading
-                ? "กำลังโหลด Widget Settings..."
+                ? "Loading widget preferences..."
                 : savingSettings
-                  ? "กำลังบันทึก Settings..."
-                  : "Widget Settings บันทึกอัตโนมัติแล้ว"}
+                  ? "Saving preferences..."
+                  : "Preferences saved automatically"}
             </div>
           </div>
 
@@ -549,7 +565,9 @@ export default function DashboardPage() {
             <div className="flex-1 rounded-2xl border border-zinc-700 bg-zinc-800 p-4">
               <div className="text-sm text-zinc-400">Creator Username</div>
               <div className="mt-1 text-xl font-black text-white">
-                {profile?.tiktok_username ? `@${profile.tiktok_username}` : "ยังไม่ได้ตั้งค่า"}
+                {profile?.tiktok_username
+                  ? `@${profile.tiktok_username}`
+                  : "Not set"}
               </div>
 
               {!profile?.tiktok_username && (
@@ -557,7 +575,7 @@ export default function DashboardPage() {
                   href="/profile"
                   className="mt-2 inline-block text-sm font-bold text-pink-400 hover:text-pink-300"
                 >
-                  ไปตั้งค่า Creator Account
+                  Set Creator Username
                 </a>
               )}
             </div>
@@ -567,7 +585,7 @@ export default function DashboardPage() {
               disabled={loading || !profile?.tiktok_username || !canConnect}
               className="rounded-xl bg-pink-600 px-6 py-4 font-bold transition hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? "กำลังเชื่อมต่อ..." : "Connect"}
+              {loading ? "Connecting..." : "Connect"}
             </button>
 
             <button
@@ -582,36 +600,36 @@ export default function DashboardPage() {
           <div className="mt-6">
             {status === "idle" && (
               <div className="rounded-2xl bg-zinc-800 px-4 py-3">
-                ⚪ ยังไม่ได้เชื่อมต่อ
+                ⚪ Not connected
                 <div className="mt-1 text-sm text-zinc-400">
-                  กรอก Creator Username แล้วกด Connect
+                  Set your Creator Username, then connect.
                 </div>
               </div>
             )}
 
             {status === "not-live" && (
               <div className="rounded-2xl border border-yellow-500 bg-yellow-500/20 px-4 py-3">
-                🟡 ไม่พบบัญชีที่กำลัง Live
+                🟡 No active live session found
                 <div className="mt-1 text-sm text-yellow-200">
-                  กรุณาเริ่ม Live แล้วกด Connect อีกครั้ง
+                  Start your live, then try connecting again.
                 </div>
               </div>
             )}
 
             {status === "success" && (
               <div className="rounded-2xl border border-green-500 bg-green-500/20 px-4 py-3">
-                🟢 เชื่อมต่อสำเร็จ
+                🟢 Connected successfully
                 <div className="mt-1 text-sm text-green-200">
-                  บัญชี: @{profile?.tiktok_username || username}
+                  Account: @{profile?.tiktok_username || username}
                 </div>
               </div>
             )}
 
             {status === "server-error" && (
               <div className="rounded-2xl border border-red-500 bg-red-500/20 px-4 py-3">
-                🔴 ไม่สามารถเชื่อมต่อ Server ได้
+                🔴 Unable to connect to server
                 <div className="mt-1 text-sm text-red-200">
-                  กรุณาลองใหม่อีกครั้ง
+                  Please try again.
                 </div>
               </div>
             )}
@@ -650,7 +668,7 @@ export default function DashboardPage() {
 
                   {widget.basketPicker && (
                     <div className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-                      <div className="mb-3 font-bold">เลือกตะกร้า</div>
+                      <div className="mb-3 font-bold">Choose Basket</div>
 
                       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                         {BASKETS.map((basket) => (
@@ -681,7 +699,7 @@ export default function DashboardPage() {
 
                   {widget.vehiclePicker && (
                     <div className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-                      <div className="mb-3 font-bold">เลือกรถ</div>
+                      <div className="mb-3 font-bold">Choose Vehicle</div>
 
                       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                         {VEHICLES.map((vehicle) => (
@@ -712,7 +730,7 @@ export default function DashboardPage() {
 
                   {widget.lanternPicker && (
                     <div className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-                      <div className="mb-3 font-bold">เลือกโคม</div>
+                      <div className="mb-3 font-bold">Choose Lantern</div>
 
                       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                         {LANTERNS.map((lantern) => (
@@ -751,7 +769,11 @@ export default function DashboardPage() {
 
                   <input
                     readOnly
-                    value={canCopy ? widget.url : "🔒 Upgrade to view Overlay URL"}
+                    value={
+                      canCopy
+                        ? widget.url
+                        : "🔒 Become a Founder to unlock this overlay"
+                    }
                     className="mb-4 w-full rounded-xl bg-zinc-800 p-3 text-sm text-zinc-200"
                   />
 
@@ -761,14 +783,14 @@ export default function DashboardPage() {
                       disabled={!canCopy}
                       className="rounded-xl bg-purple-600 px-4 py-2 font-bold transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {canCopy ? "คัดลอก" : "🔒 คัดลอก"}
+                      {canCopy ? "Copy Link" : "🔒 Copy Link"}
                     </button>
 
                     <button
                       onClick={() => window.open(widget.url, "_blank")}
                       className="rounded-xl bg-zinc-700 px-4 py-2 font-bold transition hover:bg-zinc-600"
                     >
-                      Preview
+                      Open Preview
                     </button>
 
                     {widget.active && (
@@ -776,7 +798,9 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             if (!canTest) {
-                              alert("Trial ของคุณหมดแล้ว กรุณา Upgrade เพื่อใช้งานต่อ");
+                              alert(
+                                "Your trial has ended. Become a Founder to continue.",
+                              );
                               return;
                             }
 
@@ -793,7 +817,9 @@ export default function DashboardPage() {
                         <button
                           onClick={() => {
                             if (!canReset) {
-                              alert("Trial ของคุณหมดแล้ว กรุณา Upgrade เพื่อใช้งานต่อ");
+                              alert(
+                                "Your trial has ended. Become a Founder to continue.",
+                              );
                               return;
                             }
 

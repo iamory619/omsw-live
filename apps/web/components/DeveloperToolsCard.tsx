@@ -28,7 +28,7 @@ export function DeveloperToolsCard({
           </h2>
 
           <p className="mt-1 text-sm text-green-100/80">
-            ใช้จำลองสถานะระหว่างพัฒนาเท่านั้น ลูกค้าจะไม่เห็นเมื่อเป็น production
+            Available only in development mode. Hidden automatically in production.
           </p>
         </div>
 
@@ -43,7 +43,7 @@ export function DeveloperToolsCard({
           onClick={onSimulateTrial}
           className="rounded-xl bg-zinc-800 px-4 py-2 text-sm font-bold transition hover:bg-zinc-700"
         >
-          Trial
+          🎁 Trial
         </button>
 
         <button
@@ -51,7 +51,7 @@ export function DeveloperToolsCard({
           onClick={onSimulateExpired}
           className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold transition hover:bg-red-500"
         >
-          Trial Expired
+          ⛔ Trial Ended
         </button>
 
         <button
@@ -59,7 +59,7 @@ export function DeveloperToolsCard({
           onClick={onSimulatePro}
           className="rounded-xl bg-pink-600 px-4 py-2 text-sm font-bold transition hover:bg-pink-500"
         >
-          Pro
+          ⭐ Creator
         </button>
 
         <button
@@ -67,7 +67,7 @@ export function DeveloperToolsCard({
           onClick={onSimulatePremium}
           className="rounded-xl bg-yellow-600 px-4 py-2 text-sm font-bold transition hover:bg-yellow-500"
         >
-          Premium
+          💎 Pro
         </button>
 
         <button
@@ -75,7 +75,7 @@ export function DeveloperToolsCard({
           onClick={onSimulateOwner}
           className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-bold transition hover:bg-purple-500"
         >
-          Owner
+          👑 Owner
         </button>
       </div>
     </section>

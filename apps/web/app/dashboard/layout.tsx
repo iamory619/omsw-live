@@ -7,7 +7,7 @@ import { DevModeBadge } from "@/components/DevModeBadge";
 const NAV_ITEMS = [
   {
     href: "/dashboard",
-    label: "Dashboard",
+    label: "Creator Hub",
     icon: "🏠",
   },
   {
@@ -17,7 +17,7 @@ const NAV_ITEMS = [
   },
   {
     href: "/dashboard/overlays",
-    label: "Overlay URLs",
+    label: "OBS Overlays",
     icon: "🔗",
   },
   {
@@ -27,7 +27,7 @@ const NAV_ITEMS = [
   },
   {
     href: "/dashboard/billing",
-    label: "Billing",
+    label: "Membership",
     icon: "💳",
   },
   {
@@ -57,7 +57,7 @@ export default function DashboardLayout({
             <div className="text-3xl">✨</div>
             <div className="mt-3 text-2xl font-black">OMSW Live</div>
             <div className="mt-1 text-xs text-pink-200/80">
-              Creator SaaS Dashboard
+              Make Every Live Unforgettable.
             </div>
           </div>
         </Link>
