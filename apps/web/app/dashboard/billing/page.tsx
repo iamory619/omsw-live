@@ -4,37 +4,83 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import type { Subscription } from "@/lib/core/types";
+import {
+  getTrialDaysLeft,
+  isSubscriptionExpired,
+} from "@/lib/core/subscriptions";
 
 type Profile = {
   id: string;
   email: string;
-  plan: string;
-  trial_end: string;
+  display_name: string | null;
 };
+
+function getPlanLabel(plan?: string | null) {
+  if (plan === "pro") return "⭐ Creator";
+  if (plan === "premium") return "💎 Pro";
+  if (plan === "owner") return "👑 Owner";
+  return "🎁 Trial";
+}
 
 export default function BillingPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const trialDaysLeft = useMemo(() => {
-    if (!profile?.trial_end) return 0;
-
-    return Math.max(
-      Math.ceil((new Date(profile.trial_end).getTime() - Date.now()) / 86400000),
-      0,
-    );
-  }, [profile?.trial_end]);
+    return getTrialDaysLeft(subscription);
+  }, [subscription]);
 
   const trialExpired = useMemo(() => {
-    if (!profile?.trial_end) return false;
+    return isSubscriptionExpired(subscription);
+  }, [subscription]);
 
-    return new Date(profile.trial_end).getTime() < Date.now();
-  }, [profile?.trial_end]);
+  const currentPlan = subscription?.plan || "trial";
+  const isTrial = currentPlan === "trial";
+  const isCreator = currentPlan === "pro";
+
+  const startCheckout = async (plan: "creator" | "pro") => {
+    if (!profile?.id) {
+      alert("Unable to start checkout. Please sign in again.");
+      return;
+    }
+
+    try {
+      setCheckoutLoading(true);
+
+      const res = await fetch("/api/stripe/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          plan,
+          userId: profile.id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.url) {
+        alert("Unable to start checkout. Please try again.");
+        return;
+      }
+
+      window.location.href = data.url;
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadProfile = async () => {
+    const loadData = async () => {
+      setLoading(true);
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -44,104 +90,174 @@ export default function BillingPage() {
         return;
       }
 
-      const { data } = await supabase
+      const { data: profileData } = await supabase
         .from("profiles")
-        .select("id,email,plan,trial_end")
+        .select("id,email,display_name")
         .eq("id", user.id)
         .single();
 
-      if (!data) {
-        router.replace("/login");
-        return;
-      }
+      const { data: subscriptionData } = await supabase
+        .from("subscriptions")
+        .select("id,user_id,plan,status,started_at,expires_at,created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
 
-      setProfile(data);
+      setProfile(profileData);
+      setSubscription(subscriptionData as Subscription | null);
+      setLoading(false);
     };
 
-    loadProfile();
+    loadData();
   }, [router, supabase]);
 
   return (
     <main className="min-h-screen bg-black p-6 text-white lg:p-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-black">Billing</h1>
-          <p className="mt-2 text-zinc-400">
-            จัดการแพ็กเกจและสถานะการใช้งาน OMSW Live
+          <div className="text-sm font-black text-pink-400">Membership</div>
+
+          <h1 className="mt-2 text-4xl font-black md:text-5xl">
+            Manage Your Creator Membership
+          </h1>
+
+          <p className="mt-3 text-zinc-400">
+            View your current plan, trial status, and upgrade options.
           </p>
         </div>
 
-        <section className="mb-8 rounded-[2rem] border border-white/10 bg-zinc-950 p-6">
-          <div className="text-sm text-zinc-400">Membership</div>
-          <div className="mt-3 text-4xl font-black capitalize text-pink-300">
-            {profile?.plan || "trial"}
-          </div>
+        {loading ? (
+          <section className="rounded-[2rem] border border-white/10 bg-zinc-950 p-8 text-zinc-400">
+            Loading your membership...
+          </section>
+        ) : (
+          <>
+            <section className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+              <div className="rounded-[2rem] border border-white/10 bg-zinc-950 p-8">
+                <div className="text-sm text-zinc-400">Current Membership</div>
 
-          <div
-            className={`mt-3 text-xl font-bold ${
-              trialExpired ? "text-red-300" : "text-green-300"
-            }`}
-          >
-            {trialExpired
-              ? "Trial expired"
-              : `Trial เหลือ ${trialDaysLeft} วัน`}
-          </div>
-        </section>
+                <div className="mt-3 text-4xl font-black text-pink-300">
+                  {getPlanLabel(currentPlan)}
+                </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-[2rem] border border-zinc-800 bg-zinc-950 p-8">
-            <h2 className="text-2xl font-black">Trial</h2>
-            <div className="mt-4 text-4xl font-black text-green-300">
-              ฟรี 9 วัน
-            </div>
-            <p className="mt-3 text-zinc-400">
-              สำหรับผู้ใช้ใหม่เท่านั้น ทดลองได้ 1 ครั้งต่อ Account
-            </p>
-          </div>
+                <div className="mt-4 rounded-2xl bg-black p-4">
+                  <div className="text-sm text-zinc-400">Account</div>
+                  <div className="mt-1 break-all font-bold">
+                    {profile?.email || "-"}
+                  </div>
+                </div>
 
-          <div className="rounded-[2rem] border border-pink-500 bg-pink-500/10 p-8 shadow-2xl shadow-pink-500/10">
-            <div className="mb-3 w-fit rounded-full bg-pink-600 px-3 py-1 text-xs font-bold">
-              Recommended
-            </div>
+                <div className="mt-4 rounded-2xl bg-black p-4">
+                  <div className="text-sm text-zinc-400">Status</div>
+                  <div
+                    className={`mt-1 font-black ${
+                      subscription?.status === "active"
+                        ? "text-green-300"
+                        : "text-red-300"
+                    }`}
+                  >
+                    {subscription?.status || "active"}
+                  </div>
+                </div>
 
-            <h2 className="text-2xl font-black">Pro</h2>
-            <div className="mt-4 text-4xl font-black text-pink-300">
-              ฿299
-              <span className="text-base font-normal text-zinc-400">/เดือน</span>
-            </div>
+                {isTrial && (
+                  <div className="mt-4 rounded-2xl bg-black p-4">
+                    <div className="text-sm text-zinc-400">Trial Remaining</div>
+                    <div
+                      className={`mt-1 text-2xl font-black ${
+                        trialExpired ? "text-red-300" : "text-green-300"
+                      }`}
+                    >
+                      {trialExpired ? "Trial Ended" : `${trialDaysLeft} days`}
+                    </div>
+                  </div>
+                )}
 
-            <ul className="mt-6 space-y-3 text-sm text-zinc-300">
-              <li>✅ ใช้งาน Widget ครบ</li>
-              <li>✅ Overlay URL ส่วนตัว</li>
-              <li>✅ บันทึก Widget Settings</li>
-              <li>✅ Dashboard สมาชิก</li>
-            </ul>
+                <div className="mt-4 rounded-2xl bg-black p-4">
+                  <div className="text-sm text-zinc-400">Expires</div>
+                  <div className="mt-1 font-bold text-zinc-200">
+                    {subscription?.expires_at
+                      ? new Date(subscription.expires_at).toLocaleString()
+                      : "—"}
+                  </div>
+                </div>
+              </div>
 
-            <button
-              disabled
-              className="mt-8 block w-full cursor-not-allowed rounded-xl bg-pink-600 px-5 py-3 text-center font-bold opacity-60"
-            >
-              Payment Coming Soon
-            </button>
-          </div>
+              <div className="rounded-[2rem] border border-pink-500/30 bg-pink-500/10 p-8 shadow-2xl shadow-pink-500/10">
+                <div className="w-fit rounded-full bg-pink-600 px-3 py-1 text-xs font-black">
+                  Founder Program
+                </div>
 
-          <div className="rounded-[2rem] border border-zinc-800 bg-zinc-950 p-8">
-            <h2 className="text-2xl font-black">Premium</h2>
-            <div className="mt-4 text-4xl font-black text-yellow-300">
-              เร็ว ๆ นี้
-            </div>
-            <p className="mt-3 text-zinc-400">
-              Premium Widgets, Analytics และ Custom Branding
-            </p>
-          </div>
-        </div>
+                <h2 className="mt-5 text-4xl font-black">
+                  Become a Founder
+                </h2>
 
-        <Link
-          href="/pricing"
-          className="mt-8 inline-block rounded-xl bg-zinc-800 px-5 py-3 font-bold transition hover:bg-zinc-700"
-        >
-          View public Pricing page
-        </Link>
+                <p className="mt-3 text-zinc-300">
+                  First 100 creators get the Creator plan for ฿99/month.
+                </p>
+
+                <div className="mt-6 flex items-end gap-2">
+                  <div className="text-6xl font-black">฿99</div>
+                  <div className="pb-2 text-zinc-400">/ month</div>
+                </div>
+
+                <ul className="mt-8 space-y-3 text-sm text-zinc-200">
+                  <li>✅ Lifetime founder price</li>
+                  <li>✅ Founder badge</li>
+                  <li>✅ All widgets unlocked</li>
+                  <li>✅ OBS overlays unlocked</li>
+                  <li>✅ Priority updates</li>
+                </ul>
+
+                {isCreator ? (
+                  <button
+                    disabled
+                    className="mt-8 w-full cursor-not-allowed rounded-xl bg-green-600 px-5 py-4 font-black opacity-80"
+                  >
+                    Current Plan
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => startCheckout("creator")}
+                    disabled={checkoutLoading}
+                    className="mt-8 w-full rounded-xl bg-pink-600 px-5 py-4 font-black transition hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {checkoutLoading ? "Opening checkout..." : "Become a Founder"}
+                  </button>
+                )}
+
+                <p className="mt-3 text-center text-xs text-pink-100/70">
+                  Secure checkout powered by Stripe.
+                </p>
+              </div>
+            </section>
+
+            <section className="mt-8 rounded-[2rem] border border-white/10 bg-zinc-950 p-8">
+              <h2 className="text-3xl font-black">Payment History</h2>
+
+              <div className="mt-5 rounded-2xl bg-black p-6 text-zinc-500">
+                No invoices yet.
+              </div>
+            </section>
+
+            <section className="mt-8 rounded-[2rem] border border-white/10 bg-zinc-950 p-8">
+              <h2 className="text-3xl font-black">Need a different plan?</h2>
+
+              <p className="mt-2 text-zinc-400">
+                Compare all memberships and choose the best fit for your live.
+              </p>
+
+              <Link
+                href="/pricing"
+                className="mt-5 inline-block rounded-xl bg-zinc-800 px-5 py-3 font-black transition hover:bg-zinc-700"
+              >
+                View Pricing
+              </Link>
+            </section>
+          </>
+        )}
       </div>
     </main>
   );
