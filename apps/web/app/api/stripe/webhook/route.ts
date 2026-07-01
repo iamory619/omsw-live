@@ -51,26 +51,46 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const { error } = await supabaseAdmin.from("subscriptions").upsert(
-        {
-          user_id: userId,
-          plan,
-          status: "active",
-          started_at: new Date().toISOString(),
-          expires_at: addOneMonth(),
-        },
-        {
-          onConflict: "user_id",
-        },
-      );
+      const { error: subscriptionError } = await supabaseAdmin
+        .from("subscriptions")
+        .upsert(
+          {
+            user_id: userId,
+            plan,
+            status: "active",
+            started_at: new Date().toISOString(),
+            expires_at: addOneMonth(),
+          },
+          {
+            onConflict: "user_id",
+          },
+        );
 
-      if (error) {
-        console.error("Supabase subscription update error:", error);
+      if (subscriptionError) {
+        console.error("Supabase subscription update error:", subscriptionError);
 
         return NextResponse.json(
           { error: "Unable to update subscription" },
           { status: 500 },
         );
+      }
+
+      const { error: paymentError } = await supabaseAdmin.from("payments").insert({
+        user_id: userId,
+        stripe_event_id: event.id,
+        stripe_customer_id:
+          typeof session.customer === "string" ? session.customer : null,
+        stripe_subscription_id:
+          typeof session.subscription === "string" ? session.subscription : null,
+        amount: session.amount_total || 0,
+        currency: session.currency || "thb",
+        status: "paid",
+        plan,
+        paid_at: new Date().toISOString(),
+      });
+
+      if (paymentError) {
+        console.error("Supabase payment insert error:", paymentError);
       }
     }
 
@@ -91,9 +111,6 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Stripe webhook error:", error);
 
-    return NextResponse.json(
-      { error: "Webhook failed" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Webhook failed" }, { status: 500 });
   }
 }
