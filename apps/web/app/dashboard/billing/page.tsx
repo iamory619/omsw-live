@@ -16,6 +16,15 @@ type Profile = {
   display_name: string | null;
 };
 
+type Payment = {
+  id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  plan: string | null;
+  paid_at: string | null;
+};
+
 function getPlanLabel(plan?: string | null) {
   if (plan === "pro") return "⭐ Creator";
   if (plan === "premium") return "💎 Pro";
@@ -28,6 +37,7 @@ export default function BillingPage() {
   const supabase = useMemo(() => createClient(), []);
 
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -104,8 +114,16 @@ export default function BillingPage() {
         .limit(1)
         .single();
 
+      const { data: paymentsData } = await supabase
+        .from("payments")
+        .select("id,amount,currency,status,plan,paid_at")
+        .eq("user_id", user.id)
+        .order("paid_at", { ascending: false })
+        .limit(10);
+
       setProfile(profileData);
       setSubscription(subscriptionData as Subscription | null);
+      setPayments(paymentsData || []);
       setLoading(false);
     };
 
@@ -189,9 +207,7 @@ export default function BillingPage() {
                   Founder Program
                 </div>
 
-                <h2 className="mt-5 text-4xl font-black">
-                  Become a Founder
-                </h2>
+                <h2 className="mt-5 text-4xl font-black">Become a Founder</h2>
 
                 <p className="mt-3 text-zinc-300">
                   First 100 creators get the Creator plan for ฿99/month.
@@ -224,7 +240,9 @@ export default function BillingPage() {
                     disabled={checkoutLoading}
                     className="mt-8 w-full rounded-xl bg-pink-600 px-5 py-4 font-black transition hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    {checkoutLoading ? "Opening checkout..." : "Become a Founder"}
+                    {checkoutLoading
+                      ? "Opening checkout..."
+                      : "Become a Founder"}
                   </button>
                 )}
 
@@ -237,9 +255,51 @@ export default function BillingPage() {
             <section className="mt-8 rounded-[2rem] border border-white/10 bg-zinc-950 p-8">
               <h2 className="text-3xl font-black">Payment History</h2>
 
-              <div className="mt-5 rounded-2xl bg-black p-6 text-zinc-500">
-                No invoices yet.
-              </div>
+              {payments.length === 0 ? (
+                <div className="mt-5 rounded-2xl bg-black p-6 text-zinc-500">
+                  No invoices yet.
+                </div>
+              ) : (
+                <div className="mt-5 overflow-x-auto rounded-2xl bg-black">
+                  <table className="w-full min-w-[640px] text-left text-sm">
+                    <thead className="text-zinc-400">
+                      <tr className="border-b border-white/10">
+                        <th className="p-4">Date</th>
+                        <th className="p-4">Plan</th>
+                        <th className="p-4">Amount</th>
+                        <th className="p-4">Status</th>
+                      </tr>
+                    </thead>
+
+                    <tbody className="text-zinc-200">
+                      {payments.map((payment) => (
+                        <tr
+                          key={payment.id}
+                          className="border-b border-white/5"
+                        >
+                          <td className="p-4">
+                            {payment.paid_at
+                              ? new Date(payment.paid_at).toLocaleString()
+                              : "—"}
+                          </td>
+
+                          <td className="p-4">{getPlanLabel(payment.plan)}</td>
+
+                          <td className="p-4 font-bold">
+                            ฿{(payment.amount / 100).toLocaleString()}
+                          </td>
+
+                          <td className="p-4">
+                            <span className="rounded-full bg-green-600/20 px-3 py-1 text-xs font-black text-green-300">
+                              {payment.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </section>
 
             <section className="mt-8 rounded-[2rem] border border-white/10 bg-zinc-950 p-8">
