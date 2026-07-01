@@ -87,6 +87,32 @@ export default function BillingPage() {
     }
   };
 
+  const openBillingPortal = async () => {
+    if (!profile?.id) {
+      alert("Unable to open billing portal. Please sign in again.");
+      return;
+    }
+
+    const res = await fetch("/api/stripe/create-portal-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: profile.id,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.url) {
+      alert("Unable to open billing portal. Please try again.");
+      return;
+    }
+
+    window.location.href = data.url;
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -200,6 +226,16 @@ export default function BillingPage() {
                       : "—"}
                   </div>
                 </div>
+
+                {!isTrial && (
+                  <button
+                    type="button"
+                    onClick={openBillingPortal}
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-zinc-800 px-5 py-3 font-black transition hover:border-pink-500 hover:bg-zinc-700"
+                  >
+                    💳 Manage Billing
+                  </button>
+                )}
               </div>
 
               <div className="rounded-[2rem] border border-pink-500/30 bg-pink-500/10 p-8 shadow-2xl shadow-pink-500/10">
