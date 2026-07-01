@@ -5,12 +5,15 @@ import { io } from "socket.io-client";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import type { Subscription } from "@/lib/core/types";
+import { PermissionProvider } from "@/components/PermissionProvider";
+import type { Feature } from "@/lib/core/permissions";
 import {
   canConnectTikTok,
   canCopyOverlay,
   canResetWidget,
   canSaveWidgetSettings,
   canTestWidget,
+  canUse,
 } from "@/lib/core/permissions";
 import {
   getTrialDaysLeft,
@@ -74,6 +77,7 @@ type WidgetItem = {
   name: string;
   description: string;
   url: string;
+  requiredFeature: Feature;
   active: boolean;
   testEvent: string;
   resetEvent: string;
@@ -113,12 +117,12 @@ function getPlanLabel(plan?: string | null) {
   switch (plan) {
     case "trial":
       return "🎁 Trial";
-    case "creator":
-      return "⭐ Creator";
     case "pro":
-      return "💎 Pro";
+      return "⭐ Creator";
     case "premium":
-      return "💎 Premium";
+      return "💎 Pro";
+    case "owner":
+      return "👑 Owner";
     default:
       return "🎁 Trial";
   }
@@ -375,6 +379,7 @@ export default function DashboardPage() {
           name: "🎁 Gift Goal",
           description: "Set a gift goal, such as Rose 0/100.",
           url: `${window.location.origin}/widget/gift-goal/${overlayId}`,
+          requiredFeature: "giftGoal",
           active: true,
           testEvent: "test-goal",
           resetEvent: "reset-goal",
@@ -387,6 +392,7 @@ export default function DashboardPage() {
           name: "🧙🏻‍♀️ Magic Lantern",
           description: "Collect gifts inside a magical lantern.",
           url: `${window.location.origin}/widget/magic-lantern/${overlayId}?lantern=${selectedLantern}`,
+          requiredFeature: "giftGoal",
           active: true,
           lanternPicker: true,
           testEvent: "test-lantern",
@@ -400,6 +406,7 @@ export default function DashboardPage() {
           name: "🛺 Gift Vehicle",
           description: "A vehicle drives across a carpet of roses.",
           url: `${window.location.origin}/widget/gift-vehicle/${overlayId}?vehicle=${selectedVehicle}`,
+          requiredFeature: "giftGoal",
           active: true,
           vehiclePicker: true,
           testEvent: "test-vehicle",
@@ -413,6 +420,7 @@ export default function DashboardPage() {
           name: "🧺 Gift Basket",
           description: "Watch gifts fall into a basket and pile up on screen.",
           url: `${window.location.origin}/widget/gift-plane/${overlayId}?basket=${selectedBasket}`,
+          requiredFeature: "giftGoal",
           active: true,
           basketPicker: true,
           testEvent: "test-basket",
@@ -426,6 +434,7 @@ export default function DashboardPage() {
           name: "🙏🏻 Fortune Reading",
           description: "Send a 99-coin gift or higher to receive your fortune.",
           url: `${window.location.origin}/widget/fortune-stick/${overlayId}`,
+          requiredFeature: "giftGoal",
           active: true,
           testEvent: "test-fortune",
           resetEvent: "reset-fortune",
@@ -450,7 +459,8 @@ export default function DashboardPage() {
     : [];
 
   return (
-    <main className="min-h-screen bg-zinc-950 p-8 text-white">
+    <PermissionProvider subscription={subscription}>
+      <main className="min-h-screen bg-zinc-950 p-8 text-white">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
@@ -641,7 +651,12 @@ export default function DashboardPage() {
             <h2 className="mb-6 text-2xl font-bold">Widgets</h2>
 
             <div className="space-y-6">
-              {widgets.map((widget) => (
+              {widgets.map((widget) => {
+                const widgetUnlocked =
+                  canCopy &&
+                  canUse(subscription?.plan || "trial", widget.requiredFeature);
+
+                return (
                 <div
                   key={widget.name}
                   className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6"
@@ -655,9 +670,13 @@ export default function DashboardPage() {
                       </p>
                     </div>
 
-                    {widget.active ? (
-                      <span className="w-fit rounded-full bg-green-600 px-3 py-1 text-sm">
-                        Active
+                    {widget.active && widgetUnlocked ? (
+                      <span className="w-fit rounded-full bg-green-600 px-3 py-1 text-sm font-bold">
+                        Unlocked
+                      </span>
+                    ) : widget.active ? (
+                      <span className="w-fit rounded-full bg-pink-600/80 px-3 py-1 text-sm font-bold">
+                        🔒 Locked
                       </span>
                     ) : (
                       <span className="w-fit rounded-full bg-zinc-700 px-3 py-1 text-sm">
@@ -675,7 +694,7 @@ export default function DashboardPage() {
                           <button
                             key={basket.id}
                             onClick={() => selectBasket(basket.id)}
-                            disabled={!canSaveSettings}
+                            disabled={!canSaveSettings || !widgetUnlocked}
                             className={`rounded-2xl border p-3 transition disabled:cursor-not-allowed disabled:opacity-50 ${
                               selectedBasket === basket.id
                                 ? "border-pink-500 bg-pink-500/20"
@@ -706,7 +725,7 @@ export default function DashboardPage() {
                           <button
                             key={vehicle.id}
                             onClick={() => selectVehicle(vehicle.id)}
-                            disabled={!canSaveSettings}
+                            disabled={!canSaveSettings || !widgetUnlocked}
                             className={`rounded-2xl border p-3 transition disabled:cursor-not-allowed disabled:opacity-50 ${
                               selectedVehicle === vehicle.id
                                 ? "border-yellow-500 bg-yellow-500/20"
@@ -737,7 +756,7 @@ export default function DashboardPage() {
                           <button
                             key={lantern.id}
                             onClick={() => selectLantern(lantern.id)}
-                            disabled={!canSaveSettings}
+                            disabled={!canSaveSettings || !widgetUnlocked}
                             className={`rounded-2xl border p-3 transition disabled:cursor-not-allowed disabled:opacity-50 ${
                               selectedLantern === lantern.id
                                 ? "border-purple-500 bg-purple-500/20"
@@ -759,18 +778,35 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  <div className="mb-4 overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950">
-                    <iframe
-                      key={widget.url}
-                      src={widget.url}
-                      className="h-[560px] w-full"
-                    />
-                  </div>
+                  {widgetUnlocked ? (
+                    <div className="mb-4 overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950">
+                      <iframe
+                        key={widget.url}
+                        src={widget.url}
+                        className="h-[560px] w-full"
+                      />
+                    </div>
+                  ) : (
+                    <div className="mb-4 rounded-2xl border border-pink-500/30 bg-pink-500/10 p-8 text-center">
+                      <div className="text-4xl">🔒</div>
+                      <h4 className="mt-3 text-2xl font-black">Upgrade Required</h4>
+                      <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-300">
+                        This widget is not included in your current membership.
+                        Upgrade to Creator to unlock widgets, overlays and live effects.
+                      </p>
+                      <a
+                        href="/dashboard/billing"
+                        className="mt-5 inline-block rounded-xl bg-pink-600 px-5 py-3 font-black transition hover:bg-pink-500"
+                      >
+                        Upgrade Membership
+                      </a>
+                    </div>
+                  )}
 
                   <input
                     readOnly
                     value={
-                      canCopy
+                      widgetUnlocked
                         ? widget.url
                         : "🔒 Become a Founder to unlock this overlay"
                     }
@@ -780,14 +816,21 @@ export default function DashboardPage() {
                   <div className="flex flex-wrap gap-3">
                     <button
                       onClick={() => copy(widget.url)}
-                      disabled={!canCopy}
+                      disabled={!widgetUnlocked}
                       className="rounded-xl bg-purple-600 px-4 py-2 font-bold transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {canCopy ? "Copy Link" : "🔒 Copy Link"}
+                      {widgetUnlocked ? "Copy Link" : "🔒 Copy Link"}
                     </button>
 
                     <button
-                      onClick={() => window.open(widget.url, "_blank")}
+                      onClick={() => {
+                        if (!widgetUnlocked) {
+                          alert("Upgrade your membership to unlock this widget.");
+                          return;
+                        }
+
+                        window.open(widget.url, "_blank");
+                      }}
                       className="rounded-xl bg-zinc-700 px-4 py-2 font-bold transition hover:bg-zinc-600"
                     >
                       Open Preview
@@ -797,9 +840,9 @@ export default function DashboardPage() {
                       <>
                         <button
                           onClick={() => {
-                            if (!canTest) {
+                            if (!canTest || !widgetUnlocked) {
                               alert(
-                                "Your trial has ended. Become a Founder to continue.",
+                                "Upgrade your membership to unlock this widget.",
                               );
                               return;
                             }
@@ -808,7 +851,7 @@ export default function DashboardPage() {
                               overlayId,
                             });
                           }}
-                          disabled={!canTest}
+                          disabled={!canTest || !widgetUnlocked}
                           className={`rounded-xl px-4 py-2 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${widget.testButtonClass}`}
                         >
                           {widget.testLabel}
@@ -816,9 +859,9 @@ export default function DashboardPage() {
 
                         <button
                           onClick={() => {
-                            if (!canReset) {
+                            if (!canReset || !widgetUnlocked) {
                               alert(
-                                "Your trial has ended. Become a Founder to continue.",
+                                "Upgrade your membership to unlock this widget.",
                               );
                               return;
                             }
@@ -827,7 +870,7 @@ export default function DashboardPage() {
                               overlayId,
                             });
                           }}
-                          disabled={!canReset}
+                          disabled={!canReset || !widgetUnlocked}
                           className={`rounded-xl px-4 py-2 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${widget.resetButtonClass}`}
                         >
                           {widget.resetLabel}
@@ -836,11 +879,13 @@ export default function DashboardPage() {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
       </div>
-    </main>
+      </main>
+    </PermissionProvider>
   );
 }

@@ -47,3 +47,53 @@ export function canUseWidget(
 
   return userLevel >= requiredLevel;
 }
+
+export type Feature =
+  | "giftPopup"
+  | "giftGoal"
+  | "petWidget"
+  | "obsOverlay"
+  | "analytics"
+  | "marketplace";
+
+const permissions = {
+  trial: {
+    giftPopup: true,
+    giftGoal: false,
+    petWidget: false,
+    obsOverlay: false,
+    analytics: false,
+    marketplace: false,
+  },
+
+  pro: {
+    giftPopup: true,
+    giftGoal: true,
+    petWidget: true,
+    obsOverlay: true,
+    analytics: false,
+    marketplace: false,
+  },
+
+  premium: {
+    giftPopup: true,
+    giftGoal: true,
+    petWidget: true,
+    obsOverlay: true,
+    analytics: true,
+    marketplace: true,
+  },
+
+  owner: {
+    giftPopup: true,
+    giftGoal: true,
+    petWidget: true,
+    obsOverlay: true,
+    analytics: true,
+    marketplace: true,
+  },
+} as const;
+
+export function canUse(plan: AppPlan, feature: Feature) {
+  return permissions[plan][feature];
+}
