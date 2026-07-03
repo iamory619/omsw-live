@@ -28,6 +28,13 @@ import {
 
 const SERVER_URL = "https://server-production-b88b.up.railway.app";
 
+function normalizePlan(plan?: string | null) {
+  if (plan === "creator") return "creator";
+  if (plan === "pro") return "pro";
+  if (plan === "owner") return "owner";
+  return "free";
+}
+
 const BASKETS = [
   { id: "basket-1", name: "Basket 1", image: "/assets/baskets/basket-1.png" },
   { id: "basket-2", name: "Basket 2", image: "/assets/baskets/basket-2.png" },
@@ -112,7 +119,7 @@ export default function DashboardPage() {
     "idle" | "not-live" | "success" | "server-error"
   >("idle");
 
-  const currentPlan = subscription?.plan || "free";
+  const currentPlan = normalizePlan(subscription?.plan);
 
   const trialDaysLeft = useMemo(
     () => getTrialDaysLeft(subscription),
