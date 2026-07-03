@@ -174,7 +174,7 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/login`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           display_name: displayName.trim(),
           tiktok_username: cleanTikTokUsername,
