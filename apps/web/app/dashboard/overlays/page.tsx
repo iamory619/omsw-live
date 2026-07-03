@@ -21,24 +21,9 @@ type Profile = {
 
 const WIDGETS = [
   { name: "Gift Goal", emoji: "🎁", path: "/widget/gift-goal" },
-  {
-    name: "Magic Lantern",
-    emoji: "🧙",
-    path: "/widget/magic-lantern",
-    query: "?lantern=phoenix",
-  },
-  {
-    name: "Gift Vehicle",
-    emoji: "🛺",
-    path: "/widget/gift-vehicle",
-    query: "?vehicle=tuktuk",
-  },
-  {
-    name: "Gift Basket",
-    emoji: "🧺",
-    path: "/widget/gift-plane",
-    query: "?basket=basket-1",
-  },
+  { name: "Magic Lantern", emoji: "🧙", path: "/widget/magic-lantern", query: "?lantern=phoenix" },
+  { name: "Gift Vehicle", emoji: "🛺", path: "/widget/gift-vehicle", query: "?vehicle=tuktuk" },
+  { name: "Gift Basket", emoji: "🧺", path: "/widget/gift-plane", query: "?basket=basket-1" },
   { name: "Fortune Stick", emoji: "🙏", path: "/widget/fortune-stick" },
 ];
 
@@ -64,21 +49,23 @@ export default function OverlayUrlsPage() {
       setLoading(true);
 
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (!user) {
+      if (!session?.user) {
+        setLoading(false);
         router.replace("/login");
         return;
       }
 
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("id,email,display_name,overlay_id")
-        .eq("id", user.id)
+        .eq("id", session.user.id)
         .single();
 
-      if (!profileData) {
+      if (profileError || !profileData) {
+        setLoading(false);
         router.replace("/login");
         return;
       }
@@ -86,13 +73,13 @@ export default function OverlayUrlsPage() {
       const { data: subscriptionData } = await supabase
         .from("subscriptions")
         .select("id,user_id,plan,status,started_at,expires_at,created_at")
-        .eq("user_id", user.id)
+        .eq("user_id", session.user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       setProfile(profileData);
-      setSubscription(subscriptionData as Subscription | null);
+      setSubscription((subscriptionData as Subscription | null) || null);
       setLoading(false);
     };
 
@@ -101,9 +88,7 @@ export default function OverlayUrlsPage() {
 
   const copy = async (url: string) => {
     if (!canCopy) {
-      alert(
-        "Upgrade to Creator to unlock OBS overlays and premium live effects.",
-      );
+      alert("Upgrade to Creator to unlock OBS overlays and premium live effects.");
       return;
     }
 
