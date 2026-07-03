@@ -27,11 +27,7 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
 
   const cleanTikTokUsername = useMemo(() => {
-    return tiktokUsername
-      .trim()
-      .replace(/^@/, "")
-      .replace(/\s/g, "")
-      .toLowerCase();
+    return tiktokUsername.trim().replace(/^@/, "").replace(/\s/g, "").toLowerCase();
   }, [tiktokUsername]);
 
   const usernameIsValid = useMemo(() => {
@@ -44,26 +40,11 @@ export default function RegisterPage() {
 
   const rules: Rule[] = useMemo(
     () => [
-      {
-        label: "อย่างน้อย 8 ตัวอักษร",
-        valid: password.length >= 8,
-      },
-      {
-        label: "มีตัวพิมพ์ใหญ่ A-Z",
-        valid: /[A-Z]/.test(password),
-      },
-      {
-        label: "มีตัวพิมพ์เล็ก a-z",
-        valid: /[a-z]/.test(password),
-      },
-      {
-        label: "มีตัวเลข 0-9",
-        valid: /\d/.test(password),
-      },
-      {
-        label: "มีอักขระพิเศษ เช่น ! @ # $ %",
-        valid: /[^A-Za-z0-9]/.test(password),
-      },
+      { label: "At least 8 characters", valid: password.length >= 8 },
+      { label: "One uppercase letter (A–Z)", valid: /[A-Z]/.test(password) },
+      { label: "One lowercase letter (a–z)", valid: /[a-z]/.test(password) },
+      { label: "One number (0–9)", valid: /\d/.test(password) },
+      { label: "One special character (! @ # $ %)", valid: /[^A-Za-z0-9]/.test(password) },
     ],
     [password],
   );
@@ -78,7 +59,7 @@ export default function RegisterPage() {
   const strength = useMemo(() => {
     if (!password) {
       return {
-        label: "ยังไม่ได้กรอกรหัสผ่าน",
+        label: "Please enter your password.",
         className: "bg-zinc-700",
         width: "0%",
         textClassName: "text-zinc-500",
@@ -87,7 +68,7 @@ export default function RegisterPage() {
 
     if (validRuleCount <= 2) {
       return {
-        label: "อ่อน",
+        label: "Weak",
         className: "bg-red-500",
         width: "33%",
         textClassName: "text-red-300",
@@ -96,7 +77,7 @@ export default function RegisterPage() {
 
     if (validRuleCount <= 4) {
       return {
-        label: "ปานกลาง",
+        label: "Good",
         className: "bg-yellow-400",
         width: "66%",
         textClassName: "text-yellow-300",
@@ -104,7 +85,7 @@ export default function RegisterPage() {
     }
 
     return {
-      label: "แข็งแรงมาก",
+      label: "Strong",
       className: "bg-green-500",
       width: "100%",
       textClassName: "text-green-300",
@@ -154,32 +135,36 @@ export default function RegisterPage() {
     setSuccess(false);
 
     if (displayName.trim().length < 2) {
-      setMessage("กรุณากรอกชื่อที่ใช้แสดงอย่างน้อย 2 ตัวอักษร");
+      setMessage("Please enter a display name with at least 2 characters.");
       return;
     }
 
     if (!usernameIsValid) {
-      setMessage("กรุณากรอก Creator Username ให้ถูกต้อง");
+      setMessage("Please enter a valid Creator Username.");
       return;
     }
 
     if (!emailIsValid) {
-      setMessage("กรุณากรอกอีเมลให้ถูกต้อง");
+      setMessage("Please enter a valid email address.");
       return;
     }
 
     if (!passwordIsStrong) {
-      setMessage("รหัสผ่านยังไม่ปลอดภัยพอ กรุณาทำให้ครบทุกเงื่อนไข");
+      setMessage(
+        "Your password is not strong enough. Please meet all password requirements.",
+      );
       return;
     }
 
     if (!passwordsMatch) {
-      setMessage("รหัสผ่านทั้งสองช่องไม่ตรงกัน");
+      setMessage("Passwords do not match.");
       return;
     }
 
     if (!acceptedTerms) {
-      setMessage("กรุณายอมรับ Terms of Service ก่อนสมัครใช้งาน");
+      setMessage(
+        "You must accept the Terms of Service and Privacy Policy before creating an account.",
+      );
       return;
     }
 
@@ -201,7 +186,7 @@ export default function RegisterPage() {
 
     if (error) {
       if (error.message.toLowerCase().includes("duplicate")) {
-        setMessage("Creator Username นี้ถูกใช้งานแล้ว กรุณาใช้อันอื่น");
+        setMessage("This Creator Username is already taken. Please choose another one.");
         return;
       }
 
@@ -210,7 +195,9 @@ export default function RegisterPage() {
     }
 
     setSuccess(true);
-    setMessage("สมัครสำเร็จค่ะ กรุณาเช็กอีเมลเพื่อยืนยันบัญชี");
+    setMessage(
+      "Account created successfully! Please check your email to verify your account.",
+    );
   };
 
   return (
@@ -225,7 +212,7 @@ export default function RegisterPage() {
           <h1 className="text-4xl font-black">Create Account</h1>
 
           <p className="mt-2 text-zinc-400">
-            สมัครใช้งาน OMSW Live และเริ่มทดลองใช้ฟรี 9 วัน
+            Create your OMSW Live account and start your 9-day Creator Trial.
           </p>
         </div>
 
@@ -237,7 +224,7 @@ export default function RegisterPage() {
 
             <input
               type="text"
-              placeholder="เช่น Mimi หรือ Heal Jai Travel"
+              placeholder="Mimi or Heal Jai Travel"
               value={displayName}
               onChange={(event) => setDisplayName(event.target.value)}
               required
@@ -266,6 +253,10 @@ export default function RegisterPage() {
               />
             </div>
 
+            <p className="mt-2 text-xs text-zinc-500">
+              Enter your TikTok LIVE username without the @ symbol.
+            </p>
+
             {tiktokUsername.length > 0 && (
               <p
                 className={`mt-2 text-sm ${
@@ -273,8 +264,8 @@ export default function RegisterPage() {
                 }`}
               >
                 {usernameIsValid
-                  ? `✅ จะบันทึกเป็น @${cleanTikTokUsername}`
-                  : "❌ ใช้ได้เฉพาะตัวอักษร ตัวเลข จุด และขีดล่าง"}
+                  ? `✅ Will be saved as @${cleanTikTokUsername}`
+                  : "❌ Only letters, numbers, dots, and underscores are allowed."}
               </p>
             )}
           </div>
@@ -295,7 +286,7 @@ export default function RegisterPage() {
 
             {email.length > 0 && !emailIsValid && (
               <p className="mt-2 text-sm text-red-300">
-                กรุณากรอกอีเมลให้ถูกต้อง
+                Please enter a valid email address.
               </p>
             )}
           </div>
@@ -395,9 +386,7 @@ export default function RegisterPage() {
                   passwordsMatch ? "text-green-300" : "text-red-300"
                 }`}
               >
-                {passwordsMatch
-                  ? "✅ รหัสผ่านตรงกัน"
-                  : "❌ รหัสผ่านไม่ตรงกัน"}
+                {passwordsMatch ? "✅ Passwords match" : "❌ Passwords do not match"}
               </p>
             )}
           </div>
@@ -411,15 +400,15 @@ export default function RegisterPage() {
             />
 
             <span>
-              ฉันยอมรับ{" "}
+              By creating an account, you agree to our{" "}
               <Link href="/terms" className="font-bold text-pink-400">
                 Terms of Service
               </Link>{" "}
-              และ{" "}
+              and{" "}
               <Link href="/privacy" className="font-bold text-pink-400">
                 Privacy Policy
-              </Link>{" "}
-              ของ OMSW Live
+              </Link>
+              .
             </span>
           </label>
 
@@ -440,12 +429,12 @@ export default function RegisterPage() {
             disabled={loading || !formIsValid}
             className="w-full rounded-xl bg-pink-600 p-4 font-bold transition hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "กำลังสมัคร..." : "Create Account"}
+            {loading ? "Creating account..." : "Create Account"}
           </button>
         </div>
 
         <div className="mt-6 text-center text-sm text-zinc-400">
-          มีบัญชีแล้ว?{" "}
+          Already have an account?{" "}
           <Link href="/login" className="font-bold text-pink-400">
             Login
           </Link>
@@ -453,7 +442,7 @@ export default function RegisterPage() {
 
         <div className="mt-4 text-center text-sm">
           <Link href="/" className="text-zinc-500 transition hover:text-white">
-            กลับหน้าแรก
+            Back to Home
           </Link>
         </div>
       </form>

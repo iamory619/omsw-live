@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getOnboardingHref } from "@/lib/core/onboarding-progress";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,14 +26,36 @@ export default function LoginPage() {
       password,
     });
 
-    setLoading(false);
-
     if (error) {
-      setMessage("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+      setLoading(false);
+      setMessage("Invalid email or password");
       return;
     }
 
-    router.push("/dashboard");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setLoading(false);
+      router.push("/dashboard");
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed,onboarding_step")
+      .eq("id", user.id)
+      .single();
+
+    setLoading(false);
+
+    if (profile?.onboarding_completed) {
+      router.push("/dashboard");
+    } else {
+      router.push(getOnboardingHref(profile?.onboarding_step));
+    }
+
     router.refresh();
   };
 
@@ -45,7 +68,7 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <div className="mb-4 text-4xl">✨</div>
           <h1 className="text-4xl font-black">Login</h1>
-          <p className="mt-2 text-zinc-400">เข้าสู่ระบบ OMSW Live</p>
+          <p className="mt-2 text-zinc-400">Sign in to OMSW Live</p>
         </div>
 
         <div className="space-y-4">
@@ -78,20 +101,20 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded-xl bg-pink-600 p-4 font-bold transition hover:bg-pink-500 disabled:opacity-60"
           >
-            {loading ? "กำลังเข้าสู่ระบบ..." : "Login"}
+            {loading ? "Signing in..." : "Login"}
           </button>
         </div>
 
         <div className="mt-6 text-center text-sm text-zinc-400">
-          ยังไม่มีบัญชี?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="font-bold text-pink-400">
-            สมัครสมาชิก
+             Create account
           </Link>
         </div>
 
         <div className="mt-4 text-center text-sm">
           <Link href="/" className="text-zinc-500 hover:text-white">
-            กลับหน้าแรก
+              Back to home
           </Link>
         </div>
       </form>

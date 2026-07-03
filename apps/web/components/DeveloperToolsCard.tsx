@@ -28,7 +28,8 @@ export function DeveloperToolsCard({
           </h2>
 
           <p className="mt-1 text-sm text-green-100/80">
-            Available only in development mode. Hidden automatically in production.
+            Available only in development mode. Automatically hidden in
+            production.
           </p>
         </div>
 
@@ -43,7 +44,7 @@ export function DeveloperToolsCard({
           onClick={onSimulateTrial}
           className="rounded-xl bg-zinc-800 px-4 py-2 text-sm font-bold transition hover:bg-zinc-700"
         >
-          🎁 Trial
+          🎁 Creator Trial
         </button>
 
         <button

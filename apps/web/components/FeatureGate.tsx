@@ -12,7 +12,7 @@ type Props = {
 };
 
 export function FeatureGate({ subscription, feature, children }: Props) {
-  const plan = subscription?.plan || "trial";
+  const plan = subscription?.plan || "free";
   const allowed = canUse(plan, feature);
 
   if (allowed) return <>{children}</>;

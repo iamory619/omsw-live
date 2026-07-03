@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { LoadingCard } from "@/components/ui/LoadingCard";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import type { Subscription } from "@/lib/core/types";
 import { canCopyOverlay } from "@/lib/core/permissions";
 import { isSubscriptionExpired } from "@/lib/core/subscriptions";
@@ -16,11 +20,7 @@ type Profile = {
 };
 
 const WIDGETS = [
-  {
-    name: "Gift Goal",
-    emoji: "🎁",
-    path: "/widget/gift-goal",
-  },
+  { name: "Gift Goal", emoji: "🎁", path: "/widget/gift-goal" },
   {
     name: "Magic Lantern",
     emoji: "🧙",
@@ -39,11 +39,7 @@ const WIDGETS = [
     path: "/widget/gift-plane",
     query: "?basket=basket-1",
   },
-  {
-    name: "Fortune Stick",
-    emoji: "🙏",
-    path: "/widget/fortune-stick",
-  },
+  { name: "Fortune Stick", emoji: "🙏", path: "/widget/fortune-stick" },
 ];
 
 export default function OverlayUrlsPage() {
@@ -55,8 +51,8 @@ export default function OverlayUrlsPage() {
   const [origin, setOrigin] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const trialExpired = useMemo(() => {
-    return isSubscriptionExpired(subscription);
+  const creatorTrialEnded = useMemo(() => {
+    return subscription?.plan === "free" && isSubscriptionExpired(subscription);
   }, [subscription]);
 
   const canCopy = canCopyOverlay(subscription);
@@ -105,52 +101,45 @@ export default function OverlayUrlsPage() {
 
   const copy = async (url: string) => {
     if (!canCopy) {
-      alert("Your trial has ended. Become a Founder to copy overlay links.");
+      alert(
+        "Upgrade to Creator to unlock OBS overlays and premium live effects.",
+      );
       return;
     }
 
     await navigator.clipboard.writeText(url);
-    alert("Overlay link copied successfully!");
+    alert("OBS overlay link copied successfully!");
   };
 
   return (
     <main className="min-h-screen bg-black p-6 text-white lg:p-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-black">OBS Overlays</h1>
+        <SectionHeader
+          badge="OBS Overlays"
+          title="Copy Your OBS Browser Source Links"
+          description="Copy and manage your OMSW Live overlay links for OBS Studio."
+        />
 
-          <p className="mt-2 text-zinc-400">
-            Your overlay links, ready to use in OBS.
-          </p>
-        </div>
-
-        {trialExpired && subscription?.plan === "trial" && (
-          <section className="mb-6 rounded-[2rem] border border-red-500 bg-red-500/10 p-6">
-            <h2 className="text-2xl font-black text-red-200">
-              🎁 Your Trial Has Ended
+        {creatorTrialEnded && (
+          <Card className="mb-6 border-pink-500 bg-pink-500/10">
+            <h2 className="text-2xl font-black text-pink-200">
+              ✨ Your Creator Trial Has Ended
             </h2>
 
-            <p className="mt-2 text-sm text-red-100/80">
-              Upgrade to Creator to unlock your overlay links and continue using
-              OMSW Live.
+            <p className="mt-2 text-sm text-pink-100/80">
+              You're now on the Free plan. Upgrade to Creator to unlock all
+              widgets, live effects, and premium OBS overlays.
             </p>
 
-            <Link
-              href="/dashboard/billing"
-              className="mt-4 inline-block rounded-xl bg-pink-600 px-5 py-3 font-bold transition hover:bg-pink-500"
-            >
-              Become a Founder
-            </Link>
-          </section>
+            <Button href="/dashboard/billing" variant="upgrade" className="mt-4">
+              Upgrade to Creator
+            </Button>
+          </Card>
         )}
 
-        {loading && (
-          <div className="rounded-[2rem] border border-white/10 bg-zinc-950 p-6 text-zinc-400">
-            Loading your overlays...
-          </div>
-        )}
-
-        {!loading && (
+        {loading ? (
+          <LoadingCard />
+        ) : (
           <div className="space-y-4">
             {WIDGETS.map((widget) => {
               const url = `${origin}${widget.path}/${profile?.overlay_id || ""}${
@@ -158,10 +147,7 @@ export default function OverlayUrlsPage() {
               }`;
 
               return (
-                <div
-                  key={widget.name}
-                  className="rounded-[2rem] border border-white/10 bg-zinc-950 p-6"
-                >
+                <Card key={widget.name}>
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="min-w-0 flex-1">
                       <h2 className="text-2xl font-black">
@@ -169,30 +155,31 @@ export default function OverlayUrlsPage() {
                       </h2>
 
                       <div className="mt-3 break-all rounded-2xl bg-black p-4 text-sm text-zinc-300">
-                        {canCopy ? url : "🔒 Become a Founder to unlock this overlay"}
+                        {canCopy
+                          ? url
+                          : "🔒 Upgrade to Creator to unlock this OBS overlay"}
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                      <button
-                        type="button"
+                      <Button
                         onClick={() => copy(url)}
                         disabled={!canCopy}
-                        className="rounded-xl bg-purple-600 px-4 py-2 font-bold transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        variant="secondary"
                       >
                         {canCopy ? "Copy Link" : "🔒 Copy Link"}
-                      </button>
+                      </Button>
 
                       <Link
                         href={url}
                         target="_blank"
-                        className="rounded-xl bg-zinc-700 px-4 py-2 font-bold transition hover:bg-zinc-600"
+                        className="rounded-xl bg-zinc-700 px-4 py-3 font-black transition hover:bg-zinc-600"
                       >
                         Open Preview
                       </Link>
                     </div>
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>

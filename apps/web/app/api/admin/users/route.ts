@@ -5,7 +5,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const VALID_PLANS = ["trial", "pro", "premium"] as const;
+const VALID_PLANS = ["free", "pro", "premium"] as const;
 const VALID_ROLES = ["user", "support", "admin", "owner"] as const;
 
 function getBearerToken(request: NextRequest) {
@@ -156,7 +156,7 @@ export async function GET(request: NextRequest) {
 
   const stats = {
     total: users.length,
-    trial: users.filter((user) => user.subscription?.plan === "trial").length,
+    free: users.filter((user) => user.subscription?.plan === "free").length,
     pro: users.filter((user) => user.subscription?.plan === "pro").length,
     premium: users.filter((user) => user.subscription?.plan === "premium")
       .length,
@@ -310,7 +310,7 @@ export async function PATCH(request: NextRequest) {
   } else {
     let payload: {
       user_id: string;
-      plan: "trial" | "pro" | "premium";
+      plan: "free" | "pro" | "premium";
       status: string;
       started_at?: string;
       expires_at: string | null;
@@ -319,7 +319,7 @@ export async function PATCH(request: NextRequest) {
     if (action === "make_trial") {
       payload = {
         user_id: userId,
-        plan: "trial",
+        plan: "free",
         status: "active",
         started_at: now.toISOString(),
         expires_at: new Date(
@@ -335,7 +335,7 @@ export async function PATCH(request: NextRequest) {
 
       payload = {
         user_id: userId,
-        plan: "trial",
+        plan: "free",
         status: "active",
         started_at: now.toISOString(),
         expires_at: new Date(
@@ -369,7 +369,7 @@ export async function PATCH(request: NextRequest) {
           previousSubscription?.plan === "pro" ||
           previousSubscription?.plan === "premium"
             ? previousSubscription.plan
-            : "trial",
+            : "free",
         status: "cancelled",
         started_at: now.toISOString(),
         expires_at: now.toISOString(),

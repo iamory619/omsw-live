@@ -18,7 +18,7 @@ type Props = {
 };
 
 export function PermissionProvider({ subscription, children }: Props) {
-  const plan = subscription?.plan || "trial";
+  const plan = subscription?.plan || "free";
 
   const canUseFeature = (feature: Feature) => {
     return canUse(plan, feature);

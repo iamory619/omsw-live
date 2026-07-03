@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { LoadingCard } from "@/components/ui/LoadingCard";
+import { PlanBadge } from "@/components/ui/PlanBadge";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { createClient } from "@/lib/supabase/client";
-import type { Subscription } from "@/lib/core/types";
+import type { AppPlan, Subscription } from "@/lib/core/types";
 import {
   getTrialDaysLeft,
   isSubscriptionExpired,
@@ -25,11 +30,18 @@ type Payment = {
   paid_at: string | null;
 };
 
+function normalizePlan(plan?: string | null): AppPlan {
+  if (plan === "creator") return "creator";
+  if (plan === "pro") return "pro";
+  if (plan === "owner") return "owner";
+  return "free";
+}
+
 function getPlanLabel(plan?: string | null) {
-  if (plan === "pro") return "⭐ Creator";
-  if (plan === "premium") return "💎 Pro";
+  if (plan === "creator") return "⭐ Creator";
+  if (plan === "pro") return "💎 Pro";
   if (plan === "owner") return "👑 Owner";
-  return "🎁 Trial";
+  return "🆓 Free";
 }
 
 export default function BillingPage() {
@@ -41,6 +53,7 @@ export default function BillingPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   const trialDaysLeft = useMemo(() => {
     return getTrialDaysLeft(subscription);
@@ -50,9 +63,9 @@ export default function BillingPage() {
     return isSubscriptionExpired(subscription);
   }, [subscription]);
 
-  const currentPlan = subscription?.plan || "trial";
-  const isTrial = currentPlan === "trial";
-  const isCreator = currentPlan === "pro";
+  const currentPlan = normalizePlan(subscription?.plan);
+  const isFree = currentPlan === "free";
+  const isCreator = currentPlan === "creator";
 
   const startCheckout = async (plan: "creator" | "pro") => {
     if (!profile?.id) {
@@ -93,24 +106,30 @@ export default function BillingPage() {
       return;
     }
 
-    const res = await fetch("/api/stripe/create-portal-session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: profile.id,
-      }),
-    });
+    try {
+      setPortalLoading(true);
 
-    const data = await res.json();
+      const res = await fetch("/api/stripe/create-portal-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: profile.id,
+        }),
+      });
 
-    if (!res.ok || !data.url) {
-      alert("Unable to open billing portal. Please try again.");
-      return;
+      const data = await res.json();
+
+      if (!res.ok || !data.url) {
+        alert("Unable to open billing portal. Please try again.");
+        return;
+      }
+
+      window.location.href = data.url;
+    } finally {
+      setPortalLoading(false);
     }
-
-    window.location.href = data.url;
   };
 
   useEffect(() => {
@@ -159,30 +178,22 @@ export default function BillingPage() {
   return (
     <main className="min-h-screen bg-black p-6 text-white lg:p-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8">
-          <div className="text-sm font-black text-pink-400">Membership</div>
-
-          <h1 className="mt-2 text-4xl font-black md:text-5xl">
-            Manage Your Creator Membership
-          </h1>
-
-          <p className="mt-3 text-zinc-400">
-            View your current plan, trial status, and upgrade options.
-          </p>
-        </div>
+        <SectionHeader
+          badge="Billing"
+          title="Manage Your Billing"
+          description="View your current plan, billing history, and billing options."
+        />
 
         {loading ? (
-          <section className="rounded-[2rem] border border-white/10 bg-zinc-950 p-8 text-zinc-400">
-            Loading your membership...
-          </section>
+          <LoadingCard />
         ) : (
           <>
             <section className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-              <div className="rounded-[2rem] border border-white/10 bg-zinc-950 p-8">
-                <div className="text-sm text-zinc-400">Current Membership</div>
+              <Card className="p-8">
+                <div className="text-sm text-zinc-400">Current Plan</div>
 
-                <div className="mt-3 text-4xl font-black text-pink-300">
-                  {getPlanLabel(currentPlan)}
+                <div className="mt-3">
+                  <PlanBadge plan={currentPlan} />
                 </div>
 
                 <div className="mt-4 rounded-2xl bg-black p-4">
@@ -205,21 +216,21 @@ export default function BillingPage() {
                   </div>
                 </div>
 
-                {isTrial && (
+                {isFree && (
                   <div className="mt-4 rounded-2xl bg-black p-4">
-                    <div className="text-sm text-zinc-400">Trial Remaining</div>
+                    <div className="text-sm text-zinc-400">Creator Trial</div>
                     <div
                       className={`mt-1 text-2xl font-black ${
                         trialExpired ? "text-red-300" : "text-green-300"
                       }`}
                     >
-                      {trialExpired ? "Trial Ended" : `${trialDaysLeft} days`}
+                      {trialExpired ? "Ended" : `${trialDaysLeft} days left`}
                     </div>
                   </div>
                 )}
 
                 <div className="mt-4 rounded-2xl bg-black p-4">
-                  <div className="text-sm text-zinc-400">Expires</div>
+                  <div className="text-sm text-zinc-400">Renews / Expires</div>
                   <div className="mt-1 font-bold text-zinc-200">
                     {subscription?.expires_at
                       ? new Date(subscription.expires_at).toLocaleString()
@@ -227,26 +238,28 @@ export default function BillingPage() {
                   </div>
                 </div>
 
-                {!isTrial && (
-                  <button
-                    type="button"
+                {!isFree && (
+                  <Button
+                    variant="secondary"
                     onClick={openBillingPortal}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-zinc-800 px-5 py-3 font-black transition hover:border-pink-500 hover:bg-zinc-700"
+                    disabled={portalLoading}
+                    className="mt-5 w-full border border-white/10 hover:border-pink-500"
                   >
-                    💳 Manage Billing
-                  </button>
+                    {portalLoading ? "Opening billing..." : "💳 Manage Your Billing"}
+                  </Button>
                 )}
-              </div>
+              </Card>
 
-              <div className="rounded-[2rem] border border-pink-500/30 bg-pink-500/10 p-8 shadow-2xl shadow-pink-500/10">
+              <Card className="border-pink-500/30 bg-pink-500/10 p-8 shadow-2xl shadow-pink-500/10">
                 <div className="w-fit rounded-full bg-pink-600 px-3 py-1 text-xs font-black">
-                  Founder Program
+                  Creator Membership
                 </div>
 
-                <h2 className="mt-5 text-4xl font-black">Become a Founder</h2>
+                <h2 className="mt-5 text-4xl font-black">Upgrade to Creator</h2>
 
                 <p className="mt-3 text-zinc-300">
-                  First 100 creators get the Creator plan for ฿99/month.
+                  Unlock premium widgets, overlays, and live effects for
+                  ฿99/month.
                 </p>
 
                 <div className="mt-6 flex items-end gap-2">
@@ -255,45 +268,49 @@ export default function BillingPage() {
                 </div>
 
                 <ul className="mt-8 space-y-3 text-sm text-zinc-200">
-                  <li>✅ Lifetime founder price</li>
-                  <li>✅ Founder badge</li>
-                  <li>✅ All widgets unlocked</li>
-                  <li>✅ OBS overlays unlocked</li>
-                  <li>✅ Priority updates</li>
+                  <li>✅ Everything in Free</li>
+                  <li>✅ Magic Lantern</li>
+                  <li>✅ Gift Vehicle</li>
+                  <li>✅ Gift Basket</li>
+                  <li>✅ Fortune Reading</li>
+                  <li>✅ Future premium widgets</li>
                 </ul>
 
                 {isCreator ? (
-                  <button
+                  <Button
                     disabled
-                    className="mt-8 w-full cursor-not-allowed rounded-xl bg-green-600 px-5 py-4 font-black opacity-80"
+                    variant="secondary"
+                    className="mt-8 w-full bg-green-600 opacity-80"
                   >
                     Current Plan
-                  </button>
+                  </Button>
                 ) : (
-                  <button
-                    type="button"
+                  <Button
+                    variant="upgrade"
                     onClick={() => startCheckout("creator")}
                     disabled={checkoutLoading}
-                    className="mt-8 w-full rounded-xl bg-pink-600 px-5 py-4 font-black transition hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="mt-8 w-full"
                   >
-                    {checkoutLoading
-                      ? "Opening checkout..."
-                      : "Become a Founder"}
-                  </button>
+                    {checkoutLoading ? "Opening checkout..." : "Upgrade to Creator"}
+                  </Button>
                 )}
 
                 <p className="mt-3 text-center text-xs text-pink-100/70">
                   Secure checkout powered by Stripe.
                 </p>
-              </div>
+              </Card>
             </section>
 
-            <section className="mt-8 rounded-[2rem] border border-white/10 bg-zinc-950 p-8">
-              <h2 className="text-3xl font-black">Payment History</h2>
+            <Card className="mt-8 p-8">
+              <h2 className="text-3xl font-black">Billing History</h2>
 
               {payments.length === 0 ? (
-                <div className="mt-5 rounded-2xl bg-black p-6 text-zinc-500">
-                  No invoices yet.
+                <div className="mt-5">
+                  <EmptyState
+                    icon="💳"
+                    title="No billing history yet"
+                    description="Your billing history will appear here after your first successful payment."
+                  />
                 </div>
               ) : (
                 <div className="mt-5 overflow-x-auto rounded-2xl bg-black">
@@ -336,22 +353,19 @@ export default function BillingPage() {
                   </table>
                 </div>
               )}
-            </section>
+            </Card>
 
-            <section className="mt-8 rounded-[2rem] border border-white/10 bg-zinc-950 p-8">
-              <h2 className="text-3xl font-black">Need a different plan?</h2>
+            <Card className="mt-8 p-8">
+              <h2 className="text-3xl font-black">Compare plans</h2>
 
               <p className="mt-2 text-zinc-400">
-                Compare all memberships and choose the best fit for your live.
+                Compare all plans and choose the best fit for your live.
               </p>
 
-              <Link
-                href="/pricing"
-                className="mt-5 inline-block rounded-xl bg-zinc-800 px-5 py-3 font-black transition hover:bg-zinc-700"
-              >
+              <Button href="/pricing" variant="secondary" className="mt-5">
                 View Pricing
-              </Link>
-            </section>
+              </Button>
+            </Card>
           </>
         )}
       </div>

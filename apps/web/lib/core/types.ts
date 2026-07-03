@@ -1,4 +1,4 @@
-export type AppPlan = "trial" | "pro" | "premium" | "owner";
+export type AppPlan = "free" | "creator" | "pro" | "owner";
 export type SubscriptionStatus = "active" | "expired" | "cancelled" | "past_due";
 
 export type Profile = {
@@ -32,7 +32,7 @@ export type WidgetSettings = {
   fortune_enabled: boolean;
 };
 
-export type WidgetPlan = "trial" | "pro" | "premium";
+export type WidgetPlan = "free" | "creator" | "pro";
 
 export type WidgetDefinition = {
   id: string;

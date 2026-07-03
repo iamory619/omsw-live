@@ -2,9 +2,9 @@ import type { AppPlan, Subscription, WidgetDefinition } from "./types";
 import { isSubscriptionExpired } from "./subscriptions";
 
 const PLAN_LEVEL: Record<AppPlan, number> = {
-  trial: 0,
-  pro: 1,
-  premium: 2,
+  free: 0,
+  creator: 1,
+  pro: 2,
   owner: 99,
 };
 
@@ -51,17 +51,38 @@ export function canUseWidget(
 export type Feature =
   | "giftPopup"
   | "giftGoal"
+  | "magicLantern"
+  | "giftVehicle"
+  | "giftBasket"
+  | "fortuneReading"
   | "petWidget"
   | "obsOverlay"
   | "analytics"
   | "marketplace";
 
-const permissions = {
-  trial: {
+const permissions: Record<AppPlan, Record<Feature, boolean>> = {
+  free: {
     giftPopup: true,
-    giftGoal: false,
+    giftGoal: true,
+    magicLantern: false,
+    giftVehicle: false,
+    giftBasket: false,
+    fortuneReading: false,
     petWidget: false,
-    obsOverlay: false,
+    obsOverlay: true,
+    analytics: false,
+    marketplace: false,
+  },
+
+  creator: {
+    giftPopup: true,
+    giftGoal: true,
+    magicLantern: true,
+    giftVehicle: true,
+    giftBasket: true,
+    fortuneReading: true,
+    petWidget: true,
+    obsOverlay: true,
     analytics: false,
     marketplace: false,
   },
@@ -69,15 +90,10 @@ const permissions = {
   pro: {
     giftPopup: true,
     giftGoal: true,
-    petWidget: true,
-    obsOverlay: true,
-    analytics: false,
-    marketplace: false,
-  },
-
-  premium: {
-    giftPopup: true,
-    giftGoal: true,
+    magicLantern: true,
+    giftVehicle: true,
+    giftBasket: true,
+    fortuneReading: true,
     petWidget: true,
     obsOverlay: true,
     analytics: true,
@@ -87,12 +103,16 @@ const permissions = {
   owner: {
     giftPopup: true,
     giftGoal: true,
+    magicLantern: true,
+    giftVehicle: true,
+    giftBasket: true,
+    fortuneReading: true,
     petWidget: true,
     obsOverlay: true,
     analytics: true,
     marketplace: true,
   },
-} as const;
+};
 
 export function canUse(plan: AppPlan, feature: Feature) {
   return permissions[plan][feature];
