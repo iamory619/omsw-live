@@ -50,6 +50,26 @@ export default function DashboardHomePage() {
     return isSubscriptionExpired(subscription);
   }, [subscription]);
 
+  const creatorTrialLabel = useMemo(() => {
+    if (currentPlan === "creator") {
+      if (subscription?.expires_at) {
+        return trialExpired ? "Trial Ended" : `${trialDaysLeft} days left`;
+      }
+
+      return "Active";
+    }
+
+    if (currentPlan === "pro") return "Active";
+    if (currentPlan === "owner") return "Unlimited";
+
+    return trialExpired ? "Ended" : `${trialDaysLeft} days`;
+  }, [currentPlan, subscription, trialExpired, trialDaysLeft]);
+
+  const creatorTrialTone =
+    creatorTrialLabel === "Trial Ended" || creatorTrialLabel === "Ended"
+      ? "text-red-300"
+      : "text-green-300";
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -104,25 +124,39 @@ export default function DashboardHomePage() {
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           badge="Make Every Live Unforgettable."
-          title={loading ? "Loading your dashboard..." : profile?.display_name || "Creator"}
+          title={
+            loading
+              ? "Loading your dashboard..."
+              : profile?.display_name || "Creator"
+          }
           description="Everything you need to power your LIVE."
         />
 
         <DeveloperToolsCard
           onSimulateTrial={() =>
-            alert("Developer Preview: Use Mission Control to change the current plan.")
+            alert(
+              "Developer Preview: Use Mission Control to change the current plan.",
+            )
           }
           onSimulateExpired={() =>
-            alert("Developer Preview: Use Mission Control to simulate an expired Creator Trial.")
+            alert(
+              "Developer Preview: Use Mission Control to simulate an expired Creator Trial.",
+            )
           }
           onSimulatePro={() =>
-            alert("Developer Preview: Use Mission Control to change the current plan.")
+            alert(
+              "Developer Preview: Use Mission Control to change the current plan.",
+            )
           }
           onSimulatePremium={() =>
-            alert("Developer Preview: Use Mission Control to change the current plan.")
+            alert(
+              "Developer Preview: Use Mission Control to change the current plan.",
+            )
           }
           onSimulateOwner={() =>
-            alert("Developer Preview: Use Mission Control to change the current role.")
+            alert(
+              "Developer Preview: Use Mission Control to change the current role.",
+            )
           }
         />
 
@@ -161,16 +195,8 @@ export default function DashboardHomePage() {
 
               <Card>
                 <div className="text-sm text-zinc-400">Creator Trial</div>
-                <div
-                  className={`mt-3 text-3xl font-black ${
-                    trialExpired ? "text-red-300" : "text-green-300"
-                  }`}
-                >
-                  {currentPlan !== "free"
-                    ? "—"
-                    : trialExpired
-                      ? "Ended"
-                      : `${trialDaysLeft} days`}
+                <div className={`mt-3 text-3xl font-black ${creatorTrialTone}`}>
+                  {creatorTrialLabel}
                 </div>
               </Card>
 
@@ -199,7 +225,8 @@ export default function DashboardHomePage() {
                 <div className="text-4xl">🎁</div>
                 <h2 className="mt-4 text-2xl font-black">Live Widgets</h2>
                 <p className="mt-2 text-sm text-zinc-400">
-                  Connect your TikTok LIVE account and customize your OMSW Live widgets.
+                  Connect your TikTok LIVE account and customize your OMSW Live
+                  widgets.
                 </p>
               </Link>
 
@@ -209,7 +236,8 @@ export default function DashboardHomePage() {
               >
                 <div className="text-4xl">🔗</div>
                 <h2 className="mt-4 text-2xl font-black">OBS Overlays</h2>
-                <p className="mt-2 text-sm text-zinc-400">Copy and manage your OBS Browser Source overlays.
+                <p className="mt-2 text-sm text-zinc-400">
+                  Copy and manage your OBS Browser Source overlays.
                 </p>
               </Link>
 
