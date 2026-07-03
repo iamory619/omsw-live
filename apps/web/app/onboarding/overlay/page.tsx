@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { StepFooter } from "@/components/onboarding/StepFooter";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
-import { Button } from "@/components/ui/Button";
 
 export default function OverlayStepPage() {
   return (
@@ -24,16 +24,18 @@ export default function OverlayStepPage() {
             <li>Add a new Browser Source.</li>
             <li>Copy your OMSW Live overlay URL.</li>
             <li>Paste the URL into the Browser Source settings.</li>
-            <li>Click <strong>OK</strong> to save.</li>
+            <li>
+              Click <strong>OK</strong> to save.
+            </li>
           </ol>
 
-          <Button
+          <Link
             href="/dashboard/overlays"
-            variant="upgrade"
-            className="mt-6"
+            prefetch={false}
+            className="mt-6 inline-block rounded-xl bg-pink-600 px-5 py-3 font-black transition hover:bg-pink-500"
           >
             Open OBS Overlays
-          </Button>
+          </Link>
         </div>
 
         <StepFooter
