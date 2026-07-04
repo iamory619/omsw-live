@@ -171,14 +171,16 @@ export default function DashboardPage() {
       setProfileLoading(true);
 
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (userError || !user) {
+      if (!session?.user) {
+        setProfileLoading(false);
         router.replace("/login");
         return;
       }
+
+      const user = session.user;
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
@@ -203,13 +205,14 @@ export default function DashboardPage() {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
       if (subscriptionError) {
         console.error("Load subscription error:", subscriptionError);
       }
 
-      setSubscription(subscriptionData as Subscription | null);
+      setSubscription(subscriptionData ?? null);
+
       setProfileLoading(false);
 
       const { data: settings, error: settingsError } = await supabase

@@ -19,15 +19,15 @@ export default function FinishStepPage() {
       setLoading(true);
 
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (!user) {
+      if (!session?.user) {
         router.push("/login");
         return;
       }
 
-      await saveOnboardingStep(supabase, user.id, "finish");
+      await saveOnboardingStep(supabase, session.user.id, "finish");
 
       router.push(href);
       router.refresh();

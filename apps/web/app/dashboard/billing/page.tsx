@@ -67,6 +67,26 @@ export default function BillingPage() {
   const isFree = currentPlan === "free";
   const isCreator = currentPlan === "creator";
 
+  const creatorTrialLabel = useMemo(() => {
+    if (currentPlan === "creator") {
+      if (subscription?.expires_at) {
+        return trialExpired ? "Trial Ended" : `${trialDaysLeft} days left`;
+      }
+
+      return "Active";
+    }
+
+    if (currentPlan === "pro") return "Active";
+    if (currentPlan === "owner") return "Unlimited";
+
+    return trialExpired ? "Ended" : `${trialDaysLeft} days left`;
+  }, [currentPlan, subscription, trialExpired, trialDaysLeft]);
+
+  const creatorTrialTone =
+    creatorTrialLabel === "Trial Ended" || creatorTrialLabel === "Ended"
+      ? "text-red-300"
+      : "text-green-300";
+
   const startCheckout = async (plan: "creator" | "pro") => {
     if (!profile?.id) {
       alert("Unable to start checkout. Please sign in again.");
@@ -137,19 +157,28 @@ export default function BillingPage() {
       setLoading(true);
 
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (!user) {
+      if (!session?.user) {
+        setLoading(false);
         router.replace("/login");
         return;
       }
 
-      const { data: profileData } = await supabase
+      const user = session.user;
+
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("id,email,display_name")
         .eq("id", user.id)
         .single();
+
+      if (profileError || !profileData) {
+        setLoading(false);
+        router.replace("/login");
+        return;
+      }
 
       const { data: subscriptionData } = await supabase
         .from("subscriptions")
@@ -157,7 +186,7 @@ export default function BillingPage() {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       const { data: paymentsData } = await supabase
         .from("payments")
@@ -167,7 +196,7 @@ export default function BillingPage() {
         .limit(10);
 
       setProfile(profileData);
-      setSubscription(subscriptionData as Subscription | null);
+      setSubscription(subscriptionData ?? null);
       setPayments(paymentsData || []);
       setLoading(false);
     };
@@ -216,18 +245,14 @@ export default function BillingPage() {
                   </div>
                 </div>
 
-                {isFree && (
-                  <div className="mt-4 rounded-2xl bg-black p-4">
-                    <div className="text-sm text-zinc-400">Creator Trial</div>
-                    <div
-                      className={`mt-1 text-2xl font-black ${
-                        trialExpired ? "text-red-300" : "text-green-300"
-                      }`}
-                    >
-                      {trialExpired ? "Ended" : `${trialDaysLeft} days left`}
-                    </div>
+                <div className="mt-4 rounded-2xl bg-black p-4">
+                  <div className="text-sm text-zinc-400">Creator Trial</div>
+                  <div
+                    className={`mt-1 text-2xl font-black ${creatorTrialTone}`}
+                  >
+                    {creatorTrialLabel}
                   </div>
-                )}
+                </div>
 
                 <div className="mt-4 rounded-2xl bg-black p-4">
                   <div className="text-sm text-zinc-400">Renews / Expires</div>
@@ -245,7 +270,9 @@ export default function BillingPage() {
                     disabled={portalLoading}
                     className="mt-5 w-full border border-white/10 hover:border-pink-500"
                   >
-                    {portalLoading ? "Opening billing..." : "💳 Manage Your Billing"}
+                    {portalLoading
+                      ? "Opening billing..."
+                      : "💳 Manage Your Billing"}
                   </Button>
                 )}
               </Card>
@@ -276,7 +303,7 @@ export default function BillingPage() {
                   <li>✅ Future premium widgets</li>
                 </ul>
 
-                {isCreator ? (
+                {currentPlan !== "free" ? (
                   <Button
                     disabled
                     variant="secondary"
@@ -291,7 +318,9 @@ export default function BillingPage() {
                     disabled={checkoutLoading}
                     className="mt-8 w-full"
                   >
-                    {checkoutLoading ? "Opening checkout..." : "Upgrade to Creator"}
+                    {checkoutLoading
+                      ? "Opening checkout..."
+                      : "Upgrade to Creator"}
                   </Button>
                 )}
 

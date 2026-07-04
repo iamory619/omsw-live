@@ -33,12 +33,15 @@ export default function LoginPage() {
     }
 
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const user = session?.user;
 
     if (!user) {
       setLoading(false);
       router.push("/dashboard");
+      router.refresh();
       return;
     }
 
@@ -46,7 +49,7 @@ export default function LoginPage() {
       .from("profiles")
       .select("onboarding_completed,onboarding_step")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     setLoading(false);
 
@@ -107,14 +110,14 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center text-sm text-zinc-400">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-bold text-pink-400">
-             Create account
+          <Link href="/register" prefetch={false} className="font-bold text-pink-400">
+            Create account
           </Link>
         </div>
 
         <div className="mt-4 text-center text-sm">
-          <Link href="/" className="text-zinc-500 hover:text-white">
-              Back to home
+          <Link href="/" prefetch={false} className="text-zinc-500 hover:text-white">
+            Back to home
           </Link>
         </div>
       </form>

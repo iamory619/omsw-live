@@ -75,14 +75,16 @@ export default function DashboardHomePage() {
       setLoading(true);
 
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (userError || !user) {
+      if (!session?.user) {
+        setLoading(false);
         router.replace("/login");
         return;
       }
+
+      const user = session.user;
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
@@ -102,7 +104,7 @@ export default function DashboardHomePage() {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       const { data: settingsData } = await supabase
         .from("widget_settings")
@@ -220,6 +222,7 @@ export default function DashboardHomePage() {
             <section className="mt-8 grid gap-6 xl:grid-cols-3">
               <Link
                 href="/dashboard/widgets"
+                prefetch={false}
                 className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-pink-500/20 to-zinc-950 p-6 transition hover:border-pink-500"
               >
                 <div className="text-4xl">🎁</div>
@@ -232,6 +235,7 @@ export default function DashboardHomePage() {
 
               <Link
                 href="/dashboard/overlays"
+                prefetch={false}
                 className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-purple-500/20 to-zinc-950 p-6 transition hover:border-purple-500"
               >
                 <div className="text-4xl">🔗</div>
@@ -243,6 +247,7 @@ export default function DashboardHomePage() {
 
               <Link
                 href="/dashboard/billing"
+                prefetch={false}
                 className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-yellow-500/20 to-zinc-950 p-6 transition hover:border-yellow-500"
               >
                 <div className="text-4xl">💳</div>

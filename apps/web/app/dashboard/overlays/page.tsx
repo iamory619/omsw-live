@@ -21,9 +21,24 @@ type Profile = {
 
 const WIDGETS = [
   { name: "Gift Goal", emoji: "🎁", path: "/widget/gift-goal" },
-  { name: "Magic Lantern", emoji: "🧙", path: "/widget/magic-lantern", query: "?lantern=phoenix" },
-  { name: "Gift Vehicle", emoji: "🛺", path: "/widget/gift-vehicle", query: "?vehicle=tuktuk" },
-  { name: "Gift Basket", emoji: "🧺", path: "/widget/gift-plane", query: "?basket=basket-1" },
+  {
+    name: "Magic Lantern",
+    emoji: "🧙",
+    path: "/widget/magic-lantern",
+    query: "?lantern=phoenix",
+  },
+  {
+    name: "Gift Vehicle",
+    emoji: "🛺",
+    path: "/widget/gift-vehicle",
+    query: "?vehicle=tuktuk",
+  },
+  {
+    name: "Gift Basket",
+    emoji: "🧺",
+    path: "/widget/gift-plane",
+    query: "?basket=basket-1",
+  },
   { name: "Fortune Stick", emoji: "🙏", path: "/widget/fortune-stick" },
 ];
 
@@ -43,10 +58,10 @@ export default function OverlayUrlsPage() {
   const canCopy = canCopyOverlay(subscription);
 
   useEffect(() => {
-    setOrigin(window.location.origin);
-
     const loadData = async () => {
-      setLoading(true);
+      if (typeof window !== "undefined") {
+        setOrigin(window.location.origin);
+      }
 
       const {
         data: { session },
@@ -88,7 +103,9 @@ export default function OverlayUrlsPage() {
 
   const copy = async (url: string) => {
     if (!canCopy) {
-      alert("Upgrade to Creator to unlock OBS overlays and premium live effects.");
+      alert(
+        "Upgrade to Creator to unlock OBS overlays and premium live effects.",
+      );
       return;
     }
 
@@ -116,7 +133,11 @@ export default function OverlayUrlsPage() {
               widgets, live effects, and premium OBS overlays.
             </p>
 
-            <Button href="/dashboard/billing" variant="upgrade" className="mt-4">
+            <Button
+              href="/dashboard/billing"
+              variant="upgrade"
+              className="mt-4"
+            >
               Upgrade to Creator
             </Button>
           </Card>
@@ -158,6 +179,7 @@ export default function OverlayUrlsPage() {
                       <Link
                         href={url}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="rounded-xl bg-zinc-700 px-4 py-3 font-black transition hover:bg-zinc-600"
                       >
                         Open Preview

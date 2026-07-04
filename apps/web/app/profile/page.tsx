@@ -10,8 +10,6 @@ type Profile = {
   email: string;
   display_name: string | null;
   tiktok_username: string | null;
-  plan: string;
-  trial_end: string;
   overlay_id: string;
 };
 
@@ -45,22 +43,25 @@ export default function ProfilePage() {
       setLoading(true);
 
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (userError || !user) {
+      if (!session?.user) {
+        setLoading(false);
         router.replace("/login");
         return;
       }
 
+      const user = session.user;
+
       const { data, error } = await supabase
         .from("profiles")
-        .select("id,email,display_name,tiktok_username,plan,trial_end,overlay_id")
+        .select("id,email,display_name,tiktok_username,overlay_id")
         .eq("id", user.id)
         .single();
 
       if (error || !data) {
+        setLoading(false);
         await supabase.auth.signOut();
         router.replace("/login");
         return;
@@ -87,7 +88,7 @@ export default function ProfilePage() {
     }
 
     if (!usernameIsValid) {
-      setMessage( "ชื่อบัญชีใช้ได้เฉพาะตัวอักษร ตัวเลข จุด (.) และขีดล่าง (_)");
+      setMessage("ชื่อบัญชีใช้ได้เฉพาะตัวอักษร ตัวเลข จุด (.) และขีดล่าง (_)");
       return;
     }
 
@@ -132,7 +133,11 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-3xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <Link href="/dashboard" className="text-sm font-bold text-pink-400">
+            <Link
+              href="/dashboard"
+              prefetch={false}
+              className="text-sm font-bold text-pink-400"
+            >
               ← Back to Dashboard
             </Link>
 
@@ -151,18 +156,11 @@ export default function ProfilePage() {
           </a>
         </div>
 
-        <section className="mb-6 grid gap-4 md:grid-cols-3">
+        <section className="mb-6 grid gap-4 md:grid-cols-2">
           <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-5">
             <div className="text-sm text-zinc-400">Email</div>
             <div className="mt-2 break-all font-bold">
               {loading ? "Loading..." : profile?.email}
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-5">
-            <div className="text-sm text-zinc-400">Plan</div>
-            <div className="mt-2 text-2xl font-black capitalize text-pink-300">
-              {loading ? "..." : profile?.plan || "trial"}
             </div>
           </div>
 
