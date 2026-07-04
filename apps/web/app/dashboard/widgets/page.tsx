@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { PermissionProvider } from "@/components/PermissionProvider";
 import { UpgradeModal } from "@/components/UpgradeModal";
@@ -99,7 +100,13 @@ type WidgetSettings = {
 export default function DashboardPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
-  const socket = useMemo(() => io(SERVER_URL), []);
+  const socket = useMemo(
+    () =>
+      io(SERVER_URL, {
+        autoConnect: false,
+      }),
+    [],
+  );
 
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [origin, setOrigin] = useState("");
@@ -130,6 +137,26 @@ export default function DashboardPage() {
     () => isSubscriptionExpired(subscription),
     [subscription],
   );
+
+  const creatorTrialLabel = useMemo(() => {
+    if (currentPlan === "creator") {
+      if (subscription?.expires_at) {
+        return trialExpired ? "Trial Ended" : `${trialDaysLeft} days left`;
+      }
+
+      return "Active";
+    }
+
+    if (currentPlan === "pro") return "Active";
+    if (currentPlan === "owner") return "Unlimited";
+
+    return trialExpired ? "Ended" : `${trialDaysLeft} days`;
+  }, [currentPlan, subscription, trialExpired, trialDaysLeft]);
+
+  const creatorTrialTone =
+    creatorTrialLabel === "Trial Ended" || creatorTrialLabel === "Ended"
+      ? "text-red-300"
+      : "text-green-300";
 
   const canConnect = canConnectTikTok(subscription);
   const canCopy = canCopyOverlay(subscription);
@@ -245,6 +272,10 @@ export default function DashboardPage() {
       return;
     }
 
+    if (!socket.connected) {
+      socket.connect();
+    }
+
     try {
       setLoading(true);
 
@@ -292,6 +323,16 @@ export default function DashboardPage() {
 
     await navigator.clipboard.writeText(url);
     alert("Overlay link copied successfully!");
+  };
+
+  const emitWidgetEvent = (eventName: string) => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.emit(eventName, {
+      overlayId,
+    });
   };
 
   const saveWidgetSettings = async (settings: Partial<WidgetSettings>) => {
@@ -444,16 +485,11 @@ export default function DashboardPage() {
 
                 <Card>
                   <div className="text-sm text-zinc-400">Creator Trial</div>
+
                   <div
-                    className={`mt-3 text-2xl font-black ${
-                      trialExpired ? "text-red-300" : "text-green-300"
-                    }`}
+                    className={`mt-3 text-2xl font-black ${creatorTrialTone}`}
                   >
-                    {currentPlan !== "free"
-                      ? "—"
-                      : trialExpired
-                        ? "Ended"
-                        : `${trialDaysLeft} days`}
+                    {creatorTrialLabel}
                   </div>
                 </Card>
 
@@ -702,7 +738,11 @@ export default function DashboardPage() {
                                   return;
                                 }
 
-                                window.open(widget.url, "_blank");
+                                window.open(
+                                  widget.url,
+                                  "_blank",
+                                  "noopener,noreferrer",
+                                );
                               }}
                               variant="secondary"
                             >
@@ -718,9 +758,7 @@ export default function DashboardPage() {
                                       return;
                                     }
 
-                                    socket.emit(widget.testEvent, {
-                                      overlayId,
-                                    });
+                                    emitWidgetEvent(widget.testEvent);
                                   }}
                                   disabled={!canTest || !widgetUnlocked}
                                   className={`rounded-xl px-4 py-2 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${widget.testButtonClass}`}
@@ -735,9 +773,7 @@ export default function DashboardPage() {
                                       return;
                                     }
 
-                                    socket.emit(widget.resetEvent, {
-                                      overlayId,
-                                    });
+                                    emitWidgetEvent(widget.resetEvent);
                                   }}
                                   disabled={!canReset || !widgetUnlocked}
                                   className={`rounded-xl px-4 py-2 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${widget.resetButtonClass}`}
@@ -804,10 +840,12 @@ function PickerGrid({
                 : "border-zinc-700 bg-zinc-900 hover:bg-zinc-800"
             }`}
           >
-            <img
+            <Image
               src={item.image}
               alt={item.name}
-              className="mx-auto mb-2 h-20 object-contain"
+              width={80}
+              height={80}
+              className="mx-auto mb-2 object-contain"
             />
             <div className="text-sm font-bold">{item.name}</div>
           </button>
