@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LoadingCard } from "@/components/ui/LoadingCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import type { Subscription } from "@/lib/core/types";
-import { canCopyOverlay } from "@/lib/core/permissions";
-import { isSubscriptionExpired } from "@/lib/core/subscriptions";
 
 type Profile = {
   id: string;
@@ -45,63 +42,34 @@ export default function OverlayUrlsPage() {
   const supabase = useMemo(() => createClient(), []);
 
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [origin, setOrigin] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const creatorTrialEnded = useMemo(() => {
-    return subscription?.plan === "free" && isSubscriptionExpired(subscription);
-  }, [subscription]);
-
-  const canCopy = canCopyOverlay(subscription);
-
   useEffect(() => {
     const loadData = async () => {
-      if (typeof window !== "undefined") {
-        setOrigin(window.location.origin);
-      }
+      setOrigin(window.location.origin);
 
-      let {
+      const {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const retry = await supabase.auth.getSession();
-        session = retry.data.session;
-      }
-
-      if (!session?.user) {
-        setLoading(false);
         window.location.href = "/login";
         return;
       }
-
-      const user = session.user;
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("id,email,display_name,overlay_id")
-        .eq("id", user.id)
+        .eq("id", session.user.id)
         .single();
 
       if (profileError || !profileData) {
-        setLoading(false);
         window.location.href = "/login";
         return;
       }
 
-      const { data: subscriptionData } = await supabase
-        .from("subscriptions")
-        .select("id,user_id,plan,status,started_at,expires_at,created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
       setProfile(profileData);
-      setSubscription(subscriptionData ?? null);
       setLoading(false);
     };
 
@@ -109,13 +77,6 @@ export default function OverlayUrlsPage() {
   }, [supabase]);
 
   const copy = async (url: string) => {
-    if (!canCopy) {
-      alert(
-        "Upgrade to Creator to unlock OBS overlays and premium live effects.",
-      );
-      return;
-    }
-
     await navigator.clipboard.writeText(url);
     alert("OBS overlay link copied successfully!");
   };
@@ -128,27 +89,6 @@ export default function OverlayUrlsPage() {
           title="Copy Your OBS Browser Source Links"
           description="Copy and manage your OMSW Live overlay links for OBS Studio."
         />
-
-        {creatorTrialEnded && (
-          <Card className="mb-6 border-pink-500 bg-pink-500/10">
-            <h2 className="text-2xl font-black text-pink-200">
-              ✨ Your Creator Trial Has Ended
-            </h2>
-
-            <p className="mt-2 text-sm text-pink-100/80">
-              You're now on the Free plan. Upgrade to Creator to unlock all
-              widgets, live effects, and premium OBS overlays.
-            </p>
-
-            <Button
-              href="/dashboard/billing"
-              variant="upgrade"
-              className="mt-4"
-            >
-              Upgrade to Creator
-            </Button>
-          </Card>
-        )}
 
         {loading ? (
           <LoadingCard />
@@ -168,19 +108,13 @@ export default function OverlayUrlsPage() {
                       </h2>
 
                       <div className="mt-3 break-all rounded-2xl bg-black p-4 text-sm text-zinc-300">
-                        {canCopy
-                          ? url
-                          : "🔒 Upgrade to Creator to unlock this OBS overlay"}
+                        {url}
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                      <Button
-                        onClick={() => copy(url)}
-                        disabled={!canCopy}
-                        variant="secondary"
-                      >
-                        {canCopy ? "Copy Link" : "🔒 Copy Link"}
+                      <Button onClick={() => copy(url)} variant="secondary">
+                        Copy Link
                       </Button>
 
                       <Link
