@@ -24,14 +24,18 @@ export function getOnboardingHref(step?: string | null) {
   switch (step) {
     case "connect":
       return "/onboarding/connect";
+
     case "overlay":
       return "/onboarding/overlay";
+
     case "test":
       return "/onboarding/test";
+
     case "finish":
-      return "/dashboard";
+      return "/onboarding/finish";
+
     case "creator":
     default:
-      return "/dashboard";
+      return "/onboarding/creator";
   }
 }
