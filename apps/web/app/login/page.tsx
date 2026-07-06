@@ -23,13 +23,7 @@ export default function LoginPage() {
       email,
       password,
     });
-
-    console.log("LOGIN DATA:", data);
-    console.log("LOGIN ERROR:", error);
-
-    const sessionCheck = await supabase.auth.getSession();
-    console.log("SESSION CHECK:", sessionCheck);
-
+    
     if (error || !data.user) {
       setLoading(false);
       setMessage("Invalid email or password");
