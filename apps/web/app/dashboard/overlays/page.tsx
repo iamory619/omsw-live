@@ -17,24 +17,9 @@ type Profile = {
 
 const WIDGETS = [
   { name: "Gift Goal", emoji: "🎁", path: "/widget/gift-goal" },
-  {
-    name: "Magic Lantern",
-    emoji: "🧙",
-    path: "/widget/magic-lantern",
-    query: "?lantern=phoenix",
-  },
-  {
-    name: "Gift Vehicle",
-    emoji: "🛺",
-    path: "/widget/gift-vehicle",
-    query: "?vehicle=tuktuk",
-  },
-  {
-    name: "Gift Basket",
-    emoji: "🧺",
-    path: "/widget/gift-plane",
-    query: "?basket=basket-1",
-  },
+  { name: "Magic Lantern", emoji: "🧙", path: "/widget/magic-lantern", query: "?lantern=phoenix" },
+  { name: "Gift Vehicle", emoji: "🛺", path: "/widget/gift-vehicle", query: "?vehicle=tuktuk" },
+  { name: "Gift Basket", emoji: "🧺", path: "/widget/gift-plane", query: "?basket=basket-1" },
   { name: "Fortune Stick", emoji: "🙏", path: "/widget/fortune-stick" },
 ];
 
@@ -49,20 +34,16 @@ export default function OverlayUrlsPage() {
   useEffect(() => {
     const loadData = async () => {
       setOrigin(window.location.origin);
+      setLoading(true);
+      setMessage("");
 
-      let {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      if (!session?.user) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const retry = await supabase.auth.getSession();
-        session = retry.data.session;
-      }
-
-      if (!session?.user) {
-        setMessage("Session not found. Please refresh the page or login again.");
+      if (userError || !user) {
+        setMessage("User not found. Please login again.");
         setLoading(false);
         return;
       }
@@ -70,7 +51,7 @@ export default function OverlayUrlsPage() {
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("id,email,display_name,overlay_id")
-        .eq("id", session.user.id)
+        .eq("id", user.id)
         .single();
 
       if (profileError || !profileData) {
@@ -107,6 +88,7 @@ export default function OverlayUrlsPage() {
             <div className="text-xl font-black text-red-200">
               Unable to load OBS overlays
             </div>
+
             <p className="mt-2 text-sm text-red-100/80">{message}</p>
 
             <div className="mt-4 flex gap-3">

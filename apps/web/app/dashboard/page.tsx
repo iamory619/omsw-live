@@ -41,21 +41,14 @@ export default function DashboardHomePage() {
   const [loading, setLoading] = useState(true);
 
   const currentPlan = subscription?.plan || "free";
-
-  const trialDaysLeft = useMemo(() => {
-    return getTrialDaysLeft(subscription);
-  }, [subscription]);
-
-  const trialExpired = useMemo(() => {
-    return isSubscriptionExpired(subscription);
-  }, [subscription]);
+  const trialDaysLeft = useMemo(() => getTrialDaysLeft(subscription), [subscription]);
+  const trialExpired = useMemo(() => isSubscriptionExpired(subscription), [subscription]);
 
   const creatorTrialLabel = useMemo(() => {
     if (currentPlan === "creator") {
       if (subscription?.expires_at) {
         return trialExpired ? "Trial Ended" : `${trialDaysLeft} days left`;
       }
-
       return "Active";
     }
 
@@ -75,16 +68,14 @@ export default function DashboardHomePage() {
       setLoading(true);
 
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (!session?.user) {
+      if (!user) {
         setLoading(false);
         router.replace("/login");
         return;
       }
-
-      const user = session.user;
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
@@ -126,40 +117,16 @@ export default function DashboardHomePage() {
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           badge="Make Every Live Unforgettable."
-          title={
-            loading
-              ? "Loading your dashboard..."
-              : profile?.display_name || "Creator"
-          }
+          title={loading ? "Loading your dashboard..." : profile?.display_name || "Creator"}
           description="Everything you need to power your LIVE."
         />
 
         <DeveloperToolsCard
-          onSimulateTrial={() =>
-            alert(
-              "Developer Preview: Use Mission Control to change the current plan.",
-            )
-          }
-          onSimulateExpired={() =>
-            alert(
-              "Developer Preview: Use Mission Control to simulate an expired Creator Trial.",
-            )
-          }
-          onSimulatePro={() =>
-            alert(
-              "Developer Preview: Use Mission Control to change the current plan.",
-            )
-          }
-          onSimulatePremium={() =>
-            alert(
-              "Developer Preview: Use Mission Control to change the current plan.",
-            )
-          }
-          onSimulateOwner={() =>
-            alert(
-              "Developer Preview: Use Mission Control to change the current role.",
-            )
-          }
+          onSimulateTrial={() => alert("Developer Preview: Use Mission Control to change the current plan.")}
+          onSimulateExpired={() => alert("Developer Preview: Use Mission Control to simulate an expired Creator Trial.")}
+          onSimulatePro={() => alert("Developer Preview: Use Mission Control to change the current plan.")}
+          onSimulatePremium={() => alert("Developer Preview: Use Mission Control to change the current plan.")}
+          onSimulateOwner={() => alert("Developer Preview: Use Mission Control to change the current role.")}
         />
 
         {loading ? (
@@ -173,7 +140,6 @@ export default function DashboardHomePage() {
                     <h2 className="text-2xl font-black text-pink-200">
                       ✨ Your Creator Trial Has Ended
                     </h2>
-
                     <p className="mt-2 text-sm text-pink-100/80">
                       You're now on the Free plan. Upgrade to Creator to unlock
                       all widgets, live effects, and premium overlays.
@@ -205,9 +171,7 @@ export default function DashboardHomePage() {
               <Card>
                 <div className="text-sm text-zinc-400">Creator Username</div>
                 <div className="mt-3 break-all text-2xl font-black text-yellow-300">
-                  {profile?.tiktok_username
-                    ? `@${profile.tiktok_username}`
-                    : "Not set"}
+                  {profile?.tiktok_username ? `@${profile.tiktok_username}` : "Not set"}
                 </div>
               </Card>
 
@@ -228,8 +192,7 @@ export default function DashboardHomePage() {
                 <div className="text-4xl">🎁</div>
                 <h2 className="mt-4 text-2xl font-black">Live Widgets</h2>
                 <p className="mt-2 text-sm text-zinc-400">
-                  Connect your TikTok LIVE account and customize your OMSW Live
-                  widgets.
+                  Connect your TikTok LIVE account and customize your OMSW Live widgets.
                 </p>
               </Link>
 
@@ -264,23 +227,17 @@ export default function DashboardHomePage() {
               <div className="mt-5 grid gap-4 md:grid-cols-3">
                 <div className="rounded-2xl bg-black p-4">
                   <div className="text-sm text-zinc-400">Basket</div>
-                  <div className="mt-1 font-black">
-                    {settings?.basket || "basket-1"}
-                  </div>
+                  <div className="mt-1 font-black">{settings?.basket || "basket-1"}</div>
                 </div>
 
                 <div className="rounded-2xl bg-black p-4">
                   <div className="text-sm text-zinc-400">Vehicle Theme</div>
-                  <div className="mt-1 font-black">
-                    {settings?.vehicle || "tuktuk"}
-                  </div>
+                  <div className="mt-1 font-black">{settings?.vehicle || "tuktuk"}</div>
                 </div>
 
                 <div className="rounded-2xl bg-black p-4">
                   <div className="text-sm text-zinc-400">Lantern Theme</div>
-                  <div className="mt-1 font-black">
-                    {settings?.lantern || "phoenix"}
-                  </div>
+                  <div className="mt-1 font-black">{settings?.lantern || "phoenix"}</div>
                 </div>
               </div>
             </Card>
