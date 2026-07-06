@@ -1,9 +1,37 @@
-import Link from "next/link";
+"use client";
+
+import { useMemo, useState } from "react";
 import { StepFooter } from "@/components/onboarding/StepFooter";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
+import { createClient } from "@/lib/supabase/client";
 
 export default function OverlayStepPage() {
+  const supabase = useMemo(() => createClient(), []);
+  const [loading, setLoading] = useState(false);
+
+  const openOverlays = async () => {
+    setLoading(true);
+
+    let {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const retry = await supabase.auth.getSession();
+      session = retry.data.session;
+    }
+
+    if (!session?.user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    window.location.href = "/dashboard/overlays";
+  };
+
   return (
     <>
       <StepHeader
@@ -29,13 +57,14 @@ export default function OverlayStepPage() {
             </li>
           </ol>
 
-          <Link
-            href="/dashboard/overlays"
-            prefetch={false}
-            className="mt-6 inline-block rounded-xl bg-pink-600 px-5 py-3 font-black transition hover:bg-pink-500"
+          <button
+            type="button"
+            onClick={openOverlays}
+            disabled={loading}
+            className="mt-6 rounded-xl bg-pink-600 px-5 py-3 font-black transition hover:bg-pink-500 disabled:opacity-60"
           >
-            Open OBS Overlays
-          </Link>
+            {loading ? "Opening..." : "Open OBS Overlays"}
+          </button>
         </div>
 
         <StepFooter

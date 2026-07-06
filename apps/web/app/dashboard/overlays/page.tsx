@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -43,7 +42,6 @@ const WIDGETS = [
 ];
 
 export default function OverlayUrlsPage() {
-  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -63,43 +61,52 @@ export default function OverlayUrlsPage() {
         setOrigin(window.location.origin);
       }
 
-      const {
+      let {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        const retry = await supabase.auth.getSession();
+        session = retry.data.session;
+      }
+
+      if (!session?.user) {
         setLoading(false);
-        router.replace("/login");
+        window.location.href = "/login";
         return;
       }
+
+      const user = session.user;
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("id,email,display_name,overlay_id")
-        .eq("id", session.user.id)
+        .eq("id", user.id)
         .single();
 
       if (profileError || !profileData) {
         setLoading(false);
-        router.replace("/login");
+        window.location.href = "/login";
         return;
       }
 
       const { data: subscriptionData } = await supabase
         .from("subscriptions")
         .select("id,user_id,plan,status,started_at,expires_at,created_at")
-        .eq("user_id", session.user.id)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
       setProfile(profileData);
-      setSubscription((subscriptionData as Subscription | null) || null);
+      setSubscription(subscriptionData ?? null);
       setLoading(false);
     };
 
     loadData();
-  }, [router, supabase]);
+  }, [supabase]);
 
   const copy = async (url: string) => {
     if (!canCopy) {
@@ -180,6 +187,7 @@ export default function OverlayUrlsPage() {
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        prefetch={false}
                         className="rounded-xl bg-zinc-700 px-4 py-3 font-black transition hover:bg-zinc-600"
                       >
                         Open Preview
