@@ -5,37 +5,38 @@ import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
-import { saveOnboardingStep } from "@/lib/core/onboarding-progress";
 
 export default function FinishStepPage() {
   const supabase = createClient();
-
   const [loading, setLoading] = useState(false);
 
   const completeOnboarding = async (href: string) => {
     try {
       setLoading(true);
 
-      let {
+      const {
         data: { session },
       } = await supabase.auth.getSession();
-
-      // รอให้ Supabase sync Session หลัง Onboarding
-      if (!session?.user) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const retry = await supabase.auth.getSession();
-        session = retry.data.session;
-      }
 
       if (!session?.user) {
         window.location.href = "/login";
         return;
       }
 
-      await saveOnboardingStep(supabase, session.user.id, "finish");
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          onboarding_step: "finish",
+          onboarding_completed: true,
+        })
+        .eq("id", session.user.id);
 
-      // Reload ทั้งหน้าเพื่อให้ Session พร้อม
+      if (error) {
+        console.error("Complete onboarding error:", error);
+        alert(error.message);
+        return;
+      }
+
       window.location.href = href;
     } catch (error) {
       console.error("Complete onboarding error:", error);
