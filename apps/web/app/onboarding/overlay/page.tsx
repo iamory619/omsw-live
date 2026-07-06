@@ -1,18 +1,9 @@
-"use client";
-
-import { useState } from "react";
 import { StepFooter } from "@/components/onboarding/StepFooter";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
+import { Button } from "@/components/ui/Button";
 
 export default function OverlayStepPage() {
-  const [loading, setLoading] = useState(false);
-
-  const openOverlays = () => {
-    setLoading(true);
-    window.location.href = "/dashboard/overlays";
-  };
-
   return (
     <>
       <StepHeader
@@ -38,14 +29,9 @@ export default function OverlayStepPage() {
             </li>
           </ol>
 
-          <button
-            type="button"
-            onClick={openOverlays}
-            disabled={loading}
-            className="mt-6 rounded-xl bg-pink-600 px-5 py-3 font-black transition hover:bg-pink-500 disabled:opacity-60"
-          >
-            {loading ? "Opening..." : "Open OBS Overlays"}
-          </button>
+          <Button href="/dashboard/overlays" variant="upgrade" className="mt-6">
+            Open OBS Overlays
+          </Button>
         </div>
 
         <StepFooter
