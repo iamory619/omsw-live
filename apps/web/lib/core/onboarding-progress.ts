@@ -29,9 +29,9 @@ export function getOnboardingHref(step?: string | null) {
     case "test":
       return "/onboarding/test";
     case "finish":
-      return "/onboarding/finish";
+      return "/dashboard";
     case "creator":
     default:
-      return "/onboarding/creator";
+      return "/dashboard";
   }
 }
