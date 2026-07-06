@@ -44,6 +44,7 @@ export default function OverlayUrlsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [origin, setOrigin] = useState("");
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -54,15 +55,15 @@ export default function OverlayUrlsPage() {
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         const retry = await supabase.auth.getSession();
         session = retry.data.session;
       }
 
       if (!session?.user) {
+        setMessage("Session not found. Please refresh the page or login again.");
         setLoading(false);
-        window.location.href = "/login";
         return;
       }
 
@@ -73,8 +74,8 @@ export default function OverlayUrlsPage() {
         .single();
 
       if (profileError || !profileData) {
+        setMessage("Profile not found. Please try refreshing the page.");
         setLoading(false);
-        alert("Profile not found. Please try logging in again.");
         return;
       }
 
@@ -101,6 +102,23 @@ export default function OverlayUrlsPage() {
 
         {loading ? (
           <LoadingCard />
+        ) : message ? (
+          <Card className="border-red-500 bg-red-500/10">
+            <div className="text-xl font-black text-red-200">
+              Unable to load OBS overlays
+            </div>
+            <p className="mt-2 text-sm text-red-100/80">{message}</p>
+
+            <div className="mt-4 flex gap-3">
+              <Button onClick={() => window.location.reload()} variant="secondary">
+                Refresh
+              </Button>
+
+              <Button href="/login" variant="upgrade">
+                Go to Login
+              </Button>
+            </div>
+          </Card>
         ) : (
           <div className="space-y-4">
             {WIDGETS.map((widget) => {
