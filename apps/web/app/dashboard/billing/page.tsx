@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -45,7 +44,6 @@ function getPlanLabel(plan?: string | null) {
 }
 
 export default function BillingPage() {
-  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -65,8 +63,6 @@ export default function BillingPage() {
 
   const currentPlan = normalizePlan(subscription?.plan);
   const isFree = currentPlan === "free";
-  const isCreator = currentPlan === "creator";
-
   const creatorTrialLabel = useMemo(() => {
     if (currentPlan === "creator") {
       if (subscription?.expires_at) {
@@ -156,13 +152,18 @@ export default function BillingPage() {
     const loadData = async () => {
       setLoading(true);
 
-      const {
+      let {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const retry = await supabase.auth.getSession();
+        session = retry.data.session;
+      }
+
+      if (!session?.user) {
         setLoading(false);
-        router.replace("/login");
         return;
       }
 
@@ -176,7 +177,6 @@ export default function BillingPage() {
 
       if (profileError || !profileData) {
         setLoading(false);
-        router.replace("/login");
         return;
       }
 
@@ -202,7 +202,7 @@ export default function BillingPage() {
     };
 
     loadData();
-  }, [router, supabase]);
+  }, [supabase]);
 
   return (
     <main className="min-h-screen bg-black p-6 text-white lg:p-8">

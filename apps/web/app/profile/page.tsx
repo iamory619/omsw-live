@@ -2,7 +2,6 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Profile = {
@@ -14,7 +13,6 @@ type Profile = {
 };
 
 export default function ProfilePage() {
-  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -42,13 +40,19 @@ export default function ProfilePage() {
     const loadProfile = async () => {
       setLoading(true);
 
-      const {
+      let {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        const retry = await supabase.auth.getSession();
+        session = retry.data.session;
+      }
+
+      if (!session?.user) {
         setLoading(false);
-        router.replace("/login");
         return;
       }
 
@@ -61,9 +65,8 @@ export default function ProfilePage() {
         .single();
 
       if (error || !data) {
+        console.error("Load profile error:", error);
         setLoading(false);
-        await supabase.auth.signOut();
-        router.replace("/login");
         return;
       }
 
@@ -74,7 +77,7 @@ export default function ProfilePage() {
     };
 
     loadProfile();
-  }, [router, supabase]);
+  }, [supabase]);
 
   const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

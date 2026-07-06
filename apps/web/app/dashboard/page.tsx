@@ -41,8 +41,14 @@ export default function DashboardHomePage() {
   const [loading, setLoading] = useState(true);
 
   const currentPlan = subscription?.plan || "free";
-  const trialDaysLeft = useMemo(() => getTrialDaysLeft(subscription), [subscription]);
-  const trialExpired = useMemo(() => isSubscriptionExpired(subscription), [subscription]);
+  const trialDaysLeft = useMemo(
+    () => getTrialDaysLeft(subscription),
+    [subscription],
+  );
+  const trialExpired = useMemo(
+    () => isSubscriptionExpired(subscription),
+    [subscription],
+  );
 
   const creatorTrialLabel = useMemo(() => {
     if (currentPlan === "creator") {
@@ -67,13 +73,18 @@ export default function DashboardHomePage() {
     const loadData = async () => {
       setLoading(true);
 
-      const {
+      let {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const retry = await supabase.auth.getSession();
+        session = retry.data.session;
+      }
+
+      if (!session?.user) {
         setLoading(false);
-        router.replace("/login");
         return;
       }
 
@@ -86,8 +97,7 @@ export default function DashboardHomePage() {
         .single();
 
       if (profileError || !profileData) {
-        await supabase.auth.signOut();
-        router.replace("/login");
+        setLoading(false);
         return;
       }
 
@@ -112,23 +122,47 @@ export default function DashboardHomePage() {
     };
 
     loadData();
-  }, [router, supabase]);
+  }, [supabase]);
 
   return (
     <main className="min-h-screen bg-black p-6 text-white lg:p-8">
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           badge="Make Every Live Unforgettable."
-          title={loading ? "Loading your dashboard..." : profile?.display_name || "Creator"}
+          title={
+            loading
+              ? "Loading your dashboard..."
+              : profile?.display_name || "Creator"
+          }
           description="Everything you need to power your LIVE."
         />
 
         <DeveloperToolsCard
-          onSimulateTrial={() => alert("Developer Preview: Use Mission Control to change the current plan.")}
-          onSimulateExpired={() => alert("Developer Preview: Use Mission Control to simulate an expired Creator Trial.")}
-          onSimulatePro={() => alert("Developer Preview: Use Mission Control to change the current plan.")}
-          onSimulatePremium={() => alert("Developer Preview: Use Mission Control to change the current plan.")}
-          onSimulateOwner={() => alert("Developer Preview: Use Mission Control to change the current role.")}
+          onSimulateTrial={() =>
+            alert(
+              "Developer Preview: Use Mission Control to change the current plan.",
+            )
+          }
+          onSimulateExpired={() =>
+            alert(
+              "Developer Preview: Use Mission Control to simulate an expired Creator Trial.",
+            )
+          }
+          onSimulatePro={() =>
+            alert(
+              "Developer Preview: Use Mission Control to change the current plan.",
+            )
+          }
+          onSimulatePremium={() =>
+            alert(
+              "Developer Preview: Use Mission Control to change the current plan.",
+            )
+          }
+          onSimulateOwner={() =>
+            alert(
+              "Developer Preview: Use Mission Control to change the current role.",
+            )
+          }
         />
 
         {loading ? (
@@ -143,7 +177,8 @@ export default function DashboardHomePage() {
                       ✨ Your Creator Trial Has Ended
                     </h2>
                     <p className="mt-2 text-sm text-pink-100/80">
-                      You're now on the Free plan. Upgrade to Creator to unlock all widgets, live effects, and premium overlays.
+                      You're now on the Free plan. Upgrade to Creator to unlock
+                      all widgets, live effects, and premium overlays.
                     </p>
                   </div>
 
@@ -172,7 +207,9 @@ export default function DashboardHomePage() {
               <Card>
                 <div className="text-sm text-zinc-400">Creator Username</div>
                 <div className="mt-3 break-all text-2xl font-black text-yellow-300">
-                  {profile?.tiktok_username ? `@${profile.tiktok_username}` : "Not set"}
+                  {profile?.tiktok_username
+                    ? `@${profile.tiktok_username}`
+                    : "Not set"}
                 </div>
               </Card>
 
@@ -185,15 +222,24 @@ export default function DashboardHomePage() {
             </section>
 
             <section className="mt-8 grid gap-6 xl:grid-cols-3">
-              <Link href="/dashboard/widgets" prefetch={false} className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-pink-500/20 to-zinc-950 p-6 transition hover:border-pink-500">
+              <Link
+                href="/dashboard/widgets"
+                prefetch={false}
+                className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-pink-500/20 to-zinc-950 p-6 transition hover:border-pink-500"
+              >
                 <div className="text-4xl">🎁</div>
                 <h2 className="mt-4 text-2xl font-black">Live Widgets</h2>
                 <p className="mt-2 text-sm text-zinc-400">
-                  Connect your TikTok LIVE account and customize your OMSW Live widgets.
+                  Connect your TikTok LIVE account and customize your OMSW Live
+                  widgets.
                 </p>
               </Link>
 
-              <Link href="/dashboard/overlays" prefetch={false} className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-purple-500/20 to-zinc-950 p-6 transition hover:border-purple-500">
+              <Link
+                href="/dashboard/overlays"
+                prefetch={false}
+                className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-purple-500/20 to-zinc-950 p-6 transition hover:border-purple-500"
+              >
                 <div className="text-4xl">🔗</div>
                 <h2 className="mt-4 text-2xl font-black">OBS Overlays</h2>
                 <p className="mt-2 text-sm text-zinc-400">
@@ -201,7 +247,11 @@ export default function DashboardHomePage() {
                 </p>
               </Link>
 
-              <Link href="/dashboard/billing" prefetch={false} className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-yellow-500/20 to-zinc-950 p-6 transition hover:border-yellow-500">
+              <Link
+                href="/dashboard/billing"
+                prefetch={false}
+                className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-yellow-500/20 to-zinc-950 p-6 transition hover:border-yellow-500"
+              >
                 <div className="text-4xl">💳</div>
                 <h2 className="mt-4 text-2xl font-black">Billing</h2>
                 <p className="mt-2 text-sm text-zinc-400">
@@ -216,17 +266,23 @@ export default function DashboardHomePage() {
               <div className="mt-5 grid gap-4 md:grid-cols-3">
                 <div className="rounded-2xl bg-black p-4">
                   <div className="text-sm text-zinc-400">Basket</div>
-                  <div className="mt-1 font-black">{settings?.basket || "basket-1"}</div>
+                  <div className="mt-1 font-black">
+                    {settings?.basket || "basket-1"}
+                  </div>
                 </div>
 
                 <div className="rounded-2xl bg-black p-4">
                   <div className="text-sm text-zinc-400">Vehicle Theme</div>
-                  <div className="mt-1 font-black">{settings?.vehicle || "tuktuk"}</div>
+                  <div className="mt-1 font-black">
+                    {settings?.vehicle || "tuktuk"}
+                  </div>
                 </div>
 
                 <div className="rounded-2xl bg-black p-4">
                   <div className="text-sm text-zinc-400">Lantern Theme</div>
-                  <div className="mt-1 font-black">{settings?.lantern || "phoenix"}</div>
+                  <div className="mt-1 font-black">
+                    {settings?.lantern || "phoenix"}
+                  </div>
                 </div>
               </div>
             </Card>

@@ -37,16 +37,23 @@ export default function OverlayUrlsPage() {
       setLoading(true);
       setMessage("");
 
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+      let {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (userError || !user) {
-        setMessage("User not found. Please login again.");
+      if (!session?.user) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const retry = await supabase.auth.getSession();
+        session = retry.data.session;
+      }
+
+      if (!session?.user) {
+        setMessage("Session not found. Please refresh or login again.");
         setLoading(false);
         return;
       }
+
+      const user = session.user;
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
