@@ -10,6 +10,22 @@ function addOneMonth() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: "Stripe is not configured" },
+      { status: 500 },
+    );
+  }
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    return NextResponse.json(
+      { error: "Stripe webhook secret is not configured" },
+      { status: 500 },
+    );
+  }
+
   const body = await req.text();
   const signature = req.headers.get("stripe-signature");
 
@@ -23,11 +39,7 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!,
-    );
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
     console.error("Stripe signature error:", error);
 
@@ -61,9 +73,7 @@ export async function POST(req: NextRequest) {
             started_at: new Date().toISOString(),
             expires_at: addOneMonth(),
           },
-          {
-            onConflict: "user_id",
-          },
+          { onConflict: "user_id" },
         );
 
       if (subscriptionError) {
@@ -75,19 +85,23 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const { error: paymentError } = await supabaseAdmin.from("payments").insert({
-        user_id: userId,
-        stripe_event_id: event.id,
-        stripe_customer_id:
-          typeof session.customer === "string" ? session.customer : null,
-        stripe_subscription_id:
-          typeof session.subscription === "string" ? session.subscription : null,
-        amount: session.amount_total || 0,
-        currency: session.currency || "thb",
-        status: "paid",
-        plan,
-        paid_at: new Date().toISOString(),
-      });
+      const { error: paymentError } = await supabaseAdmin
+        .from("payments")
+        .insert({
+          user_id: userId,
+          stripe_event_id: event.id,
+          stripe_customer_id:
+            typeof session.customer === "string" ? session.customer : null,
+          stripe_subscription_id:
+            typeof session.subscription === "string"
+              ? session.subscription
+              : null,
+          amount: session.amount_total || 0,
+          currency: session.currency || "thb",
+          status: "paid",
+          plan,
+          paid_at: new Date().toISOString(),
+        });
 
       if (paymentError) {
         console.error("Supabase payment insert error:", paymentError);
