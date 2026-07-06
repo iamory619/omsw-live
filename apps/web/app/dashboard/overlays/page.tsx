@@ -49,11 +49,19 @@ export default function OverlayUrlsPage() {
     const loadData = async () => {
       setOrigin(window.location.origin);
 
-      const {
+      let {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        const retry = await supabase.auth.getSession();
+        session = retry.data.session;
+      }
+
+      if (!session?.user) {
+        setLoading(false);
         window.location.href = "/login";
         return;
       }
@@ -65,7 +73,8 @@ export default function OverlayUrlsPage() {
         .single();
 
       if (profileError || !profileData) {
-        window.location.href = "/login";
+        setLoading(false);
+        alert("Profile not found. Please try logging in again.");
         return;
       }
 

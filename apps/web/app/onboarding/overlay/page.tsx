@@ -1,34 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { StepFooter } from "@/components/onboarding/StepFooter";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
-import { createClient } from "@/lib/supabase/client";
 
 export default function OverlayStepPage() {
-  const supabase = useMemo(() => createClient(), []);
   const [loading, setLoading] = useState(false);
 
-  const openOverlays = async () => {
+  const openOverlays = () => {
     setLoading(true);
-
-    let {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session?.user) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const retry = await supabase.auth.getSession();
-      session = retry.data.session;
-    }
-
-    if (!session?.user) {
-      window.location.href = "/login";
-      return;
-    }
-
     window.location.href = "/dashboard/overlays";
   };
 
