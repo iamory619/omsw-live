@@ -4,7 +4,6 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { getOnboardingHref } from "@/lib/core/onboarding-progress";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,33 +31,8 @@ export default function LoginPage() {
       return;
     }
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    const user = session?.user;
-
-    if (!user) {
-      setLoading(false);
-      window.location.href = "/dashboard";
-      router.refresh();
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("onboarding_completed,onboarding_step")
-      .eq("id", user.id)
-      .maybeSingle();
-
     setLoading(false);
-
-    if (profile?.onboarding_completed) {
-      window.location.href = "/dashboard";
-    } else {
-      window.location.href = getOnboardingHref(profile?.onboarding_step);
-    }
-
+    window.location.href = "/dashboard";
     router.refresh();
   };
 
@@ -110,21 +84,13 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center text-sm text-zinc-400">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            prefetch={false}
-            className="font-bold text-pink-400"
-          >
+          <Link href="/register" prefetch={false} className="font-bold text-pink-400">
             Create account
           </Link>
         </div>
 
         <div className="mt-4 text-center text-sm">
-          <Link
-            href="/"
-            prefetch={false}
-            className="text-zinc-500 hover:text-white"
-          >
+          <Link href="/" prefetch={false} className="text-zinc-500 hover:text-white">
             Back to home
           </Link>
         </div>
