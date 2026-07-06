@@ -15,10 +15,10 @@ export default function FinishStepPage() {
       setLoading(true);
 
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (!session?.user) {
+      if (!user) {
         window.location.href = "/login";
         return;
       }
@@ -29,7 +29,7 @@ export default function FinishStepPage() {
           onboarding_step: "finish",
           onboarding_completed: true,
         })
-        .eq("id", session.user.id);
+        .eq("id", user.id);
 
       if (error) {
         console.error("Complete onboarding error:", error);
