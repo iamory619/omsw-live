@@ -24,6 +24,12 @@ export default function LoginPage() {
       password,
     });
 
+    console.log("LOGIN DATA:", data);
+    console.log("LOGIN ERROR:", error);
+
+    const sessionCheck = await supabase.auth.getSession();
+    console.log("SESSION CHECK:", sessionCheck);
+
     if (error || !data.user) {
       setLoading(false);
       setMessage("Invalid email or password");
@@ -35,6 +41,8 @@ export default function LoginPage() {
       .select("onboarding_completed,onboarding_step")
       .eq("id", data.user.id)
       .maybeSingle();
+
+    console.log("PROFILE:", profile);
 
     setLoading(false);
 
@@ -100,8 +108,8 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-4 text-center text-sm">
-          <Link href="/" prefetch={false} className="text-zinc-500 hover:text-white">
-            Back to home
+          <Link href="/" prefetch={false} className="text-zinc-500 transition hover:text-white">
+            Back to Home
           </Link>
         </div>
       </form>
