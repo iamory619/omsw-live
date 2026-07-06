@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getOnboardingHref } from "@/lib/core/onboarding-progress";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,8 +32,33 @@ export default function LoginPage() {
       return;
     }
 
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const user = session?.user;
+
+    if (!user) {
+      setLoading(false);
+      window.location.href = "/dashboard";
+      router.refresh();
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed,onboarding_step")
+      .eq("id", user.id)
+      .maybeSingle();
+
     setLoading(false);
-    window.location.href = "/dashboard";
+
+    if (profile?.onboarding_completed === true) {
+      window.location.href = "/dashboard";
+    } else {
+      window.location.href = getOnboardingHref(profile?.onboarding_step);
+    }
+
     router.refresh();
   };
 
