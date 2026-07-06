@@ -1,9 +1,32 @@
-import { StepFooter } from "@/components/onboarding/StepFooter";
+"use client";
+
+import { useState } from "react";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
 import { Button } from "@/components/ui/Button";
+import { createClient } from "@/lib/supabase/client";
+import { saveOnboardingStep } from "@/lib/core/onboarding-progress";
 
 export default function CreatorStepPage() {
+  const supabase = createClient();
+  const [loading, setLoading] = useState(false);
+
+  const goNext = async () => {
+    setLoading(true);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    await saveOnboardingStep(supabase, session.user.id, "connect");
+    window.location.href = "/onboarding/connect";
+  };
+
   return (
     <>
       <StepHeader
@@ -26,7 +49,15 @@ export default function CreatorStepPage() {
           </Button>
         </div>
 
-        <StepFooter nextHref="/onboarding/connect" />
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={goNext}
+            disabled={loading}
+            className="rounded-xl bg-pink-600 px-5 py-3 font-black transition hover:bg-pink-500 disabled:opacity-60"
+          >
+            {loading ? "Saving..." : "Next →"}
+          </button>
+        </div>
       </WizardCard>
     </>
   );

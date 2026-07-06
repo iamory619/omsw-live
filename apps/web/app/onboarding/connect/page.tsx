@@ -1,9 +1,48 @@
-import { StepFooter } from "@/components/onboarding/StepFooter";
+"use client";
+
+import { useState } from "react";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
 import { Button } from "@/components/ui/Button";
+import { createClient } from "@/lib/supabase/client";
+import { saveOnboardingStep } from "@/lib/core/onboarding-progress";
 
 export default function ConnectStepPage() {
+  const supabase = createClient();
+  const [loading, setLoading] = useState(false);
+
+  const next = async () => {
+    setLoading(true);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    await saveOnboardingStep(supabase, session.user.id, "overlay");
+    window.location.href = "/onboarding/overlay";
+  };
+
+  const back = async () => {
+    setLoading(true);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    await saveOnboardingStep(supabase, session.user.id, "creator");
+    window.location.href = "/onboarding/creator";
+  };
+
   return (
     <>
       <StepHeader
@@ -36,10 +75,23 @@ export default function ConnectStepPage() {
           </Button>
         </div>
 
-        <StepFooter
-          backHref="/onboarding/creator"
-          nextHref="/onboarding/overlay"
-        />
+        <div className="mt-6 flex justify-between">
+          <button
+            onClick={back}
+            disabled={loading}
+            className="rounded-xl bg-zinc-700 px-5 py-3 font-black transition hover:bg-zinc-600 disabled:opacity-60"
+          >
+            ← Back
+          </button>
+
+          <button
+            onClick={next}
+            disabled={loading}
+            className="rounded-xl bg-pink-600 px-5 py-3 font-black transition hover:bg-pink-500 disabled:opacity-60"
+          >
+            {loading ? "Saving..." : "Next →"}
+          </button>
+        </div>
       </WizardCard>
     </>
   );
