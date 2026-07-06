@@ -6,6 +6,13 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export async function POST(req: NextRequest) {
   try {
+    if (!stripe) {
+      return NextResponse.json(
+        { error: "Stripe is not configured" },
+        { status: 500 },
+      );
+    }
+
     const { userId } = await req.json();
 
     if (!userId) {
