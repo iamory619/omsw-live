@@ -27,7 +27,11 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
 
   const cleanTikTokUsername = useMemo(() => {
-    return tiktokUsername.trim().replace(/^@/, "").replace(/\s/g, "").toLowerCase();
+    return tiktokUsername
+      .trim()
+      .replace(/^@/, "")
+      .replace(/\s/g, "")
+      .toLowerCase();
   }, [tiktokUsername]);
 
   const usernameIsValid = useMemo(() => {
@@ -44,7 +48,10 @@ export default function RegisterPage() {
       { label: "One uppercase letter (A–Z)", valid: /[A-Z]/.test(password) },
       { label: "One lowercase letter (a–z)", valid: /[a-z]/.test(password) },
       { label: "One number (0–9)", valid: /\d/.test(password) },
-      { label: "One special character (! @ # $ %)", valid: /[^A-Za-z0-9]/.test(password) },
+      {
+        label: "One special character (! @ # $ %)",
+        valid: /[^A-Za-z0-9]/.test(password),
+      },
     ],
     [password],
   );
@@ -174,7 +181,7 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding/creator`,
         data: {
           display_name: displayName.trim(),
           tiktok_username: cleanTikTokUsername,
@@ -182,11 +189,13 @@ export default function RegisterPage() {
       },
     });
 
-    setLoading(false); 
+    setLoading(false);
 
     if (error) {
       if (error.message.toLowerCase().includes("duplicate")) {
-        setMessage("This Creator Username is already taken. Please choose another one.");
+        setMessage(
+          "This Creator Username is already taken. Please choose another one.",
+        );
         return;
       }
 
@@ -386,7 +395,9 @@ export default function RegisterPage() {
                   passwordsMatch ? "text-green-300" : "text-red-300"
                 }`}
               >
-                {passwordsMatch ? "✅ Passwords match" : "❌ Passwords do not match"}
+                {passwordsMatch
+                  ? "✅ Passwords match"
+                  : "❌ Passwords do not match"}
               </p>
             )}
           </div>
