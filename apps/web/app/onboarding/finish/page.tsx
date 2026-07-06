@@ -11,40 +11,40 @@ export default function FinishStepPage() {
   const [loading, setLoading] = useState(false);
 
   const completeOnboarding = async (href: string) => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-      if (!user) {
-        window.location.href = "/login";
-        return;
-      }
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          onboarding_step: "finish",
-          onboarding_completed: true,
-        })
-        .eq("id", user.id);
-
-      if (error) {
-        console.error("Complete onboarding error:", error);
-        alert(error.message);
-        return;
-      }
-
-      window.location.href = href;
-    } catch (error) {
-      console.error("Complete onboarding error:", error);
-      alert("Unable to complete setup. Please try again.");
-    } finally {
-      setLoading(false);
+    if (!session?.access_token) {
+      window.location.href = "/login";
+      return;
     }
-  };
+
+    const res = await fetch("/api/onboarding/complete", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Unable to complete setup.");
+      return;
+    }
+
+    window.location.href = href;
+  } catch (error) {
+    console.error("Complete onboarding error:", error);
+    alert("Unable to complete setup. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
