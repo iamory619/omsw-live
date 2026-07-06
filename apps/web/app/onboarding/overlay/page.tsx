@@ -1,7 +1,6 @@
 import { StepFooter } from "@/components/onboarding/StepFooter";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
-import { Button } from "@/components/ui/Button";
 
 export default function OverlayStepPage() {
   return (
@@ -10,7 +9,7 @@ export default function OverlayStepPage() {
         icon="🖥️"
         step="Step 3"
         title="Set Up Your OBS Overlay"
-        description="Copy your OMSW Live overlay URL and add it as a Browser Source in OBS Studio."
+        description="You can copy your OBS overlay links after finishing setup."
       />
 
       <WizardCard>
@@ -20,18 +19,12 @@ export default function OverlayStepPage() {
           </h3>
 
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-zinc-400">
-            <li>Open OBS Studio.</li>
-            <li>Add a new Browser Source.</li>
-            <li>Copy your OMSW Live overlay URL.</li>
-            <li>Paste the URL into the Browser Source settings.</li>
-            <li>
-              Click <strong>OK</strong> to save.
-            </li>
+            <li>Finish this setup first.</li>
+            <li>Go to Dashboard.</li>
+            <li>Open OBS Overlays.</li>
+            <li>Copy your overlay URL.</li>
+            <li>Paste it into OBS Browser Source.</li>
           </ol>
-
-          <Button href="/dashboard/overlays" variant="upgrade" className="mt-6">
-            Open OBS Overlays
-          </Button>
         </div>
 
         <StepFooter
