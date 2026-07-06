@@ -29,8 +29,7 @@ export default function FinishStepPage() {
 
       await saveOnboardingStep(supabase, session.user.id, "finish");
 
-      router.push(href);
-      router.refresh();
+      window.location.href = href;
     } catch (error) {
       console.error("Complete onboarding error:", error);
       alert("Unable to complete setup. Please try again.");

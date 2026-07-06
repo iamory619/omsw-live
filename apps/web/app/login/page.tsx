@@ -40,7 +40,7 @@ export default function LoginPage() {
 
     if (!user) {
       setLoading(false);
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
       router.refresh();
       return;
     }
@@ -54,9 +54,9 @@ export default function LoginPage() {
     setLoading(false);
 
     if (profile?.onboarding_completed) {
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } else {
-      router.push(getOnboardingHref(profile?.onboarding_step));
+      window.location.href = getOnboardingHref(profile?.onboarding_step);
     }
 
     router.refresh();
@@ -110,13 +110,21 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center text-sm text-zinc-400">
           Don&apos;t have an account?{" "}
-          <Link href="/register" prefetch={false} className="font-bold text-pink-400">
+          <Link
+            href="/register"
+            prefetch={false}
+            className="font-bold text-pink-400"
+          >
             Create account
           </Link>
         </div>
 
         <div className="mt-4 text-center text-sm">
-          <Link href="/" prefetch={false} className="text-zinc-500 hover:text-white">
+          <Link
+            href="/"
+            prefetch={false}
+            className="text-zinc-500 hover:text-white"
+          >
             Back to home
           </Link>
         </div>
