@@ -1,7 +1,6 @@
 import { StepFooter } from "@/components/onboarding/StepFooter";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
-import { Button } from "@/components/ui/Button";
 
 export default function TestStepPage() {
   return (
@@ -10,29 +9,22 @@ export default function TestStepPage() {
         icon="🎁"
         step="Step 4"
         title="Test Your Widgets"
-        description="Send a test event to make sure your OMSW Live overlay appears correctly before going live."
+        description="After completing setup, you can test your OMSW Live widgets from the Dashboard."
       />
 
       <WizardCard>
         <div className="rounded-2xl bg-zinc-900 p-6">
           <h3 className="text-xl font-black text-white">
-            Run a Quick Test
+            You're Almost Ready!
           </h3>
 
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-zinc-400">
-            <li>Open the Live Widgets page.</li>
-            <li>Choose Gift Goal or another widget.</li>
-            <li>Click the Test button.</li>
-            <li>Make sure the overlay appears in OBS Studio.</li>
+            <li>Complete the onboarding process.</li>
+            <li>Open your Dashboard.</li>
+            <li>Go to Live Widgets.</li>
+            <li>Connect your TikTok LIVE.</li>
+            <li>Click Test to verify everything works.</li>
           </ol>
-
-          <Button
-            href="/dashboard/widgets"
-            variant="upgrade"
-            className="mt-6"
-          >
-            Open Live Widgets
-          </Button>
         </div>
 
         <StepFooter
