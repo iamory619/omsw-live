@@ -182,7 +182,7 @@ export default function RegisterPage() {
       },
     });
 
-    setLoading(false);
+    setLoading(false); 
 
     if (error) {
       if (error.message.toLowerCase().includes("duplicate")) {
