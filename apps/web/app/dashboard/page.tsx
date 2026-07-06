@@ -68,14 +68,16 @@ export default function DashboardHomePage() {
       setLoading(true);
 
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (!user) {
+      if (!session?.user) {
         setLoading(false);
         router.replace("/login");
         return;
       }
+
+      const user = session.user;
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
@@ -141,8 +143,7 @@ export default function DashboardHomePage() {
                       ✨ Your Creator Trial Has Ended
                     </h2>
                     <p className="mt-2 text-sm text-pink-100/80">
-                      You're now on the Free plan. Upgrade to Creator to unlock
-                      all widgets, live effects, and premium overlays.
+                      You're now on the Free plan. Upgrade to Creator to unlock all widgets, live effects, and premium overlays.
                     </p>
                   </div>
 
@@ -184,11 +185,7 @@ export default function DashboardHomePage() {
             </section>
 
             <section className="mt-8 grid gap-6 xl:grid-cols-3">
-              <Link
-                href="/dashboard/widgets"
-                prefetch={false}
-                className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-pink-500/20 to-zinc-950 p-6 transition hover:border-pink-500"
-              >
+              <Link href="/dashboard/widgets" prefetch={false} className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-pink-500/20 to-zinc-950 p-6 transition hover:border-pink-500">
                 <div className="text-4xl">🎁</div>
                 <h2 className="mt-4 text-2xl font-black">Live Widgets</h2>
                 <p className="mt-2 text-sm text-zinc-400">
@@ -196,11 +193,7 @@ export default function DashboardHomePage() {
                 </p>
               </Link>
 
-              <Link
-                href="/dashboard/overlays"
-                prefetch={false}
-                className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-purple-500/20 to-zinc-950 p-6 transition hover:border-purple-500"
-              >
+              <Link href="/dashboard/overlays" prefetch={false} className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-purple-500/20 to-zinc-950 p-6 transition hover:border-purple-500">
                 <div className="text-4xl">🔗</div>
                 <h2 className="mt-4 text-2xl font-black">OBS Overlays</h2>
                 <p className="mt-2 text-sm text-zinc-400">
@@ -208,11 +201,7 @@ export default function DashboardHomePage() {
                 </p>
               </Link>
 
-              <Link
-                href="/dashboard/billing"
-                prefetch={false}
-                className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-yellow-500/20 to-zinc-950 p-6 transition hover:border-yellow-500"
-              >
+              <Link href="/dashboard/billing" prefetch={false} className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-yellow-500/20 to-zinc-950 p-6 transition hover:border-yellow-500">
                 <div className="text-4xl">💳</div>
                 <h2 className="mt-4 text-2xl font-black">Billing</h2>
                 <p className="mt-2 text-sm text-zinc-400">
