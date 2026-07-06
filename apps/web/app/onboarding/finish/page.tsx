@@ -1,51 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
 import { Button } from "@/components/ui/Button";
-import { createClient } from "@/lib/supabase/client";
 
 export default function FinishStepPage() {
-  const supabase = createClient();
-  const [loading, setLoading] = useState(false);
-
-  const completeOnboarding = async (href: string) => {
-  try {
-    setLoading(true);
-
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session?.access_token) {
-      window.location.href = "/login";
-      return;
-    }
-
-    const res = await fetch("/api/onboarding/complete", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.error || "Unable to complete setup.");
-      return;
-    }
-
-    window.location.href = href;
-  } catch (error) {
-    console.error("Complete onboarding error:", error);
-    alert("Unable to complete setup. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
   return (
     <>
       <StepHeader
@@ -72,28 +31,16 @@ export default function FinishStepPage() {
             <div className="font-black text-white">What's Next?</div>
 
             <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-400">
-              <li>Start your TikTok LIVE.</li>
-              <li>Connect OMSW Live from the Live Widgets page.</li>
-              <li>Open OBS Studio with your overlay.</li>
+              <li>Go to Login.</li>
+              <li>Sign in to your account.</li>
+              <li>Open Dashboard, Live Widgets, or OBS Overlays.</li>
               <li>Enjoy your live stream!</li>
             </ul>
           </div>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Button
-              onClick={() => completeOnboarding("/dashboard")}
-              disabled={loading}
-              variant="upgrade"
-            >
-              {loading ? "Finishing setup..." : "Open Dashboard"}
-            </Button>
-
-            <Button
-              onClick={() => completeOnboarding("/dashboard/widgets")}
-              disabled={loading}
-              variant="secondary"
-            >
-              {loading ? "Opening..." : "Open Live Widgets"}
+          <div className="mt-8 flex justify-center">
+            <Button href="/login" variant="upgrade">
+              Go to Login
             </Button>
           </div>
         </div>
