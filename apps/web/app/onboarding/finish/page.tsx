@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { StepHeader } from "@/components/onboarding/StepHeader";
 import { WizardCard } from "@/components/onboarding/WizardCard";
 import { Button } from "@/components/ui/Button";
@@ -9,7 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 import { saveOnboardingStep } from "@/lib/core/onboarding-progress";
 
 export default function FinishStepPage() {
-  const router = useRouter();
   const supabase = createClient();
 
   const [loading, setLoading] = useState(false);
@@ -18,17 +16,26 @@ export default function FinishStepPage() {
     try {
       setLoading(true);
 
-      const {
+      let {
         data: { session },
       } = await supabase.auth.getSession();
 
+      // รอให้ Supabase sync Session หลัง Onboarding
       if (!session?.user) {
-        router.push("/login");
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        const retry = await supabase.auth.getSession();
+        session = retry.data.session;
+      }
+
+      if (!session?.user) {
+        window.location.href = "/login";
         return;
       }
 
       await saveOnboardingStep(supabase, session.user.id, "finish");
 
+      // Reload ทั้งหน้าเพื่อให้ Session พร้อม
       window.location.href = href;
     } catch (error) {
       console.error("Complete onboarding error:", error);
@@ -85,7 +92,7 @@ export default function FinishStepPage() {
               disabled={loading}
               variant="secondary"
             >
-              Open Live Widgets
+              {loading ? "Opening..." : "Open Live Widgets"}
             </Button>
           </div>
         </div>
