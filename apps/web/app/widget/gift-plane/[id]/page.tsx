@@ -209,8 +209,11 @@ export default function GiftPlaneWidget() {
   return (
     <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
       {showMessage && (
-        <div className="animate-message fixed left-1/2 top-[8vh] z-50 -translate-x-1/2 rounded-3xl border-4 border-pink-200 bg-pink-600/90 px-8 py-4 text-center text-2xl font-black text-white shadow-[0_0_35px_rgba(236,72,153,0.9)]">
-          {message}
+        <div className="animate-basket-banner fixed left-1/2 top-[7vh] z-50 -translate-x-1/2 rounded-[2rem] border-4 border-pink-200 bg-gradient-to-r from-pink-600/95 via-fuchsia-500/95 to-rose-500/95 px-10 py-5 text-center text-white shadow-[0_0_45px_rgba(236,72,153,0.95)]">
+          <div className="text-sm font-black text-pink-100">
+            💖 THANK YOU 💖
+          </div>
+          <div className="mt-1 text-3xl font-black">{message}</div>
         </div>
       )}
 
@@ -260,7 +263,7 @@ export default function GiftPlaneWidget() {
           width={260}
           height={160}
           priority
-          className="absolute bottom-0 left-1/2 z-40 w-[260px] -translate-x-1/2 drop-shadow-[0_0_30px_rgba(255,105,180,0.9)]"
+          className="animate-basket-enter absolute bottom-0 left-1/2 z-40 w-[260px] -translate-x-1/2 drop-shadow-[0_0_35px_rgba(255,105,180,0.95)]"
         />
 
         {sparkles.map((sparkle) => (
@@ -408,6 +411,59 @@ export default function GiftPlaneWidget() {
             transform: translate3d(var(--petal-drift), 92vh, 0)
               rotate(var(--petal-rotate)) scale(1);
           }
+        }
+
+        @keyframes basketEnter {
+          0% {
+            opacity: 0;
+            transform: translateX(260px) translateY(30px) scale(0.7)
+              rotate(8deg);
+          }
+
+          55% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-12px) scale(1.08)
+              rotate(-3deg);
+          }
+
+          75% {
+            transform: translateX(-50%) translateY(4px) scale(0.97) rotate(2deg);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1) rotate(0deg);
+          }
+        }
+
+        @keyframes basketBanner {
+          0% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-28px) scale(0.75);
+          }
+
+          18% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1.04);
+          }
+
+          82% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+          }
+
+          100% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-14px) scale(0.92);
+          }
+        }
+
+        .animate-basket-enter {
+          animation: basketEnter 0.9s cubic-bezier(0.18, 0.9, 0.22, 1) both;
+        }
+
+        .animate-basket-banner {
+          animation: basketBanner 3.4s ease-in-out forwards;
         }
 
         .animate-petal-rain {
