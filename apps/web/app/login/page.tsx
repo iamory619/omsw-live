@@ -1,12 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getOnboardingHref } from "@/lib/core/onboarding-progress";
 
 export default function LoginPage() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,10 +23,23 @@ export default function LoginPage() {
       email,
       password,
     });
-    
-    if (error || !data.user) {
+
+    if (error || !data.user || !data.session) {
       setLoading(false);
       setMessage("Invalid email or password");
+      return;
+    }
+
+    await supabase.auth.setSession({
+      access_token: data.session.access_token,
+      refresh_token: data.session.refresh_token,
+    });
+
+    const sessionCheck = await supabase.auth.getSession();
+
+    if (!sessionCheck.data.session?.user) {
+      setLoading(false);
+      setMessage("Login session was not saved. Please try again.");
       return;
     }
 
@@ -35,8 +48,6 @@ export default function LoginPage() {
       .select("onboarding_completed,onboarding_step")
       .eq("id", data.user.id)
       .maybeSingle();
-
-    console.log("PROFILE:", profile);
 
     setLoading(false);
 
