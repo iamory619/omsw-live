@@ -171,16 +171,16 @@ export default function DashboardPage() {
       setProfileLoading(true);
 
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      if (!session?.user) {
+      if (userError || !user) {
+        console.error(userError);
         setProfileLoading(false);
         router.replace("/login");
         return;
       }
-
-      const user = session.user;
 
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
@@ -189,8 +189,9 @@ export default function DashboardPage() {
         .single();
 
       if (profileError || !profileData) {
-        await supabase.auth.signOut();
-        router.replace("/login");
+        console.error("Load profile error:", profileError);
+
+        setProfileLoading(false);
         return;
       }
 
@@ -271,7 +272,7 @@ export default function DashboardPage() {
     } = await supabase.auth.getSession();
 
     if (!session?.access_token) {
-      router.replace("/login");
+      alert("Session not found. Please refresh the page and try again.");
       return;
     }
 

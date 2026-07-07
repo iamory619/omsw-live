@@ -32,47 +32,42 @@ export default function OverlayUrlsPage() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const loadData = async () => {
-      setOrigin(window.location.origin);
-      setLoading(true);
-      setMessage("");
+  const loadData = async () => {
+    setOrigin(window.location.origin);
+    setLoading(true);
+    setMessage("");
 
-      let {
-        data: { session },
-      } = await supabase.auth.getSession();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-      if (!session?.user) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const retry = await supabase.auth.getSession();
-        session = retry.data.session;
-      }
-
-      if (!session?.user) {
-        setMessage("Session not found. Please refresh or login again.");
-        setLoading(false);
-        return;
-      }
-
-      const user = session.user;
-
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("id,email,display_name,overlay_id")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError || !profileData) {
-        setMessage("Profile not found. Please try refreshing the page.");
-        setLoading(false);
-        return;
-      }
-
-      setProfile(profileData);
+    if (userError || !user) {
+      console.error("Overlay user error:", userError);
+      setMessage("User not found. Please login again.");
       setLoading(false);
-    };
+      return;
+    }
 
-    loadData();
-  }, [supabase]);
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("id,email,display_name,overlay_id")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profileData) {
+      console.error("Overlay profile error:", profileError);
+      setMessage("Profile not found. Please try refreshing the page.");
+      setLoading(false);
+      return;
+    }
+
+    setProfile(profileData);
+    setLoading(false);
+  };
+
+  loadData();
+}, [supabase]);
 
   const copy = async (url: string) => {
     await navigator.clipboard.writeText(url);
