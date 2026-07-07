@@ -111,14 +111,10 @@ export async function POST(req: NextRequest) {
     if (event.type === "invoice.payment_failed") {
       const invoice = event.data.object as Stripe.Invoice;
       const customerId = invoice.customer;
-
-      console.log("Payment failed for customer:", customerId);
     }
 
     if (event.type === "customer.subscription.deleted") {
       const subscription = event.data.object as Stripe.Subscription;
-
-      console.log("Subscription cancelled:", subscription.id);
     }
 
     return NextResponse.json({ received: true });

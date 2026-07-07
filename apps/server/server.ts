@@ -131,7 +131,6 @@ app.post("/connect", async (req, res) => {
     connections.set(overlayId, tiktok);
 
     tiktok.on("gift", (data: any) => {
-      console.log("GIFT DATA:", JSON.stringify(data, null, 2));
 
       const giftPayload = {
         user: data.nickname || "Someone",
@@ -190,11 +189,11 @@ app.post("/connect", async (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("✅ Client connected:", socket.id);
+
 
   socket.on("join-overlay", (overlayId: string) => {
     socket.join(overlayId);
-    console.log(`📺 Overlay joined room: ${overlayId}`);
+    
   });
 
   socket.on("test-goal", (payload: string | TestPayload) => {
@@ -288,7 +287,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("❌ Client disconnected");
+   
   });
 });
 
@@ -302,5 +301,5 @@ app.get("/", (_, res) => {
 const PORT = Number(process.env.PORT) || 4000;
 
 httpServer.listen(PORT, () => {
-  console.log(`🚀 OMSW Live Server running on port ${PORT}`);
+ 
 });
