@@ -40,23 +40,16 @@ export default function ProfilePage() {
     const loadProfile = async () => {
       setLoading(true);
 
-      let {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      if (!session?.user) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const retry = await supabase.auth.getSession();
-        session = retry.data.session;
-      }
-
-      if (!session?.user) {
+      if (userError || !user) {
+        console.error("User not found", userError);
         setLoading(false);
         return;
       }
-
-      const user = session.user;
 
       const { data, error } = await supabase
         .from("profiles")
@@ -64,15 +57,15 @@ export default function ProfilePage() {
         .eq("id", user.id)
         .single();
 
-      if (error || !data) {
-        console.error("Load profile error:", error);
+      if (error) {
+        console.error(error);
         setLoading(false);
         return;
       }
 
       setProfile(data);
-      setDisplayName(data.display_name || "");
-      setTiktokUsername(data.tiktok_username || "");
+      setDisplayName(data.display_name ?? "");
+      setTiktokUsername(data.tiktok_username ?? "");
       setLoading(false);
     };
 
