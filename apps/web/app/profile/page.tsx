@@ -35,42 +35,54 @@ export default function ProfilePage() {
   const usernameIsValid = useMemo(() => {
     return /^[a-zA-Z0-9._]{2,24}$/.test(cleanTikTokUsername);
   }, [cleanTikTokUsername]);
+useEffect(() => {
+  const loadProfile = async () => {
+    setLoading(true);
+    setMessage("");
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      setLoading(true);
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+    console.log("PROFILE USER:", user);
+    console.log("PROFILE USER ERROR:", userError);
 
-      if (userError || !user) {
-        console.error("User not found", userError);
-        setLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id,email,display_name,tiktok_username,overlay_id")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error(error);
-        setLoading(false);
-        return;
-      }
-
-      setProfile(data);
-      setDisplayName(data.display_name ?? "");
-      setTiktokUsername(data.tiktok_username ?? "");
+    if (userError || !user) {
+      setMessage("ไม่พบ session/user กรุณา login ใหม่");
       setLoading(false);
-    };
+      return;
+    }
 
-    loadProfile();
-  }, [supabase]);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id,email,display_name,tiktok_username,overlay_id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    console.log("PROFILE DATA:", data);
+    console.log("PROFILE ERROR:", error);
+
+    if (error) {
+      setMessage(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (!data) {
+      setMessage(`ไม่พบ profile ของ user id: ${user.id}`);
+      setLoading(false);
+      return;
+    }
+
+    setProfile(data);
+    setDisplayName(data.display_name ?? "");
+    setTiktokUsername(data.tiktok_username ?? "");
+    setLoading(false);
+  };
+
+  loadProfile();
+}, [supabase]);
 
   const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
