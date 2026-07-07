@@ -469,9 +469,12 @@ export default function DashboardPage() {
 
             <div className="flex flex-wrap gap-3">
               <Button href="/profile">My Profile</Button>
-              <Button href="/logout" variant="secondary">
+              <a
+                href="/logout"
+                className="rounded-xl bg-zinc-800 px-4 py-3 font-bold transition hover:bg-zinc-700"
+              >
                 Logout
-              </Button>
+              </a>
             </div>
           </div>
 
