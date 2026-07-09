@@ -59,6 +59,7 @@ const BASKET_VARIANTS: Record<string, BasketVariant> = {
 
 export function BasketEngine({ overlayId, basketId }: BasketEngineProps) {
   const basket = BASKET_VARIANTS[basketId] ?? BASKET_VARIANTS["basket-1"];
+  const isChest = basket.id.startsWith("chest");
 
   const [message, setMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
@@ -194,7 +195,9 @@ export function BasketEngine({ overlayId, basketId }: BasketEngineProps) {
 
         <div
           key={runId}
-          className="animate-basket-enter absolute z-40 h-[190px] w-[330px] -translate-x-1/2"
+          className={`absolute z-40 h-[190px] w-[330px] -translate-x-1/2 ${
+            isChest ? "animate-chest-bounce" : "animate-basket-enter"
+          }`}
           style={{
             left: `calc(50% + ${basket.offsetX}px)`,
             bottom: `${basket.offsetY}px`,
@@ -203,8 +206,12 @@ export function BasketEngine({ overlayId, basketId }: BasketEngineProps) {
           <img
             src={basket.backImage}
             alt="Basket back"
-            className="absolute bottom-0 left-1/2 z-20 w-[330px] -translate-x-1/2 drop-shadow-[0_0_35px_rgba(255,105,180,0.95)]"
+            className="absolute bottom-0 left-1/2 z-20 w-[330px] -translate-x-1/2"
           />
+
+          {isChest && (
+            <div className="animate-chest-glow absolute left-1/2 top-[64px] z-30 h-[90px] w-[220px] -translate-x-1/2 rounded-full bg-yellow-300/35 blur-2xl" />
+          )}
 
           {pileRoses.map((rose, index) => (
             <img
@@ -316,6 +323,42 @@ export function BasketEngine({ overlayId, basketId }: BasketEngineProps) {
           }
         }
 
+        @keyframes chestBounce {
+          0% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(70px) scale(0.62)
+              rotate(4deg);
+          }
+
+          45% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-20px) scale(1.08)
+              rotate(-3deg);
+          }
+
+          68% {
+            transform: translateX(-50%) translateY(8px) scale(0.97) rotate(2deg);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1) rotate(0deg);
+          }
+        }
+
+        @keyframes chestGlow {
+          0%,
+          100% {
+            opacity: 0.35;
+            scale: 0.9;
+          }
+
+          50% {
+            opacity: 0.9;
+            scale: 1.2;
+          }
+        }
+
         @keyframes basketBanner {
           0% {
             opacity: 0;
@@ -418,6 +461,14 @@ export function BasketEngine({ overlayId, basketId }: BasketEngineProps) {
 
         .animate-basket-enter {
           animation: basketEnter 0.95s cubic-bezier(0.18, 0.9, 0.22, 1) both;
+        }
+
+        .animate-chest-bounce {
+          animation: chestBounce 0.95s cubic-bezier(0.18, 0.9, 0.22, 1) both;
+        }
+
+        .animate-chest-glow {
+          animation: chestGlow 1.35s ease-in-out infinite;
         }
 
         .animate-basket-banner {
