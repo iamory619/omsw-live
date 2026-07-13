@@ -131,7 +131,6 @@ app.post("/connect", async (req, res) => {
     connections.set(overlayId, tiktok);
 
     tiktok.on("gift", (data: any) => {
-
       const giftPayload = {
         user: data.nickname || "Someone",
         giftName: data.giftName || "Gift",
@@ -148,6 +147,7 @@ app.post("/connect", async (req, res) => {
       io.to(overlayId).emit("vehicle-gift", giftPayload);
       io.to(overlayId).emit("basket-gift", giftPayload);
       io.to(overlayId).emit("fortune-gift", giftPayload);
+      io.to(overlayId).emit("wheel-gift", giftPayload);
     });
 
     tiktok.on("chat", (data: any) => {
@@ -189,11 +189,8 @@ app.post("/connect", async (req, res) => {
 });
 
 io.on("connection", (socket) => {
-
-
   socket.on("join-overlay", (overlayId: string) => {
     socket.join(overlayId);
-    
   });
 
   socket.on("test-goal", (payload: string | TestPayload) => {
@@ -286,9 +283,29 @@ io.on("connection", (socket) => {
     io.to(overlayId).emit("reset-fortune");
   });
 
-  socket.on("disconnect", () => {
-   
+  socket.on("test-wheel", (payload: string | TestPayload) => {
+    const overlayId = getOverlayId(payload);
+
+    if (!overlayId) return;
+
+    io.to(overlayId).emit("test-wheel", {
+      user: "Mimi",
+      giftName: "Rose",
+      amount: 10,
+      diamond: 10,
+      giftImage: "/assets/rose.png",
+    });
   });
+
+  socket.on("reset-wheel", (payload: string | TestPayload) => {
+    const overlayId = getOverlayId(payload);
+
+    if (!overlayId) return;
+
+    io.to(overlayId).emit("reset-wheel");
+  });
+
+  socket.on("disconnect", () => {});
 });
 
 app.get("/", (_, res) => {
@@ -300,6 +317,4 @@ app.get("/", (_, res) => {
 
 const PORT = Number(process.env.PORT) || 4000;
 
-httpServer.listen(PORT, () => {
- 
-});
+httpServer.listen(PORT, () => {});

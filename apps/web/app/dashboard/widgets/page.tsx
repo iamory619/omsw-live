@@ -37,12 +37,15 @@ function normalizePlan(plan?: string | null) {
 }
 
 const BASKETS = [
-  { id: "basket-1", name: "Basket 1", image: "/assets/baskets/basket-1.png" },
-  { id: "basket-2", name: "Basket 2", image: "/assets/baskets/basket-2.png" },
   {
-    id: "chest-1",
-    name: "Treasure Chest",
-    image: "/assets/baskets/chest-1.png",
+    id: "basket-1",
+    name: "Classic Basket",
+    image: "/assets/baskets/basket-1.png",
+  },
+  {
+    id: "basket-2",
+    name: "Clay Bowl",
+    image: "/assets/baskets/basket-2.png",
   },
 ];
 
@@ -424,21 +427,21 @@ export default function DashboardPage() {
             testButtonClass: "bg-yellow-600 hover:bg-yellow-500",
             resetButtonClass: "bg-red-600 hover:bg-red-500",
           },
-          {
-            name: "🧺 Gift Basket",
-            description:
-              "Watch gifts fall into a basket and pile up on screen.",
-            url: `${origin}/widget/gift-plane/${overlayId}?basket=${selectedBasket}`,
-            requiredFeature: "giftBasket",
-            active: true,
-            basketPicker: true,
-            testEvent: "test-basket",
-            resetEvent: "reset-basket",
-            testLabel: "🧺 Test Basket",
-            resetLabel: "🔄 Reset Basket",
-            testButtonClass: "bg-emerald-600 hover:bg-emerald-500",
-            resetButtonClass: "bg-red-600 hover:bg-red-500",
-          },
+          // {
+          //   name: "🧺 Gift Basket",
+          //   description:
+          //     "Watch gifts fall into your selected theme and pile up on screen.",
+          //   url: `${origin}/widget/gift-plane/${overlayId}?basket=${selectedBasket}`,
+          //   requiredFeature: "giftBasket",
+          //   active: true,
+          //   basketPicker: true,
+          //   testEvent: "test-basket",
+          //   resetEvent: "reset-basket",
+          //   testLabel: "🧺 Test Basket",
+          //   resetLabel: "🔄 Reset Basket",
+          //   testButtonClass: "bg-emerald-600 hover:bg-emerald-500",
+          //   resetButtonClass: "bg-red-600 hover:bg-red-500",
+          // },
           {
             name: "🙏🏻 Fortune Reading",
             description:
@@ -451,6 +454,23 @@ export default function DashboardPage() {
             testLabel: "🙏 Test Fortune",
             resetLabel: "🔄 Reset Fortune",
             testButtonClass: "bg-orange-600 hover:bg-orange-500",
+            resetButtonClass: "bg-red-600 hover:bg-red-500",
+          },
+          {
+            name: "🎡 Gift Jackpot Wheel",
+            description:
+              "Spin the lucky wheel whenever viewers send gifts and reveal exciting rewards.",
+            url: `${origin}/widget/gift-wheel/${overlayId}`,
+            requiredFeature: "giftWheel",
+            active: true,
+
+            testEvent: "test-wheel",
+            resetEvent: "reset-wheel",
+
+            testLabel: "🎡 Test Wheel",
+            resetLabel: "🔄 Reset Wheel",
+
+            testButtonClass: "bg-fuchsia-600 hover:bg-fuchsia-500",
             resetButtonClass: "bg-red-600 hover:bg-red-500",
           },
         ]
@@ -660,7 +680,7 @@ export default function DashboardPage() {
 
                           {widget.basketPicker && (
                             <PickerGrid
-                              title="Choose Basket"
+                              title="Choose Theme"
                               items={BASKETS}
                               selectedId={selectedBasket}
                               onSelect={selectBasket}

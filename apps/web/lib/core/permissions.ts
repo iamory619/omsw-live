@@ -55,6 +55,7 @@ export type Feature =
   | "giftVehicle"
   | "giftBasket"
   | "fortuneReading"
+  | "giftWheel"
   | "petWidget"
   | "obsOverlay"
   | "analytics"
@@ -68,6 +69,7 @@ const permissions: Record<AppPlan, Record<Feature, boolean>> = {
     giftVehicle: false,
     giftBasket: false,
     fortuneReading: false,
+    giftWheel: false,
     petWidget: false,
     obsOverlay: true,
     analytics: false,
@@ -81,6 +83,7 @@ const permissions: Record<AppPlan, Record<Feature, boolean>> = {
     giftVehicle: true,
     giftBasket: true,
     fortuneReading: true,
+    giftWheel: true,
     petWidget: true,
     obsOverlay: true,
     analytics: false,
@@ -94,6 +97,7 @@ const permissions: Record<AppPlan, Record<Feature, boolean>> = {
     giftVehicle: true,
     giftBasket: true,
     fortuneReading: true,
+    giftWheel: true,
     petWidget: true,
     obsOverlay: true,
     analytics: true,
@@ -107,6 +111,7 @@ const permissions: Record<AppPlan, Record<Feature, boolean>> = {
     giftVehicle: true,
     giftBasket: true,
     fortuneReading: true,
+    giftWheel: true,
     petWidget: true,
     obsOverlay: true,
     analytics: true,

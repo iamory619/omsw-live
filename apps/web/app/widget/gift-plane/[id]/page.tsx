@@ -3,7 +3,7 @@
 import { useParams, useSearchParams } from "next/navigation";
 import { BasketEngine } from "@/components/widgets/basket/BasketEngine";
 
-export default function GiftPlaneWidget() {
+export default function GiftPlaneWidgetPage() {
   const params = useParams();
   const searchParams = useSearchParams();
 
