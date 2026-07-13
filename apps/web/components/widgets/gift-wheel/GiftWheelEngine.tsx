@@ -169,8 +169,7 @@ export function GiftWheelEngine({
     const selected = pickWeightedPrize(wheelPrizes);
     const segmentCenter = selected.index * segmentAngle + segmentAngle / 2;
 
-    const normalizedCurrent =
-      ((rotationRef.current % 360) + 360) % 360;
+    const normalizedCurrent = ((rotationRef.current % 360) + 360) % 360;
 
     const targetNormalized = (360 - segmentCenter) % 360;
     const delta =
@@ -271,9 +270,9 @@ export function GiftWheelEngine({
       {showWheel && (
         <section
           key={runId}
-          className="animate-wheel-stage fixed left-1/2 top-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
+          className="animate-wheel-stage fixed inset-0 z-40 flex flex-col items-center justify-center"
         >
-          <div className="mb-5 rounded-[2rem] border-4 border-pink-200 bg-gradient-to-r from-fuchsia-700/95 via-pink-600/95 to-orange-500/95 px-8 py-4 text-center shadow-[0_0_48px_rgba(236,72,153,0.9)]">
+          <div className="mb-8 w-[420px] rounded-[2rem] border-4 border-pink-200 bg-gradient-to-r from-fuchsia-700/95 via-pink-600/95 to-orange-500/95 px-8 py-4 text-center shadow-[0_0_48px_rgba(236,72,153,0.9)]">
             <div className="text-sm font-black tracking-[0.22em] text-pink-100">
               🎁 GIFT JACKPOT WHEEL 🎁
             </div>
@@ -283,11 +282,11 @@ export function GiftWheelEngine({
             </div>
           </div>
 
-          <div className="relative h-[430px] w-[430px]">
-            <div className="absolute inset-[-22px] rounded-full bg-fuchsia-500/30 blur-3xl" />
+          <div className="relative h-[360px] w-[360px]">
+            <div className="absolute inset-[-12px] rounded-full bg-fuchsia-500/30 blur-3xl" />
 
-            <div className="absolute left-1/2 top-[-24px] z-[80] -translate-x-1/2">
-              <div className="h-0 w-0 border-l-[24px] border-r-[24px] border-t-[46px] border-l-transparent border-r-transparent border-t-yellow-300 drop-shadow-[0_5px_8px_rgba(0,0,0,0.65)]" />
+            <div className="absolute left-1/2 top-[-18px] z-[80] -translate-x-1/2">
+              <div className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[34px] border-l-transparent border-r-transparent border-t-yellow-300 drop-shadow-[0_4px_7px_rgba(0,0,0,0.65)]" />
             </div>
 
             <div className="absolute inset-0 rounded-full border-[14px] border-yellow-300 bg-zinc-950 shadow-[0_0_42px_rgba(250,204,21,0.9)]">
@@ -308,35 +307,38 @@ export function GiftWheelEngine({
                 />
 
                 {wheelPrizes.map((prize, index) => {
-                  const angle = index * segmentAngle + segmentAngle / 2;
+                  /*
+                   * CSS conic-gradient ใช้ 0deg ที่ด้านบน และหมุนตามเข็มนาฬิกา
+                   * วงล้อเริ่มจาก -90deg จึงต้องคำนวณด้วย sin/cos แบบ CSS
+                   * เพื่อให้ Emoji อยู่ตรงกึ่งกลางของแต่ละช่องสีจริง
+                   */
+                  const cssAngle =
+                    -90 + index * segmentAngle + segmentAngle / 2;
+                  const angleInRadians = (cssAngle * Math.PI) / 180;
+                  const emojiRadiusPercent = 31;
+
+                  const emojiX =
+                    50 + Math.sin(angleInRadians) * emojiRadiusPercent;
+                  const emojiY =
+                    50 - Math.cos(angleInRadians) * emojiRadiusPercent;
 
                   return (
                     <div
                       key={prize.id}
-                      className="absolute left-1/2 top-1/2 h-1/2 w-[112px] origin-bottom -translate-x-1/2 -translate-y-full"
+                      className="absolute z-20 flex h-[64px] w-[64px] -translate-x-1/2 -translate-y-1/2 items-center justify-center"
                       style={{
-                        transform: `rotate(${angle}deg)`,
+                        left: `${emojiX}%`,
+                        top: `${emojiY}%`,
                       }}
                     >
-                      <div
-                        className="flex h-full flex-col items-center pt-6 text-center"
-                        style={{
-                          transform: `rotate(${-angle}deg)`,
-                        }}
-                      >
-                        <div className="text-4xl drop-shadow-lg">
-                          {prize.emoji}
-                        </div>
-                        <div className="mt-1 max-w-[100px] text-sm font-black leading-tight text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]">
-                          {prize.label}
-                        </div>
+                      <div className="text-5xl leading-none drop-shadow-[0_3px_5px_rgba(0,0,0,0.75)]">
+                        {prize.emoji}
                       </div>
                     </div>
                   );
                 })}
 
-                <div className="absolute left-1/2 top-1/2 h-[84px] w-[84px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[8px] border-yellow-200 bg-gradient-to-br from-yellow-300 to-orange-500 shadow-[0_0_24px_rgba(250,204,21,0.95)]" />
-              </div>
+                <div className="absolute left-1/2 top-1/2 z-30 h-[54px] w-[54px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[5px] border-yellow-200 bg-gradient-to-br from-yellow-300 to-orange-500 shadow-[0_0_18px_rgba(250,204,21,0.95)]" />              </div>
             </div>
 
             {isSpinning && (
@@ -345,7 +347,7 @@ export function GiftWheelEngine({
           </div>
 
           {showResult && result && (
-            <div className="animate-result-pop mt-6 min-w-[360px] rounded-[2rem] border-4 border-yellow-200 bg-gradient-to-r from-amber-700/95 via-yellow-500/95 to-orange-600/95 px-9 py-6 text-center shadow-[0_0_55px_rgba(250,204,21,0.95)]">
+            <div className="animate-result-pop mt-8 min-w-[380px] max-w-[520px] rounded-[2rem] border-4 border-yellow-200 bg-gradient-to-r from-amber-700/95 via-yellow-500/95 to-orange-600/95 px-10 py-6 text-center shadow-[0_0_55px_rgba(250,204,21,0.95)]">
               <div className="text-sm font-black tracking-[0.2em] text-yellow-50">
                 🏆 WINNER 🏆
               </div>
@@ -399,17 +401,17 @@ export function GiftWheelEngine({
         @keyframes wheelStage {
           0% {
             opacity: 0;
-            transform: translate(-50%, -42%) scale(0.72);
+            transform: scale(0.72);
           }
 
           65% {
             opacity: 1;
-            transform: translate(-50%, -52%) scale(1.05);
+            transform: scale(1.05);
           }
 
           100% {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
+            transform: scale(1);
           }
         }
 
@@ -465,13 +467,11 @@ export function GiftWheelEngine({
         }
 
         .animate-wheel-stage {
-          animation: wheelStage 0.8s cubic-bezier(0.18, 0.9, 0.22, 1)
-            both;
+          animation: wheelStage 0.8s cubic-bezier(0.18, 0.9, 0.22, 1) both;
         }
 
         .animate-result-pop {
-          animation: resultPop 0.55s cubic-bezier(0.18, 0.9, 0.22, 1)
-            both;
+          animation: resultPop 0.55s cubic-bezier(0.18, 0.9, 0.22, 1) both;
         }
 
         .animate-spin-glow {
