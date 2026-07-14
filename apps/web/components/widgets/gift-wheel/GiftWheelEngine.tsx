@@ -16,6 +16,84 @@ type GiftWheelEngineProps = {
   prizes?: WheelPrize[];
 };
 
+type WheelTheme =
+  | "classic"
+  | "neon"
+  | "casino"
+  | "japanese"
+  | "christmas"
+  | "halloween";
+
+type LoadedWheelSettings = {
+  giftPerSpin: number;
+  theme: WheelTheme;
+  tickSoundEnabled: boolean;
+  confettiEnabled: boolean;
+  stopBurstEnabled: boolean;
+  jackpotEnabled: boolean;
+  prizes: WheelPrize[];
+};
+
+type ThemeStyle = {
+  borderColor: string;
+  centerFrom: string;
+  centerTo: string;
+  outerGlow: string;
+  stageGlow: string;
+  pointerColor: string;
+};
+
+const THEME_STYLES: Record<WheelTheme, ThemeStyle> = {
+  classic: {
+    borderColor: "#facc15",
+    centerFrom: "#fde047",
+    centerTo: "#f97316",
+    outerGlow: "rgba(250,204,21,0.9)",
+    stageGlow: "rgba(236,72,153,0.3)",
+    pointerColor: "#fde047",
+  },
+  neon: {
+    borderColor: "#22d3ee",
+    centerFrom: "#67e8f9",
+    centerTo: "#a855f7",
+    outerGlow: "rgba(34,211,238,0.95)",
+    stageGlow: "rgba(168,85,247,0.38)",
+    pointerColor: "#67e8f9",
+  },
+  casino: {
+    borderColor: "#fbbf24",
+    centerFrom: "#facc15",
+    centerTo: "#b91c1c",
+    outerGlow: "rgba(220,38,38,0.9)",
+    stageGlow: "rgba(127,29,29,0.42)",
+    pointerColor: "#fbbf24",
+  },
+  japanese: {
+    borderColor: "#f8fafc",
+    centerFrom: "#ffffff",
+    centerTo: "#dc2626",
+    outerGlow: "rgba(248,250,252,0.85)",
+    stageGlow: "rgba(220,38,38,0.3)",
+    pointerColor: "#ffffff",
+  },
+  christmas: {
+    borderColor: "#facc15",
+    centerFrom: "#ef4444",
+    centerTo: "#15803d",
+    outerGlow: "rgba(34,197,94,0.9)",
+    stageGlow: "rgba(239,68,68,0.3)",
+    pointerColor: "#facc15",
+  },
+  halloween: {
+    borderColor: "#fb923c",
+    centerFrom: "#fb923c",
+    centerTo: "#7e22ce",
+    outerGlow: "rgba(168,85,247,0.95)",
+    stageGlow: "rgba(249,115,22,0.32)",
+    pointerColor: "#fb923c",
+  },
+};
+
 type ConfettiPiece = {
   id: number;
   x: number;
@@ -30,7 +108,6 @@ const SPIN_DURATION_MS = 5200;
 const RESULT_VISIBLE_MS = 4200;
 const EXTRA_ROTATIONS = 7;
 const WHEEL_LIGHT_COUNT = 28;
-const GIFTS_PER_SPIN = 10;
 
 function getPrizeWeight(prize: WheelPrize) {
   return Math.max(0, Number(prize.weight) || 0);
@@ -106,11 +183,6 @@ export function GiftWheelEngine({
   overlayId,
   prizes = DEFAULT_PRIZES,
 }: GiftWheelEngineProps) {
-  const wheelPrizes = useMemo(
-    () => (prizes.length >= 2 ? prizes : DEFAULT_PRIZES),
-    [prizes],
-  );
-
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [showWheel, setShowWheel] = useState(false);
@@ -123,6 +195,26 @@ export function GiftWheelEngine({
   const [stopBurst, setStopBurst] = useState(false);
   const [giftBalance, setGiftBalance] = useState(0);
   const [queuedSpins, setQueuedSpins] = useState(0);
+  const [loadedPrizes, setLoadedPrizes] = useState<WheelPrize[]>(prizes);
+  const [giftPerSpin, setGiftPerSpin] = useState(10);
+  const [theme, setTheme] = useState<WheelTheme>("classic");
+  const [tickSoundEnabled, setTickSoundEnabled] = useState(true);
+  const [confettiEnabled, setConfettiEnabled] = useState(true);
+  const [stopBurstEnabled, setStopBurstEnabled] = useState(true);
+  const [jackpotEnabled, setJackpotEnabled] = useState(true);
+
+  const wheelPrizes = useMemo(() => {
+    const source = loadedPrizes.length >= 2 ? loadedPrizes : DEFAULT_PRIZES;
+    const withoutDisabledJackpot = jackpotEnabled
+      ? source
+      : source.filter((prize) => prize.id !== "jackpot");
+
+    return withoutDisabledJackpot.length >= 2
+      ? withoutDisabledJackpot
+      : DEFAULT_PRIZES;
+  }, [jackpotEnabled, loadedPrizes]);
+
+  const themeStyle = THEME_STYLES[theme];
 
   const rotationRef = useRef(0);
   const spinningRef = useRef(false);
@@ -149,10 +241,13 @@ export function GiftWheelEngine({
     ];
 
     return wheelPrizes
-      .map((_, index) => {
+      .map((prize, index) => {
         const start = index * segmentAngle;
         const end = start + segmentAngle;
-        const color = palette[index % palette.length];
+        const color =
+          ("color" in prize && typeof prize.color === "string"
+            ? prize.color
+            : palette[index % palette.length]);
 
         return `${color} ${start}deg ${end}deg`;
       })
@@ -186,6 +281,8 @@ export function GiftWheelEngine({
   };
 
   const playTickSound = (progress: number) => {
+    if (!tickSoundEnabled) return;
+
     const audioContext = getAudioContext();
 
     if (!audioContext || audioContext.state !== "running") return;
@@ -348,12 +445,14 @@ export function GiftWheelEngine({
 
       setResult(landedResult);
       setShowResult(true);
-      setConfetti(createConfetti());
-      setStopBurst(true);
+      setConfetti(confettiEnabled ? createConfetti() : []);
+      setStopBurst(stopBurstEnabled);
 
-      window.setTimeout(() => {
-        setStopBurst(false);
-      }, 950);
+      if (stopBurstEnabled) {
+        window.setTimeout(() => {
+          setStopBurst(false);
+        }, 950);
+      }
 
       hideTimerRef.current = setTimeout(() => {
         setShowResult(false);
@@ -385,8 +484,8 @@ export function GiftWheelEngine({
     if (amount <= 0) return;
 
     const totalGifts = giftBalanceRef.current + amount;
-    const spinsEarned = Math.floor(totalGifts / GIFTS_PER_SPIN);
-    const remainder = totalGifts % GIFTS_PER_SPIN;
+    const spinsEarned = Math.floor(totalGifts / giftPerSpin);
+    const remainder = totalGifts % giftPerSpin;
 
     giftBalanceRef.current = remainder;
     setGiftBalance(remainder);
@@ -397,7 +496,7 @@ export function GiftWheelEngine({
 
     const spinPayload: GiftWheelPayload = {
       ...payload,
-      amount: GIFTS_PER_SPIN,
+      amount: giftPerSpin,
     };
 
     const newSpins = Array.from(
@@ -414,6 +513,50 @@ export function GiftWheelEngine({
   useEffect(() => {
     if (!overlayId) return;
 
+    let cancelled = false;
+
+    const loadWheelSettings = async () => {
+      try {
+        const response = await fetch(
+          `/api/gift-wheel/settings/${encodeURIComponent(overlayId)}`,
+          {
+            cache: "no-store",
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Gift Wheel settings request failed: ${response.status}`);
+        }
+
+        const data = (await response.json()) as LoadedWheelSettings;
+
+        if (cancelled) return;
+
+        setGiftPerSpin(Math.max(1, Number(data.giftPerSpin) || 10));
+        setTheme(data.theme || "classic");
+        setTickSoundEnabled(data.tickSoundEnabled !== false);
+        setConfettiEnabled(data.confettiEnabled !== false);
+        setStopBurstEnabled(data.stopBurstEnabled !== false);
+        setJackpotEnabled(data.jackpotEnabled !== false);
+
+        if (Array.isArray(data.prizes) && data.prizes.length >= 2) {
+          setLoadedPrizes(data.prizes);
+        }
+      } catch (error) {
+        console.warn("Gift Wheel settings fallback:", error);
+      }
+    };
+
+    void loadWheelSettings();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [overlayId]);
+
+  useEffect(() => {
+    if (!overlayId) return;
+
     const socket = io(SERVER_URL, {
       reconnection: true,
       reconnectionAttempts: 5,
@@ -422,16 +565,19 @@ export function GiftWheelEngine({
     });
 
     const joinOverlay = () => {
+      console.log("🎡 Gift Wheel joined overlay:", overlayId);
       socket.emit("join-overlay", overlayId);
     };
 
     const handleTestWheel = (payload?: GiftWheelPayload) => {
+        console.log("🎡 Gift Wheel received test-wheel:", payload);
+        
       addGiftToSpinQueue(
         payload ?? {
           user: "Test Viewer",
           giftName: "Rose",
-          amount: GIFTS_PER_SPIN,
-          diamond: GIFTS_PER_SPIN,
+          amount: giftPerSpin,
+          diamond: giftPerSpin,
         },
       );
     };
@@ -467,13 +613,21 @@ export function GiftWheelEngine({
       socket.off("reset-wheel", handleResetWheel);
       socket.disconnect();
     };
-  }, [overlayId, segmentAngle, wheelPrizes]);
+  }, [
+    overlayId,
+    segmentAngle,
+    wheelPrizes,
+    giftPerSpin,
+    tickSoundEnabled,
+    confettiEnabled,
+    stopBurstEnabled,
+  ]);
 
   return (
     <main className="fixed inset-0 overflow-hidden bg-transparent text-white">
       {!showWheel && giftBalance > 0 && (
         <div className="fixed left-1/2 top-[8vh] z-30 -translate-x-1/2 rounded-full border border-pink-300/70 bg-zinc-950/85 px-5 py-2 text-sm font-black shadow-[0_0_24px_rgba(236,72,153,0.55)]">
-          🎡 Saved {giftBalance}/{GIFTS_PER_SPIN} gifts
+          🎡 Saved {giftBalance}/{giftPerSpin} gifts
         </div>
       )}
 
@@ -492,8 +646,8 @@ export function GiftWheelEngine({
                 {giftLabel}
               </div>
               <div className="mt-2 text-xs font-bold text-white/85">
-                Every {GIFTS_PER_SPIN} gifts = 1 spin · Saved {giftBalance}/
-                {GIFTS_PER_SPIN}
+                Every {giftPerSpin} gifts = 1 spin · Saved {giftBalance}/
+                {giftPerSpin}
                 {queuedSpins > 0 ? ` · Queue ${queuedSpins}` : ""}
               </div>
             </div>
@@ -504,7 +658,10 @@ export function GiftWheelEngine({
               stopBurst ? "animate-wheel-stop-burst" : ""
             }`}
           >
-            <div className="absolute inset-[-12px] rounded-full bg-fuchsia-500/30 blur-3xl" />
+            <div
+              className="absolute inset-[-12px] rounded-full blur-3xl"
+              style={{ backgroundColor: themeStyle.stageGlow }}
+            />
 
             <div className="pointer-events-none absolute inset-[-7px] z-[70]">
               {Array.from({ length: WHEEL_LIGHT_COUNT }, (_, index) => {
@@ -530,10 +687,19 @@ export function GiftWheelEngine({
             </div>
 
             <div className="absolute left-1/2 top-[-18px] z-[80] -translate-x-1/2">
-              <div className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[34px] border-l-transparent border-r-transparent border-t-yellow-300 drop-shadow-[0_4px_7px_rgba(0,0,0,0.65)]" />
+              <div
+                className="h-0 w-0 border-l-[18px] border-r-[18px] border-t-[34px] border-l-transparent border-r-transparent drop-shadow-[0_4px_7px_rgba(0,0,0,0.65)]"
+                style={{ borderTopColor: themeStyle.pointerColor }}
+              />
             </div>
 
-            <div className="absolute inset-0 rounded-full border-[14px] border-yellow-300 bg-zinc-950 shadow-[0_0_42px_rgba(250,204,21,0.9)]">
+            <div
+              className="absolute inset-0 rounded-full border-[14px] bg-zinc-950"
+              style={{
+                borderColor: themeStyle.borderColor,
+                boxShadow: `0 0 42px ${themeStyle.outerGlow}`,
+              }}
+            >
               <div
                 className="absolute inset-[12px] overflow-hidden rounded-full"
                 style={{
@@ -582,7 +748,14 @@ export function GiftWheelEngine({
                   );
                 })}
 
-                <div className="absolute left-1/2 top-1/2 z-30 h-[54px] w-[54px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[5px] border-yellow-200 bg-gradient-to-br from-yellow-300 to-orange-500 shadow-[0_0_18px_rgba(250,204,21,0.95)]" />
+                <div
+                  className="absolute left-1/2 top-1/2 z-30 h-[54px] w-[54px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[5px]"
+                  style={{
+                    borderColor: themeStyle.borderColor,
+                    background: `linear-gradient(135deg, ${themeStyle.centerFrom}, ${themeStyle.centerTo})`,
+                    boxShadow: `0 0 18px ${themeStyle.outerGlow}`,
+                  }}
+                />
               </div>
             </div>
 
