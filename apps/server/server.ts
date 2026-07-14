@@ -189,9 +189,10 @@ app.post("/connect", async (req, res) => {
 });
 
 io.on("connection", (socket) => {
-   console.log("Socket Connected:", socket.id);
-   
+  console.log("✅ Socket connected:", socket.id);
+
   socket.on("join-overlay", (overlayId: string) => {
+    console.log("📺 Overlay joined:", overlayId, socket.id);
     socket.join(overlayId);
   });
 
@@ -287,6 +288,14 @@ io.on("connection", (socket) => {
 
   socket.on("test-wheel", (payload: string | TestPayload) => {
     const overlayId = getOverlayId(payload);
+
+    console.log("🎡 Server received test-wheel:", {
+      overlayId,
+      socketId: socket.id,
+      roomSize: overlayId
+        ? (io.sockets.adapter.rooms.get(overlayId)?.size ?? 0)
+        : 0,
+    });
 
     if (!overlayId) return;
 
