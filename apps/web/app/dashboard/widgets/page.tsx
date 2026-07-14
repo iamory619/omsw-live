@@ -14,6 +14,7 @@ import { PlanBadge } from "@/components/ui/PlanBadge";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import type { Subscription } from "@/lib/core/types";
 import type { Feature } from "@/lib/core/permissions";
+import { SERVER_URL } from "@/lib/core/server-url";
 import {
   canConnectTikTok,
   canCopyOverlay,
@@ -26,8 +27,6 @@ import {
   getTrialDaysLeft,
   isSubscriptionExpired,
 } from "@/lib/core/subscriptions";
-
-const SERVER_URL = "https://server-production-b88b.up.railway.app";
 
 function normalizePlan(plan?: string | null) {
   if (plan === "creator") return "creator";
@@ -107,9 +106,42 @@ export default function DashboardPage() {
     () =>
       io(SERVER_URL, {
         autoConnect: false,
+        reconnection: true,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000,
       }),
     [],
   );
+
+  useEffect(() => {
+    const handleConnect = () => {
+      console.log("✅ Dashboard socket connected:", socket.id);
+    };
+
+    const handleDisconnect = (reason: string) => {
+      console.warn("⚠️ Dashboard socket disconnected:", reason);
+    };
+
+    const handleConnectError = (error: Error) => {
+      console.warn("Dashboard socket reconnecting:", error.message);
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleConnectError);
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleConnectError);
+    };
+  }, [socket]);
 
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const [origin, setOrigin] = useState("");
@@ -333,13 +365,42 @@ export default function DashboardPage() {
   };
 
   const emitWidgetEvent = (eventName: string) => {
-    if (!socket.connected) {
-      socket.connect();
+    if (!overlayId) {
+      alert("Overlay ID not found. Please refresh the page.");
+      return;
     }
 
-    socket.emit(eventName, {
-      overlayId,
-    });
+    const sendEvent = () => {
+      console.log("📤 Widget event:", eventName, overlayId);
+
+      socket.emit(eventName, {
+        overlayId,
+      });
+    };
+
+    if (socket.connected) {
+      sendEvent();
+      return;
+    }
+
+    const handleConnect = () => {
+      socket.off("connect_error", handleConnectError);
+      sendEvent();
+    };
+
+    const handleConnectError = (error: Error) => {
+      socket.off("connect", handleConnect);
+
+      console.error("Dashboard socket connection failed:", error.message);
+
+      alert(
+        "The widget server is waking up or unavailable. Open the Render server URL, wait until it responds, then try again.",
+      );
+    };
+
+    socket.once("connect", handleConnect);
+    socket.once("connect_error", handleConnectError);
+    socket.connect();
   };
 
   const saveWidgetSettings = async (settings: Partial<WidgetSettings>) => {
@@ -873,6 +934,7 @@ function PickerGrid({
               width={80}
               height={80}
               className="mx-auto mb-2 object-contain"
+              style={{ width: 80, height: "auto" }}
             />
             <div className="text-sm font-bold">{item.name}</div>
           </button>

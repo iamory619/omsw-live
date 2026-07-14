@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import { SERVER_URL } from "@/lib/core/server-url";
 import type {
   BasketPetal,
   BasketRose,
@@ -14,8 +15,6 @@ import {
   getRoseCount,
   rebuildPile,
 } from "./BasketPhysics";
-
-const SERVER_URL = "https://server-production-b88b.up.railway.app";
 
 type BasketEngineProps = {
   overlayId: string;

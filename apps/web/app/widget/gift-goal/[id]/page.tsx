@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from "next/navigation";
+import { SERVER_URL } from "@/lib/core/server-url";
 
 export default function GiftGoalWidget() {
   const params = useParams();
@@ -16,7 +17,7 @@ export default function GiftGoalWidget() {
   useEffect(() => {
     if (!overlayId) return;
 
-    const socket = io("https://server-production-b88b.up.railway.app");
+    const socket = io(SERVER_URL);
 
     socket.emit("join-overlay", overlayId);
 

@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { SERVER_URL } from "@/lib/core/server-url";
 
 export default function OverlayPage() {
   const [gift, setGift] = useState("");
 
   useEffect(() => {
-    const socket = io("https://server-production-b88b.up.railway.app");
+    const socket = io(SERVER_URL);
 
     socket.on("gift-alert", (message: string) => {
       setGift(message);

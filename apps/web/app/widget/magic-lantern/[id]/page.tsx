@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { SERVER_URL } from "@/lib/core/server-url";
 
 type GiftPayload = {
   user: string;
@@ -15,6 +16,7 @@ type GiftPayload = {
 
 type FloatingGift = {
   id: number;
+  uid: string;
   image: string;
   name: string;
   size: number;
@@ -100,6 +102,7 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
     const newGifts: FloatingGift[] = Array.from({ length: count }).map(
       (_, index) => ({
         id: Date.now() + index,
+        uid: `${Date.now()}-${index}-${Math.random().toString(36).slice(2,8)}`,
         image: giftImage,
         name: gift.giftName,
         size: 9 + Math.random() * 5,
@@ -127,7 +130,7 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
   useEffect(() => {
     if (!overlayId) return;
 
-    const socket = io("https://server-production-b88b.up.railway.app");
+    const socket = io(SERVER_URL);
 
     socket.emit("join-overlay", overlayId);
 
@@ -216,7 +219,7 @@ const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
 
           {gifts.map((gift) => (
             <img
-              key={gift.id}
+              key={gift.uid}
               src={gift.image}
               alt={gift.name}
               className={`animate-float-gift absolute ${giftGlow}`}

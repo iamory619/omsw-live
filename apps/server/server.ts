@@ -189,6 +189,8 @@ app.post("/connect", async (req, res) => {
 });
 
 io.on("connection", (socket) => {
+   console.log("Socket Connected:", socket.id);
+   
   socket.on("join-overlay", (overlayId: string) => {
     socket.join(overlayId);
   });

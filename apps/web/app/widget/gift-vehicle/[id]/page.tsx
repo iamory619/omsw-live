@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { SERVER_URL } from "@/lib/core/server-url";
 
 type GiftPayload = {
   user: string;
@@ -15,6 +16,7 @@ type GiftPayload = {
 
 type Item = {
   id: number;
+  uid: string;
   image: string;
   size: number;
   x: number;
@@ -27,6 +29,7 @@ type Item = {
 
 type Petal = {
   id: number;
+  uid: string;
   image: string;
   size: number;
   x: number;
@@ -73,6 +76,7 @@ export default function GiftVehicleWidget() {
     const newRoad: Item[] = Array.from({ length: roadCount }).map(
       (_, index) => ({
         id: Date.now() + index,
+        uid: `${Date.now()}-${index}-${Math.random().toString(36).slice(2,8)}`,
         image: gift.giftImage || ROSE_IMAGE,
         size: 22 + Math.random() * 18,
         x: Math.random() * 980,
@@ -87,6 +91,7 @@ export default function GiftVehicleWidget() {
     const newFalling: Petal[] = Array.from({ length: fallCount }).map(
       (_, index) => ({
         id: Date.now() + 10000 + index,
+        uid: `${Date.now()}-fall-${index}-${Math.random().toString(36).slice(2,8)}`,
         image: PETAL_IMAGE,
         size: 24 + Math.random() * 28,
         x: Math.random() * 980,
@@ -115,7 +120,7 @@ export default function GiftVehicleWidget() {
   useEffect(() => {
     if (!overlayId) return;
 
-    const socket = io("https://server-production-b88b.up.railway.app");
+    const socket = io(SERVER_URL);
 
     socket.emit("join-overlay", overlayId);
 
@@ -156,7 +161,7 @@ export default function GiftVehicleWidget() {
 
         {road.map((item) => (
           <img
-            key={`road-${item.id}`}
+            key={item.uid}
             src={item.image}
             alt="rose"
             className="animate-road-petal absolute z-20 drop-shadow-[0_0_12px_rgba(255,105,180,0.95)]"
@@ -173,7 +178,7 @@ export default function GiftVehicleWidget() {
 
         {falling.map((petal) => (
           <img
-            key={`fall-${petal.id}`}
+            key={petal.uid}
             src={petal.image}
             alt="petal"
             className="animate-falling-petal absolute z-30 drop-shadow-[0_0_18px_rgba(255,105,180,1)]"
@@ -200,7 +205,8 @@ export default function GiftVehicleWidget() {
               width={540}
               height={330}
               priority
-              className="w-[460px] scale-x-[-1] drop-shadow-[0_0_35px_rgba(250,204,21,0.95)]"
+              className="scale-x-[-1] drop-shadow-[0_0_35px_rgba(250,204,21,0.95)]"
+              style={{ width: 460, height: "auto" }}
             />
           </div>
         )}

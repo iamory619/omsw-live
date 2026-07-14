@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useParams } from "next/navigation";
 import { fortunes } from "@/lib/fortune";
+import { SERVER_URL } from "@/lib/core/server-url";
+
 
 type GiftPayload = {
   user: string;
@@ -48,7 +50,7 @@ export default function FortuneStickWidget() {
   useEffect(() => {
     if (!overlayId) return;
 
-    const socket = io("https://server-production-b88b.up.railway.app");
+   const socket = io(SERVER_URL);
 
     socket.emit("join-overlay", overlayId);
 
