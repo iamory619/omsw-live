@@ -35,19 +35,6 @@ function normalizePlan(plan?: string | null) {
   return "free";
 }
 
-const BASKETS = [
-  {
-    id: "basket-1",
-    name: "Classic Basket",
-    image: "/assets/baskets/basket-1.png",
-  },
-  {
-    id: "basket-2",
-    name: "Clay Bowl",
-    image: "/assets/baskets/basket-2.png",
-  },
-];
-
 const VEHICLES = [
   { id: "tuktuk", name: "Tuk Tuk", image: "/assets/vehicles/tuktuk.png" },
   { id: "pickup", name: "Pickup", image: "/assets/vehicles/pickup.png" },
@@ -62,12 +49,22 @@ const LANTERNS = [
   { id: "rabbit", name: "Rabbit", image: "/assets/lantern/rabbit-back.png" },
 ];
 
+type WidgetCategory = "creator" | "seller";
+type WidgetReleaseStatus = "stable" | "beta" | "new";
+
 type WidgetItem = {
+  id: string;
   name: string;
   description: string;
   url: string;
   requiredFeature: Feature;
   active: boolean;
+  category: WidgetCategory;
+  releaseStatus: WidgetReleaseStatus;
+  version: string;
+  previewZoom: number;
+  configureHref?: string;
+  badge?: string;
   testEvent: string;
   resetEvent: string;
   testLabel: string;
@@ -154,12 +151,53 @@ export default function DashboardPage() {
   const [userId, setUserId] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [selectedBasket, setSelectedBasket] = useState("basket-1");
   const [selectedVehicle, setSelectedVehicle] = useState("tuktuk");
   const [selectedLantern, setSelectedLantern] = useState("phoenix");
   const [status, setStatus] = useState<
     "idle" | "not-live" | "success" | "server-error"
   >("idle");
+  const [mobilePreviewId, setMobilePreviewId] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<
+    "all" | WidgetCategory
+  >("all");
+  const [favoriteWidgetIds, setFavoriteWidgetIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const savedFavorites = window.localStorage.getItem(
+      "omsw-widget-favorites",
+    );
+
+    if (!savedFavorites) return;
+
+    try {
+      const parsed = JSON.parse(savedFavorites) as unknown;
+
+      if (
+        Array.isArray(parsed) &&
+        parsed.every((item) => typeof item === "string")
+      ) {
+        setFavoriteWidgetIds(parsed);
+      }
+    } catch {
+      window.localStorage.removeItem("omsw-widget-favorites");
+    }
+  }, []);
+
+  const toggleFavorite = (widgetId: string) => {
+    setFavoriteWidgetIds((current) => {
+      const next = current.includes(widgetId)
+        ? current.filter((id) => id !== widgetId)
+        : [...current, widgetId];
+
+      window.localStorage.setItem(
+        "omsw-widget-favorites",
+        JSON.stringify(next),
+      );
+
+      return next;
+    });
+  };
 
   const currentPlan = normalizePlan(subscription?.plan);
 
@@ -269,12 +307,10 @@ export default function DashboardPage() {
         }
 
         if (createdSettings) {
-          setSelectedBasket(createdSettings.basket);
           setSelectedVehicle(createdSettings.vehicle);
           setSelectedLantern(createdSettings.lantern);
         }
       } else {
-        setSelectedBasket(settings.basket);
         setSelectedVehicle(settings.vehicle);
         setSelectedLantern(settings.lantern);
       }
@@ -429,11 +465,6 @@ export default function DashboardPage() {
     }
   };
 
-  const selectBasket = (basketId: string) => {
-    setSelectedBasket(basketId);
-    saveWidgetSettings({ basket: basketId });
-  };
-
   const selectVehicle = (vehicleId: string) => {
     setSelectedVehicle(vehicleId);
     saveWidgetSettings({ vehicle: vehicleId });
@@ -448,11 +479,19 @@ export default function DashboardPage() {
     overlayId && origin
       ? [
           {
+            id: "gift-goal",
             name: "🎁 Gift Goal",
             description: "Set a gift goal, such as Rose 0/100.",
             url: `${origin}/widget/gift-goal/${overlayId}`,
             requiredFeature: "giftGoal",
             active: true,
+            category: "creator",
+            releaseStatus: "stable",
+            version: "v1.0",
+            previewZoom: 0.80,
+            badge: "Creator",
+            configureHref: "/dashboard/widgets/gift-goal",
+            
             testEvent: "test-goal",
             resetEvent: "reset-goal",
             testLabel: "🎯 Test Goal",
@@ -461,11 +500,17 @@ export default function DashboardPage() {
             resetButtonClass: "bg-red-600 hover:bg-red-500",
           },
           {
+            id: "magic-lantern",
             name: "🧙🏻‍♀️ Magic Lantern",
             description: "Collect gifts inside a magical lantern.",
             url: `${origin}/widget/magic-lantern/${overlayId}?lantern=${selectedLantern}`,
             requiredFeature: "magicLantern",
             active: true,
+            category: "creator",
+            releaseStatus: "stable",
+            version: "v1.0",
+            previewZoom: 0.6,
+            badge: "Creator",
             lanternPicker: true,
             testEvent: "test-lantern",
             resetEvent: "reset-lantern",
@@ -475,11 +520,17 @@ export default function DashboardPage() {
             resetButtonClass: "bg-red-600 hover:bg-red-500",
           },
           {
+            id: "gift-vehicle",
             name: "🛺 Gift Vehicle",
             description: "A vehicle drives across a carpet of roses.",
             url: `${origin}/widget/gift-vehicle/${overlayId}?vehicle=${selectedVehicle}`,
             requiredFeature: "giftVehicle",
             active: true,
+            category: "creator",
+            releaseStatus: "stable",
+            version: "v1.0",
+            previewZoom: 0.6,
+            badge: "Creator",
             vehiclePicker: true,
             testEvent: "test-vehicle",
             resetEvent: "reset-vehicle",
@@ -504,12 +555,18 @@ export default function DashboardPage() {
           //   resetButtonClass: "bg-red-600 hover:bg-red-500",
           // },
           {
+            id: "fortune-reading",
             name: "🙏🏻 Fortune Reading",
             description:
               "Send a 99-coin gift or higher to receive your fortune.",
             url: `${origin}/widget/fortune-stick/${overlayId}`,
             requiredFeature: "fortuneReading",
             active: true,
+            category: "creator",
+            releaseStatus: "beta",
+            version: "v1.0",
+            previewZoom: 0.6,
+            badge: "Creator",
             testEvent: "test-fortune",
             resetEvent: "reset-fortune",
             testLabel: "🙏 Test Fortune",
@@ -518,12 +575,19 @@ export default function DashboardPage() {
             resetButtonClass: "bg-red-600 hover:bg-red-500",
           },
           {
+            id: "gift-wheel",
             name: "🎡 Gift Jackpot Wheel",
             description:
               "Spin the lucky wheel whenever viewers send gifts and reveal exciting rewards.",
             url: `${origin}/widget/gift-wheel/${overlayId}`,
             requiredFeature: "giftWheel",
             active: true,
+            category: "creator",
+            releaseStatus: "new",
+            version: "v2.0",
+            previewZoom: 0.55,
+            badge: "Creator",
+            configureHref: "/dashboard/widgets/gift-wheel",
 
             testEvent: "test-wheel",
             resetEvent: "reset-wheel",
@@ -537,10 +601,34 @@ export default function DashboardPage() {
         ]
       : [];
 
+  const filteredWidgets = widgets
+    .filter((widget) => {
+      const normalizedSearch = searchQuery.trim().toLowerCase();
+      const matchesSearch =
+        !normalizedSearch ||
+        widget.name.toLowerCase().includes(normalizedSearch) ||
+        widget.description.toLowerCase().includes(normalizedSearch);
+
+      const matchesCategory =
+        categoryFilter === "all" || widget.category === categoryFilter;
+
+      return matchesSearch && matchesCategory;
+    })
+    .sort((first, second) => {
+      const firstFavorite = favoriteWidgetIds.includes(first.id) ? 1 : 0;
+      const secondFavorite = favoriteWidgetIds.includes(second.id) ? 1 : 0;
+
+      if (firstFavorite !== secondFavorite) {
+        return secondFavorite - firstFavorite;
+      }
+
+      return first.name.localeCompare(second.name);
+    });
+
   return (
     <PermissionProvider subscription={subscription}>
-      <main className="min-h-screen bg-zinc-950 p-6 text-white lg:p-8">
-        <div className="mx-auto max-w-5xl">
+      <main className="min-h-screen bg-zinc-950 px-3 py-5 text-white sm:px-5 lg:p-8">
+        <div className="mx-auto max-w-7xl">
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <SectionHeader
               badge="Make Every Live Unforgettable."
@@ -703,179 +791,374 @@ export default function DashboardPage() {
               </Card>
 
               {overlayId && (
-                <section>
-                  <h2 className="mb-6 text-2xl font-black">Live Widgets</h2>
-
-                  <div className="space-y-6">
-                    {widgets.map((widget) => {
-                      const widgetUnlocked = canUse(
-                        currentPlan,
-                        widget.requiredFeature,
-                      );
-
-                      return (
-                        <Card key={widget.name}>
-                          <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                            <div>
-                              <h3 className="text-2xl font-black">
-                                {widget.name}
-                              </h3>
-                              <p className="mt-1 text-sm text-zinc-400">
-                                {widget.description}
-                              </p>
-                            </div>
-                            {widget.active && widgetUnlocked ? (
-                              <span className="w-fit rounded-full bg-green-600 px-3 py-1 text-sm font-bold">
-                                Unlocked
-                              </span>
-                            ) : widget.active ? (
-                              <span className="w-fit rounded-full bg-pink-600/80 px-3 py-1 text-sm font-bold">
-                                🔒 Creator Feature
-                              </span>
-                            ) : (
-                              <span className="w-fit rounded-full bg-zinc-700 px-3 py-1 text-sm">
-                                Coming Soon
-                              </span>
-                            )}
+                <>
+                  <section>
+                    <div className="mb-6">
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                          <div className="text-sm font-black uppercase tracking-[0.2em] text-pink-300">
+                            Widget Center V3
                           </div>
+                          <h2 className="mt-2 text-3xl font-black sm:text-4xl">
+                            Creator Widgets
+                          </h2>
+                          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
+                            Preview, configure and control every overlay from
+                            one responsive workspace.
+                          </p>
+                        </div>
 
-                          {widget.basketPicker && (
-                            <PickerGrid
-                              title="Choose Theme"
-                              items={BASKETS}
-                              selectedId={selectedBasket}
-                              onSelect={selectBasket}
-                              disabled={!canSaveSettings || !widgetUnlocked}
-                              selectedClassName="border-pink-500 bg-pink-500/20"
-                            />
-                          )}
+                        <div className="rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-zinc-300">
+                          Showing{" "}
+                          <span className="font-black text-white">
+                            {filteredWidgets.length}
+                          </span>{" "}
+                          of{" "}
+                          <span className="font-black text-white">
+                            {widgets.length}
+                          </span>{" "}
+                          widgets
+                        </div>
+                      </div>
 
-                          {widget.vehiclePicker && (
-                            <PickerGrid
-                              title="Choose Vehicle"
-                              items={VEHICLES}
-                              selectedId={selectedVehicle}
-                              onSelect={selectVehicle}
-                              disabled={!canSaveSettings || !widgetUnlocked}
-                              selectedClassName="border-yellow-500 bg-yellow-500/20"
-                            />
-                          )}
-
-                          {widget.lanternPicker && (
-                            <PickerGrid
-                              title="Choose Lantern"
-                              items={LANTERNS}
-                              selectedId={selectedLantern}
-                              onSelect={selectLantern}
-                              disabled={!canSaveSettings || !widgetUnlocked}
-                              selectedClassName="border-purple-500 bg-purple-500/20"
-                            />
-                          )}
-
-                          {widgetUnlocked ? (
-                            <div className="mb-4 overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950">
-                              <iframe
-                                key={widget.url}
-                                src={widget.url}
-                                className="h-[560px] w-full"
-                              />
-                            </div>
-                          ) : (
-                            <div className="mb-4 rounded-2xl border border-pink-500/30 bg-pink-500/10 p-8 text-center">
-                              <div className="text-4xl">🔒</div>
-                              <h4 className="mt-3 text-2xl font-black">
-                                Creator Feature
-                              </h4>
-                              <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-300">
-                                Upgrade to Creator to unlock this widget,
-                                overlay link, test controls and live effects.
-                              </p>
-                              <Button
-                                onClick={() => setUpgradeModalOpen(true)}
-                                variant="upgrade"
-                                className="mt-5"
-                              >
-                                Upgrade to Creator
-                              </Button>
-                            </div>
-                          )}
-
+                      <div className="mt-6 grid gap-3 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-3 sm:grid-cols-[1fr_auto] sm:p-4">
+                        <label className="relative block">
+                          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                            🔎
+                          </span>
                           <input
-                            readOnly
-                            value={
-                              widgetUnlocked
-                                ? widget.url
-                                : "🔒 Upgrade to Creator to unlock this overlay"
+                            value={searchQuery}
+                            onChange={(event) =>
+                              setSearchQuery(event.target.value)
                             }
-                            className="mb-4 w-full rounded-xl bg-zinc-800 p-3 text-sm text-zinc-200"
+                            placeholder="Search widgets..."
+                            className="w-full rounded-2xl border border-zinc-700 bg-zinc-950 py-3 pl-11 pr-4 text-sm font-bold outline-none transition focus:border-pink-500"
                           />
+                        </label>
 
-                          <div className="flex flex-wrap gap-3">
-                            <Button
-                              onClick={() => copy(widget.url)}
-                              disabled={!widgetUnlocked || !canCopy}
-                              variant="secondary"
+                        <div className="grid grid-cols-3 gap-2">
+                          {(
+                            [
+                              ["all", "All"],
+                              ["creator", "Creator"],
+                              ["seller", "Seller"],
+                            ] as const
+                          ).map(([value, label]) => (
+                            <button
+                              key={value}
+                              type="button"
+                              onClick={() => setCategoryFilter(value)}
+                              className={`rounded-2xl px-3 py-3 text-xs font-black transition ${
+                                categoryFilter === value
+                                  ? "bg-pink-600 text-white"
+                                  : "bg-zinc-950 text-zinc-400 hover:text-white"
+                              }`}
                             >
-                              {widgetUnlocked ? "Copy Link" : "🔒 Copy Link"}
-                            </Button>
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
 
-                            <Button
-                              onClick={() => {
-                                if (!widgetUnlocked) {
-                                  setUpgradeModalOpen(true);
-                                  return;
-                                }
+                    {filteredWidgets.length === 0 ? (
+                      <Card className="py-14 text-center">
+                        <div className="text-5xl">🔍</div>
+                        <h3 className="mt-4 text-xl font-black">
+                          No widgets found
+                        </h3>
+                        <p className="mt-2 text-sm text-zinc-400">
+                          Try another search or category.
+                        </p>
+                      </Card>
+                    ) : (
+                      <div className="grid gap-5 xl:grid-cols-2">
+                        {filteredWidgets.map((widget) => {
+                          const widgetUnlocked = canUse(
+                            currentPlan,
+                            widget.requiredFeature,
+                          );
+                          const isFavorite = favoriteWidgetIds.includes(
+                            widget.id,
+                          );
+                          const mobilePreviewOpen =
+                            mobilePreviewId === widget.id;
 
-                                window.open(
-                                  widget.url,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                );
-                              }}
-                              variant="secondary"
+                          return (
+                            <Card
+                              key={widget.id}
+                              className="flex min-h-[640px] flex-col overflow-hidden"
                             >
-                              Open Preview
-                            </Button>
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <h3 className="text-xl font-black sm:text-2xl">
+                                      {widget.name}
+                                    </h3>
 
-                            {widget.active && (
-                              <>
-                                <button
-                                  onClick={() => {
-                                    if (!canTest || !widgetUnlocked) {
-                                      setUpgradeModalOpen(true);
-                                      return;
+                                    <span className="rounded-full bg-violet-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-violet-200">
+                                      {widget.badge}
+                                    </span>
+
+                                    <ReleaseBadge
+                                      status={widget.releaseStatus}
+                                    />
+
+                                    <span className="rounded-full bg-zinc-800 px-2.5 py-1 text-[10px] font-black text-zinc-400">
+                                      {widget.version}
+                                    </span>
+                                  </div>
+
+                                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+                                    {widget.description}
+                                  </p>
+                                </div>
+
+                                <div className="flex shrink-0 items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleFavorite(widget.id)}
+                                    aria-label={
+                                      isFavorite
+                                        ? "Remove from favorites"
+                                        : "Add to favorites"
                                     }
+                                    className={`flex h-9 w-9 items-center justify-center rounded-full border text-lg transition ${
+                                      isFavorite
+                                        ? "border-yellow-400/50 bg-yellow-400/15"
+                                        : "border-zinc-700 bg-zinc-900 grayscale hover:grayscale-0"
+                                    }`}
+                                  >
+                                    ⭐
+                                  </button>
 
-                                    emitWidgetEvent(widget.testEvent);
-                                  }}
-                                  disabled={!canTest || !widgetUnlocked}
-                                  className={`rounded-xl px-4 py-2 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${widget.testButtonClass}`}
-                                >
-                                  {widget.testLabel}
-                                </button>
+                                  {widgetUnlocked ? (
+                                    <span className="rounded-full bg-green-600 px-3 py-1 text-[10px] font-black">
+                                      LIVE
+                                    </span>
+                                  ) : (
+                                    <span className="rounded-full bg-pink-600/80 px-3 py-1 text-[10px] font-black">
+                                      LOCKED
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
 
-                                <button
-                                  onClick={() => {
-                                    if (!canReset || !widgetUnlocked) {
-                                      setUpgradeModalOpen(true);
-                                      return;
+                              <div className="mt-5">
+                                {widget.vehiclePicker && (
+                                  <PickerGrid
+                                    title="Choose Vehicle"
+                                    items={VEHICLES}
+                                    selectedId={selectedVehicle}
+                                    onSelect={selectVehicle}
+                                    disabled={
+                                      !canSaveSettings || !widgetUnlocked
                                     }
+                                    selectedClassName="border-yellow-500 bg-yellow-500/20"
+                                  />
+                                )}
 
-                                    emitWidgetEvent(widget.resetEvent);
-                                  }}
-                                  disabled={!canReset || !widgetUnlocked}
-                                  className={`rounded-xl px-4 py-2 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${widget.resetButtonClass}`}
-                                >
-                                  {widget.resetLabel}
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </section>
+                                {widget.lanternPicker && (
+                                  <PickerGrid
+                                    title="Choose Lantern"
+                                    items={LANTERNS}
+                                    selectedId={selectedLantern}
+                                    onSelect={selectLantern}
+                                    disabled={
+                                      !canSaveSettings || !widgetUnlocked
+                                    }
+                                    selectedClassName="border-purple-500 bg-purple-500/20"
+                                  />
+                                )}
+                              </div>
+
+                              {widgetUnlocked ? (
+                                <>
+                                  <div className="mt-1 hidden md:block">
+                                    <WidgetPreview
+                                      widget={widget}
+                                      mode="desktop"
+                                    />
+                                  </div>
+
+                                  <div className="mt-1 md:hidden">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setMobilePreviewId((current) =>
+                                          current === widget.id
+                                            ? ""
+                                            : widget.id,
+                                        )
+                                      }
+                                      className="flex w-full items-center justify-between rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-left font-black"
+                                    >
+                                      <span>
+                                        👁️{" "}
+                                        {mobilePreviewOpen
+                                          ? "ซ่อนตัวอย่าง"
+                                          : "ดูตัวอย่าง Widget"}
+                                      </span>
+                                      <span className="text-zinc-400">
+                                        {mobilePreviewOpen ? "▲" : "▼"}
+                                      </span>
+                                    </button>
+
+                                    {mobilePreviewOpen && (
+                                      <div className="mt-3">
+                                        <WidgetPreview
+                                          widget={widget}
+                                          mode="mobile"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                </>
+                              ) : (
+                                <div className="mt-5 rounded-3xl border border-pink-500/30 bg-pink-500/10 p-8 text-center">
+                                  <div className="text-4xl">🔒</div>
+                                  <div className="mt-3 text-xl font-black">
+                                    Creator Feature
+                                  </div>
+                                  <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-300">
+                                    Upgrade to unlock the live preview,
+                                    settings and OBS controls.
+                                  </p>
+                                  <Button
+                                    onClick={() => setUpgradeModalOpen(true)}
+                                    variant="upgrade"
+                                    className="mt-5"
+                                  >
+                                    Upgrade
+                                  </Button>
+                                </div>
+                              )}
+
+                              <div className="mt-auto pt-5">
+                                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-xs text-zinc-400">
+                                  <div className="mb-1 flex items-center justify-between gap-3">
+                                    <span className="font-black text-zinc-300">
+                                      OBS Overlay URL
+                                    </span>
+                                    <span className="rounded-full bg-zinc-800 px-2 py-1 text-[9px] font-black text-zinc-500">
+                                      1920×1080
+                                    </span>
+                                  </div>
+                                  <div className="truncate">
+                                    {widgetUnlocked
+                                      ? widget.url
+                                      : "Upgrade to unlock this overlay"}
+                                  </div>
+                                </div>
+
+                                {widgetUnlocked && (
+                                  <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                                    {widget.configureHref ? (
+                                      <Button
+                                        href={widget.configureHref}
+                                        variant="upgrade"
+                                        className="w-full sm:w-auto"
+                                      >
+                                        ⚙️ Configure
+                                      </Button>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        disabled
+                                        title="Settings page coming soon"
+                                        className="w-full cursor-not-allowed rounded-xl bg-zinc-800 px-4 py-2 font-bold text-zinc-500 sm:w-auto"
+                                      >
+                                        ⚙️ Configure
+                                      </button>
+                                    )}
+
+                                    <Button
+                                      onClick={() =>
+                                        window.open(
+                                          widget.url,
+                                          "_blank",
+                                          "noopener,noreferrer",
+                                        )
+                                      }
+                                      variant="secondary"
+                                      className="w-full sm:w-auto"
+                                    >
+                                      Open Overlay
+                                    </Button>
+
+                                    <Button
+                                      onClick={() => copy(widget.url)}
+                                      disabled={!canCopy}
+                                      variant="secondary"
+                                      className="w-full sm:w-auto"
+                                    >
+                                      Copy OBS
+                                    </Button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        emitWidgetEvent(widget.testEvent)
+                                      }
+                                      disabled={!canTest}
+                                      className={`w-full rounded-xl px-4 py-2 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto ${widget.testButtonClass}`}
+                                    >
+                                      {widget.testLabel}
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        emitWidgetEvent(widget.resetEvent)
+                                      }
+                                      disabled={!canReset}
+                                      className={`w-full rounded-xl px-4 py-2 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto ${widget.resetButtonClass}`}
+                                    >
+                                      {widget.resetLabel}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="mt-10">
+                    <div className="mb-6">
+                      <div className="text-sm font-black uppercase tracking-[0.2em] text-amber-300">
+                        Seller Mode
+                      </div>
+                      <h2 className="mt-2 text-3xl font-black">
+                        Seller Widgets
+                      </h2>
+                      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
+                        Tools designed for live sellers. These cards prepare the
+                        structure for the Seller plan.
+                      </p>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                      <ComingSoonWidgetCard
+                        icon="🔥"
+                        title="Flash Sale"
+                        description="Show a product, sale price and countdown timer during your live."
+                      />
+                      <ComingSoonWidgetCard
+                        icon="💬"
+                        title="Comment Picker"
+                        description="Pick comments and customer codes directly from the live audience."
+                      />
+                      <ComingSoonWidgetCard
+                        icon="🏆"
+                        title="Lucky Buyer"
+                        description="Celebrate a selected buyer with rewards, coupons or free shipping."
+                      />
+                    </div>
+                  </section>
+                </>
               )}
             </>
           )}
@@ -941,6 +1224,106 @@ function PickerGrid({
         ))}
       </div>
     </div>
+  );
+}
+
+
+
+type WidgetPreviewProps = {
+  widget: WidgetItem;
+  mode: "desktop" | "mobile";
+};
+
+function WidgetPreview({ widget, mode }: WidgetPreviewProps) {
+  const heightClass = mode === "desktop" ? "h-[330px]" : "h-[390px]";
+
+  return (
+    <div className="overflow-hidden rounded-3xl border border-zinc-700 bg-black shadow-inner">
+      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950/95 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-green-400 shadow-[0_0_9px_rgba(74,222,128,0.9)]" />
+          <span className="text-[11px] font-black uppercase tracking-[0.18em] text-zinc-200">
+            OBS Preview
+          </span>
+        </div>
+
+        <span className="rounded-full bg-zinc-800 px-2 py-1 text-[9px] font-black text-zinc-400">
+          {mode === "desktop" ? "DESKTOP" : "MOBILE"}
+        </span>
+      </div>
+
+      <div className={`relative overflow-hidden bg-[#050505] ${heightClass}`}>
+        <iframe
+          key={`${mode}-${widget.url}`}
+          src={widget.url}
+          title={`${widget.name} ${mode} preview`}
+          loading="lazy"
+          className="absolute left-1/2 top-1/2 border-0"
+          style={{
+            width: `${100 / widget.previewZoom}%`,
+            height: `${100 / widget.previewZoom}%`,
+            transform: `translate(-50%, -50%) scale(${widget.previewZoom})`,
+            transformOrigin: "center",
+          }}
+        />
+
+        <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/5" />
+      </div>
+    </div>
+  );
+}
+
+function ReleaseBadge({ status }: { status: WidgetReleaseStatus }) {
+  const className =
+    status === "new"
+      ? "bg-pink-500/20 text-pink-200"
+      : status === "beta"
+        ? "bg-amber-500/20 text-amber-200"
+        : "bg-emerald-500/15 text-emerald-200";
+
+  return (
+    <span
+      className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${className}`}
+    >
+      {status}
+    </span>
+  );
+}
+
+type ComingSoonWidgetCardProps = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+function ComingSoonWidgetCard({
+  icon,
+  title,
+  description,
+}: ComingSoonWidgetCardProps) {
+  return (
+    <Card className="relative overflow-hidden">
+      <div className="pointer-events-none absolute -right-10 -top-10 text-[120px] opacity-[0.04]">
+        {icon}
+      </div>
+
+      <div className="relative">
+        <div className="text-4xl">{icon}</div>
+        <h3 className="mt-4 text-xl font-black">{title}</h3>
+        <p className="mt-2 min-h-16 text-sm leading-relaxed text-zinc-400">
+          {description}
+        </p>
+
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-black text-amber-200">
+            Seller Plan
+          </span>
+          <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-black text-zinc-400">
+            Coming Soon
+          </span>
+        </div>
+      </div>
+    </Card>
   );
 }
 
