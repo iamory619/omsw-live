@@ -511,6 +511,8 @@ export default function DashboardPage() {
             version: "v1.0",
             previewZoom: 0.6,
             badge: "Creator",
+            configureHref: "/dashboard/widgets/magic-lantern",
+
             lanternPicker: true,
             testEvent: "test-lantern",
             resetEvent: "reset-lantern",
@@ -958,18 +960,7 @@ export default function DashboardPage() {
                                   />
                                 )}
 
-                                {widget.lanternPicker && (
-                                  <PickerGrid
-                                    title="Choose Lantern"
-                                    items={LANTERNS}
-                                    selectedId={selectedLantern}
-                                    onSelect={selectLantern}
-                                    disabled={
-                                      !canSaveSettings || !widgetUnlocked
-                                    }
-                                    selectedClassName="border-purple-500 bg-purple-500/20"
-                                  />
-                                )}
+                           
                               </div>
 
                               {widgetUnlocked ? (

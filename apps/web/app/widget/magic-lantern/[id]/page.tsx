@@ -1,372 +1,541 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
-import { useParams, useSearchParams } from "next/navigation";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
+import {
+  useWidgetSettings,
+  useWidgetSocket,
+  WIDGET_EVENTS,
+} from "@omsw/widget-core";
 import { SERVER_URL } from "@/lib/core/server-url";
 
 type GiftPayload = {
-  user: string;
-  giftName: string;
-  amount: number;
-  diamond: number;
-  giftImage: string;
+  user?: string;
+  uniqueId?: string;
+  giftName?: string;
+  amount?: number;
+  repeatCount?: number;
+  diamond?: number;
+  giftImage?: string;
+  giftPictureUrl?: string;
+};
+
+type LanternTheme = "phoenix" | "rat" | "cat" | "rabbit";
+type PetalEffect = "sakura" | "hearts" | "stars" | "sparkles" | "none";
+
+type MagicLanternSettings = {
+  lantern: LanternTheme;
+  gift_name: string;
+  gift_emoji: string;
+  gift_image: string | null;
+  target_amount: number;
+  start_value: number;
+  glow_color: string;
+  petal_effect: PetalEffect;
+  full_message: string;
+  show_progress: boolean;
+  show_gift_name: boolean;
+  show_last_gifter: boolean;
+  enable_fill_animation: boolean;
+  enable_complete_animation: boolean;
+  enable_sound: boolean;
 };
 
 type FloatingGift = {
-  id: number;
-  uid: string;
+  id: string;
   image: string;
+  emoji: string;
   name: string;
+  user: string;
+  slotIndex: number;
   size: number;
-  x: number;
-  y: number;
-  rotate: number;
-  floatX: number;
-  floatY: number;
-  delay: number;
+  rotation: number;
   duration: number;
+  delay: number;
 };
 
-// type Dust = {
-//   id: number;
-//   x: number;
-//   y: number;
-//   size: number;
-//   delay: number;
-//   duration: number;
-// };
-
-const JAR = {
-  left: 450,
-  top: 600,
-  width: 214,
-  height: 150,
+type ThankYouMessage = {
+  id: string;
+  user: string;
+  giftName: string;
 };
+
+const DEFAULT_SETTINGS: MagicLanternSettings = {
+  lantern: "phoenix",
+  gift_name: "All Gifts",
+  gift_emoji: "🎁",
+  gift_image: "/assets/rose.png",
+  target_amount: 12,
+  start_value: 0,
+  glow_color: "#a855f7",
+  petal_effect: "sparkles",
+  full_message: "Thank you for the gift!",
+  show_progress: false,
+  show_gift_name: true,
+  show_last_gifter: true,
+  enable_fill_animation: true,
+  enable_complete_animation: false,
+  enable_sound: false,
+};
+
+const PARTICLES: Record<PetalEffect, string[]> = {
+  sakura: ["🌸", "🌸", "🌺", "🌸"],
+  hearts: ["💖", "💗", "💕", "💖"],
+  stars: ["⭐", "🌟", "⭐", "🌟"],
+  sparkles: ["✨", "💫", "✨", "💫"],
+  none: [],
+};
+
+/*
+  ตำแหน่งคงที่ภายในกระจก
+  ช่วยให้ของขวัญกระจายสวยและไม่กองทับกันมากเกินไป
+*/
+const GIFT_SLOTS = [
+  { x: 23, y: 24, dx: 8, dy: -7 },
+  { x: 50, y: 20, dx: -7, dy: 8 },
+  { x: 76, y: 26, dx: 6, dy: 7 },
+  { x: 34, y: 43, dx: -8, dy: -5 },
+  { x: 66, y: 45, dx: 7, dy: -6 },
+  { x: 20, y: 63, dx: 6, dy: 7 },
+  { x: 48, y: 61, dx: -7, dy: 6 },
+  { x: 78, y: 65, dx: -6, dy: -7 },
+  { x: 34, y: 79, dx: 7, dy: -5 },
+  { x: 66, y: 80, dx: -7, dy: -5 },
+  { x: 14, y: 42, dx: 5, dy: 6 },
+  { x: 86, y: 44, dx: -5, dy: 6 },
+];
+
+function normalizeSettings(data: unknown): MagicLanternSettings {
+  const raw =
+    data && typeof data === "object"
+      ? (data as Partial<MagicLanternSettings>)
+      : {};
+
+  const lantern: LanternTheme =
+    raw.lantern === "rat" || raw.lantern === "cat" || raw.lantern === "rabbit"
+      ? raw.lantern
+      : "phoenix";
+
+  return {
+    ...DEFAULT_SETTINGS,
+    ...raw,
+    lantern,
+    target_amount: Math.min(16, Math.max(5, Number(raw.target_amount) || 12)),
+    show_progress: false,
+    enable_complete_animation: false,
+  };
+}
+
+function randomBetween(min: number, max: number) {
+  return min + Math.random() * (max - min);
+}
+
+function createFloatingGift(
+  payload: GiftPayload,
+  settings: MagicLanternSettings,
+  slotIndex: number,
+): FloatingGift {
+  const image =
+    payload.giftImage?.trim() ||
+    payload.giftPictureUrl?.trim() ||
+    settings.gift_image?.trim() ||
+    "";
+
+  return {
+    id: `${Date.now()}-${slotIndex}-${crypto.randomUUID()}`,
+    image,
+    emoji: settings.gift_emoji || "🎁",
+    name: payload.giftName?.trim() || "Gift",
+    user: payload.user?.trim() || payload.uniqueId?.trim() || "Viewer",
+    slotIndex,
+    size: randomBetween(30, 40),
+    rotation: randomBetween(-8, 8),
+    duration: randomBetween(6, 9),
+    delay: randomBetween(-2.4, 0),
+  };
+}
 
 export default function MagicLanternWidget() {
   const params = useParams();
-  const searchParams = useSearchParams();
+  const overlayId = String(params.id || "");
 
-  const overlayId = params.id as string;
-  const lantern = searchParams.get("lantern") || "phoenix";
+  const { settings } = useWidgetSettings<MagicLanternSettings>({
+    endpoint: overlayId
+      ? `/api/magic-lantern/settings/${encodeURIComponent(overlayId)}`
+      : "",
+    fallback: DEFAULT_SETTINGS,
+    enabled: Boolean(overlayId),
+    transform: normalizeSettings,
+  });
 
-  const lanternBack = `/assets/lantern/${lantern}-back.png`;
-  const lanternFront = `/assets/lantern/${lantern}-front.gif`;
-  const LANTERN_GLOW: Record<string, string> = {
-  phoenix:
-   "radial-gradient(circle at 50% 58%, rgba(147,51,234,0.42) 0%, rgba(168,85,247,0.26) 45%, rgba(216,180,254,0.16) 72%, transparent 100%)",
-  rat:
-    "radial-gradient(circle at 50% 58%, rgba(251, 146, 60, 0.5) 0%, rgba(251, 113, 133, 0.25) 45%, rgba(253, 164, 175, 0.1) 72%, transparent 100%)",
-  cat:
-    "radial-gradient(circle at 50% 58%, rgba(236,72,153,0.42) 0%, rgba(244,114,182,0.26) 45%, rgba(168,85,247,0.16) 72%, transparent 100%)",
-  rabbit:
-    "radial-gradient(circle at 50% 58%, rgba(56,189,248,0.42) 0%, rgba(14,165,233,0.26) 45%, rgba(99,102,241,0.16) 72%, transparent 100%)",
-};
+  const { socket } = useWidgetSocket({
+    serverUrl: SERVER_URL,
+    overlayId,
+  });
 
-const lanternGlow =
-  LANTERN_GLOW[lantern] || LANTERN_GLOW.phoenix;
-
- const DUST_COLOR: Record<string, string> = {
-  phoenix: "#FFD54A",
-  rat: "#FFB347",
-  cat: "#FF6FB5",
-  rabbit: "#66D9FF",
-};
-
-  const GIFT_GLOW: Record<string, string> = {
-  phoenix: "drop-shadow-[0_0_12px_rgba(255,180,0,.9)]",
-  rat: "drop-shadow-[0_0_10px_rgba(255,140,0,.9)]",
-  cat: "drop-shadow-[0_0_10px_rgba(255,90,180,.9)]",
-  rabbit: "drop-shadow-[0_0_10px_rgba(80,220,255,.9)]",
-};
-
-const giftGlow = GIFT_GLOW[lantern] || GIFT_GLOW.phoenix;
-
-
-const dustColor = DUST_COLOR[lantern] || DUST_COLOR.phoenix;
-
-  const [message, setMessage] = useState("");
-  const [showMessage, setShowMessage] = useState(false);
   const [gifts, setGifts] = useState<FloatingGift[]>([]);
-  // const [dusts, setDusts] = useState<Dust[]>([]);
+  const [thankYou, setThankYou] = useState<ThankYouMessage | null>(null);
+  const thankYouTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nextSlotRef = useRef(0);
 
-  const playEffect = (gift: GiftPayload) => {
-    setMessage(`ขอบคุณ ${gift.user} ส่ง ${gift.giftName} x${gift.amount}`);
-    setShowMessage(true);
+  const maxItems = Math.min(
+    16,
+    Math.max(5, Number(settings.target_amount) || 12),
+  );
 
-    const count = Math.min(Math.max((gift.amount || 1) * 2, 5), 45);
-    const giftImage = gift.giftImage || "/assets/rose.png";
-
-    const newGifts: FloatingGift[] = Array.from({ length: count }).map(
-      (_, index) => ({
-        id: Date.now() + index,
-        uid: `${Date.now()}-${index}-${Math.random().toString(36).slice(2,8)}`,
-        image: giftImage,
-        name: gift.giftName,
-        size: 9 + Math.random() * 5,
-
-        // กระจายกุหลาบในโหล ไม่เรียงเป็นกอง
-        x: 30 + Math.random() * 150,
-        y: 38 + Math.random() * 95,
-
-        rotate: -45 + Math.random() * 90,
-        floatX: -4 + Math.random() * 8,
-        floatY: -4 + Math.random() * 8,
-        delay: Math.random() * 0.8,
-        duration: 3 + Math.random() * 2,
-        orbit: 8 + Math.random() * 16,
-      }),
-    );     
-
-    setGifts((prev) => [...prev, ...newGifts].slice(-160));
-
-    setTimeout(() => {
-      setShowMessage(false);
-    }, 3200);
-  };
+  const lanternBack = `/assets/lantern/${settings.lantern}-back.png`;
+  const lanternFront = `/assets/lantern/${settings.lantern}-front.gif`;
+  const particles = PARTICLES[settings.petal_effect] || [];
 
   useEffect(() => {
-    if (!overlayId) return;
+    setGifts((current) => current.slice(-maxItems));
+  }, [maxItems]);
 
-    const socket = io(SERVER_URL);
+  useEffect(() => {
+    return () => {
+      if (thankYouTimer.current) {
+        clearTimeout(thankYouTimer.current);
+      }
+    };
+  }, []);
 
-    socket.emit("join-overlay", overlayId);
+  useEffect(() => {
+    const showThankYou = (payload: GiftPayload) => {
+      if (!settings.show_last_gifter) return;
 
-    // ใช้สำหรับปุ่ม Test Lantern จาก Dashboard
-    socket.on("test-lantern", (gift: GiftPayload) => {
-      playEffect(gift);
-    });
+      setThankYou({
+        id: crypto.randomUUID(),
+        user: payload.user?.trim() || payload.uniqueId?.trim() || "Viewer",
+        giftName: payload.giftName?.trim() || "Gift",
+      });
 
-    // ใช้สำหรับของขวัญจริงจาก TikTok เฉพาะ Magic Lantern
-    socket.on("lantern-gift", (gift: GiftPayload) => {
-      playEffect(gift);
-    });
+      if (thankYouTimer.current) {
+        clearTimeout(thankYouTimer.current);
+      }
 
-    // ใช้สำหรับ Reset Lantern จาก Dashboard
-    socket.on("reset-lantern", () => {
-      setMessage("");
-      setShowMessage(false);
+      thankYouTimer.current = setTimeout(() => {
+        setThankYou(null);
+      }, 2600);
+    };
+
+    const addGift = (payload: GiftPayload) => {
+      const gift = payload || {};
+      const amount = Math.min(
+        4,
+        Math.max(1, Number(gift.repeatCount ?? gift.amount ?? 1) || 1),
+      );
+
+      const incoming = Array.from({ length: amount }, () => {
+        const slotIndex = nextSlotRef.current % GIFT_SLOTS.length;
+        nextSlotRef.current += 1;
+        return createFloatingGift(gift, settings, slotIndex);
+      });
+
+      setGifts((current) => [...current, ...incoming].slice(-maxItems));
+      showThankYou(gift);
+    };
+
+    const reset = () => {
       setGifts([]);
-    });
+      setThankYou(null);
+      nextSlotRef.current = 0;
+
+      if (thankYouTimer.current) {
+        clearTimeout(thankYouTimer.current);
+      }
+    };
+
+    socket.on(WIDGET_EVENTS.TEST_LANTERN, addGift);
+    socket.on(WIDGET_EVENTS.LANTERN_GIFT, addGift);
+    socket.on(WIDGET_EVENTS.RESET_LANTERN, reset);
 
     return () => {
-      socket.disconnect();
+      socket.off(WIDGET_EVENTS.TEST_LANTERN, addGift);
+      socket.off(WIDGET_EVENTS.LANTERN_GIFT, addGift);
+      socket.off(WIDGET_EVENTS.RESET_LANTERN, reset);
     };
-  }, [overlayId, lantern]);
+  }, [maxItems, settings, socket]);
 
   return (
-    <main className="fixed inset-0 h-screen w-screen overflow-hidden bg-transparent">
-      {showMessage && (
-        <div className="animate-message fixed left-1/2 top-[8vh] z-50 -translate-x-1/2 rounded-3xl border-4 border-purple-200 bg-purple-700/90 px-8 py-4 text-center text-2xl font-black text-white shadow-[0_0_35px_rgba(168,85,247,0.9)]">
-          {message}
-        </div>
-      )}
-
-      <div className="fixed bottom-[100px] left-1/2 h-[900px] w-[900px] -translate-x-1/2">
-        <div
-          className="absolute z-0 rounded-[38px] blur-[42px] pointer-events-none"
-          style={{
-            left: `${JAR.left - 6}px`,
-            top: `${JAR.top + 2}px`,
-            width: `${JAR.width + 10}px`,
-            height: `${JAR.height}px`,
-            background: lanternGlow,          }}
-        />
-
-        <div
-          className="absolute z-0 rounded-full blur-[42px] pointer-events-none"
-          style={{
-            left: `${JAR.left - 10}px`,
-            top: `${JAR.top + 78}px`,
-            width: `${JAR.width + 30}px`,
-            height: "92px",
-            background: lanternGlow,
-            opacity: 0.25,
-                     }}
-        />
-
-        <Image
-          src={lanternBack}
-          alt="Magic lantern back"
-          width={900}
-          height={1100}
-          priority
-          className="absolute bottom-[-50px] left-1/2 z-10 w-[820px] -translate-x-1/2 pointer-events-none"
-        />
-
-        <div
-          className="absolute z-30 overflow-hidden rounded-[34px]"
-          style={{
-            left: `${JAR.left}px`,
-            top: `${JAR.top}px`,
-            width: `${JAR.width}px`,
-            height: `${JAR.height}px`,
-            clipPath:
-              "polygon(8% 0%, 92% 0%, 92% 76%, 82% 100%, 18% 100%, 8% 76%)",
-          }}
-        >
-         <div
-  className="absolute inset-0 blur-xl"
-  style={{
-    background: lanternGlow,
-    opacity: 0.18,
-  }}
-/>
-
-          {}
-
-          {gifts.map((gift) => (
-            <img
-              key={gift.uid}
-              src={gift.image}
-              alt={gift.name}
-              className={`animate-float-gift absolute ${giftGlow}`}
-              //className="animate-float-gift absolute drop-shadow-[0_0_6px_rgba(255,105,180,0.75)]"
-              style={{
-                left: `${gift.x}px`,
-                top: `${gift.y}px`,
-                width: `${gift.size}px`,
-                height: `${gift.size}px`,
-                animationDelay: `${gift.delay}s`,
-                animationDuration: `${gift.duration}s`,
-                ["--gift-float-x" as string]: `${gift.floatX}px`,
-                ["--gift-float-y" as string]: `${gift.floatY}px`,
-                ["--gift-rotate" as string]: `${gift.rotate}deg`,
-              }}
-            />
-          ))}
-        </div>
-
-        <Image
-          src={lanternFront}
-          alt="Magic lantern front"
-          width={900}
-          height={1100}
-          priority
-          className="absolute bottom-[-50px] left-1/2 z-40 w-[820px] -translate-x-1/2 pointer-events-none"
-        />
-
-        <div
-          className="animate-glow pointer-events-none absolute z-50 rounded-[34px] blur-xl"
-          style={{
-            left: `${JAR.left + 16}px`,
-            top: `${JAR.top + 12}px`,
-            width: `${JAR.width - 34}px`,
-            height: `${JAR.height - 20}px`,
-            background: lanternGlow,
-            opacity: 0.28,
-                    }}
-        />
-      </div>
-
-      <style>{`
-        html,
-        body {
-          margin: 0;
-          padding: 0;
-          overflow: hidden;
-          background: transparent !important;
-        }
-
-        @keyframes message {
-          0% {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-20px) scale(0.85);
-          }
-
-          15% {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(1);
-          }
-
-          85% {
-            opacity: 1;
-          }
-
+    <main className="fixed inset-0 overflow-hidden bg-transparent">
+      <style jsx global>{`
+        @keyframes omswLanternIdle {
+          0%,
           100% {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-10px) scale(0.95);
+            transform: translate(-50%, -50%) translateY(0) scale(1);
           }
-        }
-
-        @keyframes floatGift {
-          0% {
-            opacity: 0;
-            transform: translateY(8px) scale(0.7) rotate(0deg);
-          }
-
-          20% {
-            opacity: 1;
-          }
-
           50% {
-            transform: translate(var(--gift-float-x), var(--gift-float-y))
-              scale(1) rotate(var(--gift-rotate));
+            transform: translate(-50%, -50%) translateY(-9px) scale(1.008);
+          }
+        }
+
+        @keyframes omswJarPulse {
+          0%,
+          100% {
+            opacity: 0.52;
+            transform: scale(0.96);
+          }
+          50% {
+            opacity: 0.9;
+            transform: scale(1.04);
+          }
+        }
+
+        @keyframes omswGiftSummon {
+          0% {
+            opacity: 0;
+            transform:
+              translate(-50%, 92px)
+              scale(0.05)
+              rotate(-12deg);
+            filter: blur(10px) brightness(1.8);
+          }
+
+          55% {
+            opacity: 1;
+            transform:
+              translate(-50%, -58%)
+              scale(1.18)
+              rotate(4deg);
+            filter: blur(0) brightness(1.7);
+          }
+
+          78% {
+            opacity: 1;
+            transform:
+              translate(-50%, -50%)
+              scale(0.94)
+              rotate(-1deg);
+            filter: blur(0) brightness(1.25);
           }
 
           100% {
             opacity: 1;
-            transform: translate(
-    calc(var(--gift-float-x) * -0.6),
-    calc(var(--gift-float-y) * -0.6)
-)
-              scale(0.95) rotate(calc(var(--gift-rotate) * -0.5));
+            transform:
+              translate(-50%, -50%)
+              scale(1)
+              rotate(0deg);
+            filter: blur(0) brightness(1);
           }
         }
 
-        @keyframes magicDust {
+        @keyframes omswGiftSpirit {
           0% {
-            opacity: 0;
-            transform: translateY(10px) scale(0.5);
+            transform: translate3d(0, 4px, 0) rotate(var(--gift-rotation))
+              scale(0.94);
           }
 
           35% {
-            opacity: 1;
+            transform: translate3d(
+                calc(var(--gift-drift-x) * 0.65),
+                calc(var(--gift-drift-y) * -0.8),
+                0
+              )
+              rotate(calc(var(--gift-rotation) + 4deg)) scale(1.04);
+          }
+
+          70% {
+            transform: translate3d(
+                calc(var(--gift-drift-x) * -0.55),
+                calc(var(--gift-drift-y) * 0.5),
+                0
+              )
+              rotate(calc(var(--gift-rotation) - 3deg)) scale(0.98);
           }
 
           100% {
-            opacity: 0.25;
-            transform: translateY(-18px) scale(1);
+            transform: translate3d(
+                calc(var(--gift-drift-x) * 0.25),
+                calc(var(--gift-drift-y) * -0.35),
+                0
+              )
+              rotate(calc(var(--gift-rotation) + 2deg)) scale(0.96);
           }
         }
 
-        @keyframes glow {
+        @keyframes omswMagicBreath {
           0%,
           100% {
-            opacity: 0.25;
-            scale: 0.95;
+            opacity: 0.45;
+            filter: blur(7px);
+            transform: scale(0.96);
           }
 
           50% {
-            opacity: 0.55;
-            scale: 1.03;
+            opacity: 0.9;
+            filter: blur(11px);
+            transform: scale(1.05);
           }
         }
 
-        .animate-message {
-          animation: message 3.2s ease-in-out forwards;
+        @keyframes omswParticleFloat {
+          0%,
+          100% {
+            opacity: 0.12;
+            transform: translateY(5px) scale(0.82);
+          }
+          50% {
+            opacity: 0.62;
+            transform: translateY(-9px) scale(1);
+          }
         }
 
-        .animate-float-gift {
-          animation-name: floatGift;
-          animation-timing-function: ease-in-out;
-          animation-iteration-count: infinite;
-          animation-direction: alternate;
-        }
-
-        .animate-magic-dust {
-          animation-name: magicDust;
-          animation-timing-function: ease-in-out;
-          animation-iteration-count: infinite;
-          animation-direction: alternate;
-        }
-
-        .animate-glow {
-          animation: glow 1.8s ease-in-out infinite;
+        @keyframes omswThankYou {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, 12px) scale(0.88);
+          }
+          18%,
+          76% {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -12px) scale(0.96);
+          }
         }
       `}</style>
+
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse at 50% 62%, ${settings.glow_color}3d 0%, ${settings.glow_color}16 27%, transparent 62%)`,
+        }}
+      />
+
+      <div
+        className="pointer-events-none absolute left-1/2 top-[58%] aspect-[4/5]"
+        style={{
+          width: "clamp(800px, 115vmin, 1500px)",
+          animation: "omswLanternIdle 5.8s ease-in-out infinite",
+        }}
+      >
+        <div
+          className="absolute left-[63.5%] top-[45%] h-[36%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-[28%]"
+          style={{
+            background: `radial-gradient(circle, ${settings.glow_color}55 0%, ${settings.glow_color}20 48%, transparent 76%)`,
+            filter: "blur(12px)",
+            animation: "omswJarPulse 3.8s ease-in-out infinite",
+          }}
+        />
+
+        <img
+          src={lanternBack}
+          alt=""
+          className="absolute inset-0 h-full w-full object-contain"
+        />
+
+        <div
+          className="absolute left-[53.3%] top-[27.5%] h-[35.5%] w-[20.5%] overflow-hidden rounded-[22%]"
+          style={{ clipPath: "inset(0 round 22%)" }}
+        >
+          <div
+            className="absolute inset-0 origin-center"
+            style={{
+              background: `radial-gradient(circle at 50% 52%, ${settings.glow_color}48, transparent 74%)`,
+              animation: "omswMagicBreath 3.6s ease-in-out infinite",
+            }}
+          />
+
+          {particles.map((particle, index) => (
+            <span
+              key={`${particle}-${index}`}
+              className="absolute select-none"
+              style={{
+                left: `${18 + ((index * 22) % 58)}%`,
+                top: `${17 + ((index * 25) % 62)}%`,
+                fontSize: "clamp(9px, 1vmin, 15px)",
+                animation: `omswParticleFloat ${4.5 + index * 0.45}s ease-in-out ${index * 0.3}s infinite`,
+                filter: `drop-shadow(0 0 5px ${settings.glow_color})`,
+              }}
+            >
+              {particle}
+            </span>
+          ))}
+
+          {gifts.map((gift) => {
+            const slot = GIFT_SLOTS[gift.slotIndex];
+
+            return (
+              <div
+                key={gift.id}
+                className="absolute"
+                style={
+                  {
+                    left: `${slot.x}%`,
+                    top: `${slot.y}%`,
+                    width: `clamp(24px, ${gift.size / 13}vmin, ${gift.size}px)`,
+                    height: `clamp(24px, ${gift.size / 13}vmin, ${gift.size}px)`,
+                    animation:
+                      "omswGiftSummon 760ms cubic-bezier(.14,.85,.24,1) both",
+                    "--gift-drift-x": `${slot.dx}px`,
+                    "--gift-drift-y": `${slot.dy}px`,
+                    "--gift-rotation": `${gift.rotation}deg`,
+                  } as React.CSSProperties
+                }
+              >
+                <div
+                  className="h-full w-full"
+                  style={{
+                    animation: `omswGiftSpirit ${gift.duration}s ease-in-out ${gift.delay}s infinite alternate`,
+                    filter: `
+                      drop-shadow(0 0 5px ${settings.glow_color})
+                      drop-shadow(0 0 11px ${settings.glow_color}99)
+                    `,
+                  }}
+                >
+                  {gift.image ? (
+                    <>
+                      <img
+                        src={gift.image}
+                        alt={gift.name}
+                        className="h-full w-full object-contain"
+                        referrerPolicy="no-referrer"
+                        onError={(event) => {
+                          event.currentTarget.style.display = "none";
+                          const fallback = event.currentTarget
+                            .nextElementSibling as HTMLElement | null;
+                          if (fallback) fallback.style.display = "grid";
+                        }}
+                      />
+                      <span className="hidden h-full w-full place-items-center text-2xl">
+                        {gift.emoji}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="grid h-full w-full place-items-center text-2xl">
+                      {gift.emoji}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <img
+          src={lanternFront}
+          alt=""
+          className="absolute inset-0 z-50 h-full w-full object-contain"
+        />
+      </div>
+
+      {thankYou && (
+        <div
+          key={thankYou.id}
+          className="pointer-events-none absolute left-1/2 top-[7%] z-[100] whitespace-nowrap rounded-full border bg-black/58 px-5 py-2.5 text-center text-white backdrop-blur-md"
+          style={{
+            borderColor: `${settings.glow_color}75`,
+            boxShadow: `0 0 18px ${settings.glow_color}45`,
+            animation: "omswThankYou 2.6s ease-in-out both",
+          }}
+        >
+          <span className="text-sm font-black">
+            ✨ {thankYou.user} sent {thankYou.giftName}
+          </span>
+        </div>
+      )}
     </main>
   );
 }
