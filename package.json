@@ -7,5 +7,9 @@
     "dev": "pnpm --filter web dev",
     "build": "pnpm --filter web build",
     "start": "pnpm --filter web start"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3"
   }
 }
