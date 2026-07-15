@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { io } from "socket.io-client";
 import { useParams } from "next/navigation";
+import {
+  useWidgetSettings,
+  useWidgetSocket,
+  WIDGET_EVENTS,
+} from "@omsw/widget-core";
 import { SERVER_URL } from "@/lib/core/server-url";
 
 type GiftPayload = {
@@ -13,6 +17,14 @@ type GiftPayload = {
   giftImage?: string;
 };
 
+type GiftGoalTheme =
+  | "cute-pink"
+  | "neon"
+  | "minimal"
+  | "candy"
+  | "cyber"
+  | "glass";
+
 type GiftGoalSettings = {
   title: string;
   gift_name: string;
@@ -21,7 +33,7 @@ type GiftGoalSettings = {
   goal_amount: number;
   start_value: number;
   progress_color: string;
-  theme: "cute-pink" | "neon" | "minimal" | "candy" | "cyber" | "glass";
+  theme: GiftGoalTheme;
   show_gift_icon: boolean;
   show_percentage: boolean;
   show_current_value: boolean;
@@ -49,7 +61,7 @@ const DEFAULT_SETTINGS: GiftGoalSettings = {
   goal_complete_message: "🎉 Goal Complete! Thank you everyone!",
 };
 
-const THEME_CLASS: Record<GiftGoalSettings["theme"], string> = {
+const THEME_CLASS: Record<GiftGoalTheme, string> = {
   "cute-pink":
     "border-pink-200/80 bg-gradient-to-br from-pink-500/90 via-fuchsia-600/90 to-rose-500/90 shadow-[0_0_55px_rgba(236,72,153,0.75)]",
   candy:
@@ -64,13 +76,57 @@ const THEME_CLASS: Record<GiftGoalSettings["theme"], string> = {
     "border-violet-400/80 bg-gradient-to-br from-zinc-950/95 via-violet-950/95 to-cyan-950/95 shadow-[0_0_55px_rgba(139,92,246,0.75)]",
 };
 
+function normalizeSettings(data: unknown): GiftGoalSettings {
+  const raw =
+    data && typeof data === "object"
+      ? (data as Partial<GiftGoalSettings>)
+      : {};
+
+  return {
+    ...DEFAULT_SETTINGS,
+    ...raw,
+    goal_amount: Math.max(1, Number(raw.goal_amount) || 100),
+    start_value: Math.max(0, Number(raw.start_value) || 0),
+    gift_name:
+      typeof raw.gift_name === "string" && raw.gift_name.trim()
+        ? raw.gift_name.trim()
+        : DEFAULT_SETTINGS.gift_name,
+    gift_emoji:
+      typeof raw.gift_emoji === "string" && raw.gift_emoji.trim()
+        ? raw.gift_emoji.trim()
+        : DEFAULT_SETTINGS.gift_emoji,
+    theme:
+      raw.theme && raw.theme in THEME_CLASS
+        ? raw.theme
+        : DEFAULT_SETTINGS.theme,
+  };
+}
+
 export default function GiftGoalWidget() {
   const params = useParams();
   const overlayId = params.id as string;
 
-  const [settings, setSettings] =
-    useState<GiftGoalSettings>(DEFAULT_SETTINGS);
-  const [current, setCurrent] = useState(DEFAULT_SETTINGS.start_value);
+  const endpoint = overlayId
+    ? `/api/gift-goal/settings/${encodeURIComponent(overlayId)}`
+    : "";
+
+  const {
+    settings,
+    loading: settingsLoading,
+    error: settingsError,
+  } = useWidgetSettings<GiftGoalSettings>({
+    endpoint,
+    fallback: DEFAULT_SETTINGS,
+    enabled: Boolean(overlayId),
+    transform: normalizeSettings,
+  });
+
+  const { socket, status: socketStatus } = useWidgetSocket({
+    serverUrl: SERVER_URL,
+    overlayId,
+  });
+
+  const [current, setCurrent] = useState(settings.start_value);
   const [lastGifter, setLastGifter] = useState("");
   const [goalComplete, setGoalComplete] = useState(false);
   const completionShownRef = useRef(false);
@@ -85,51 +141,13 @@ export default function GiftGoalWidget() {
   );
 
   useEffect(() => {
-    if (!overlayId) return;
-
-    let cancelled = false;
-
-    const loadSettings = async () => {
-      try {
-        const response = await fetch(
-          `/api/gift-goal/settings/${encodeURIComponent(overlayId)}`,
-          { cache: "no-store" },
-        );
-
-        if (!response.ok) throw new Error("Unable to load settings.");
-
-        const data = (await response.json()) as GiftGoalSettings;
-
-        if (cancelled) return;
-
-        setSettings({ ...DEFAULT_SETTINGS, ...data });
-        setCurrent(Math.max(0, Number(data.start_value) || 0));
-      } catch (error) {
-        console.warn("Gift Goal settings fallback:", error);
-      }
-    };
-
-    void loadSettings();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [overlayId]);
+    setCurrent(Math.max(0, Number(settings.start_value) || 0));
+    completionShownRef.current = false;
+    setGoalComplete(false);
+    setLastGifter("");
+  }, [settings.start_value, settings.gift_name, settings.goal_amount]);
 
   useEffect(() => {
-    if (!overlayId) return;
-
-    const socket = io(SERVER_URL, {
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-      timeout: 20000,
-    });
-
-    const joinOverlay = () => {
-      socket.emit("join-overlay", overlayId);
-    };
-
     const handleGoalGift = (gift: GiftPayload) => {
       const receivedGiftName = (gift.giftName || "").trim().toLowerCase();
       const selectedGiftName = settings.gift_name.trim().toLowerCase();
@@ -149,19 +167,14 @@ export default function GiftGoalWidget() {
       setCurrent(Math.max(0, Number(settings.start_value) || 0));
     };
 
-    socket.on("connect", joinOverlay);
-    socket.on("goal-gift", handleGoalGift);
-    socket.on("reset-goal", handleReset);
-
-    if (socket.connected) joinOverlay();
+    socket.on(WIDGET_EVENTS.GOAL_GIFT, handleGoalGift);
+    socket.on(WIDGET_EVENTS.RESET_GOAL, handleReset);
 
     return () => {
-      socket.off("connect", joinOverlay);
-      socket.off("goal-gift", handleGoalGift);
-      socket.off("reset-goal", handleReset);
-      socket.disconnect();
+      socket.off(WIDGET_EVENTS.GOAL_GIFT, handleGoalGift);
+      socket.off(WIDGET_EVENTS.RESET_GOAL, handleReset);
     };
-  }, [goal, overlayId, settings.gift_name, settings.start_value]);
+  }, [goal, settings.gift_name, settings.start_value, socket]);
 
   useEffect(() => {
     if (current < goal || completionShownRef.current) return;
@@ -255,6 +268,16 @@ export default function GiftGoalWidget() {
               💖 Thank you, {lastGifter}!
             </div>
           )}
+
+          {(settingsLoading || settingsError || socketStatus === "error") && (
+            <div className="mt-4 text-center text-[10px] font-bold opacity-50">
+              {settingsLoading
+                ? "Loading settings..."
+                : settingsError
+                  ? "Using fallback settings"
+                  : "Widget server reconnecting..."}
+            </div>
+          )}
         </div>
       </div>
 
@@ -270,6 +293,7 @@ export default function GiftGoalWidget() {
             <div className="mt-3 text-lg font-bold">
               {settings.goal_complete_message}
             </div>
+
             {lastGifter && (
               <div className="mt-4 rounded-full bg-white/20 px-5 py-2 font-black">
                 Last gift from {lastGifter} 💖

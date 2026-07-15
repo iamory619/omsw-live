@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@omsw/widget-core": "workspace:*",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "next": "16.2.7",
@@ -17,11 +18,11 @@
     "stripe": "latest"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "typescript": "latest",
-    "@tailwindcss/postcss": "latest",
-    "tailwindcss": "latest"
+    "tailwindcss": "latest",
+    "typescript": "5.9.3"
   }
 }
