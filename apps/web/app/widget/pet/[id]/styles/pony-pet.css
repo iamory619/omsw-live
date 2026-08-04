@@ -1,0 +1,2221 @@
+/* =========================
+   MAGIC PONY RIG
+========================= */
+
+.pony-pet-rig {
+  position: relative;
+  width: 460px;
+  height: 390px;
+  isolation: isolate;
+}
+
+.pony-pet-image {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 5;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 15px 12px rgba(0, 0, 0, 0.28));
+  animation: ponyPetIdle 3s ease-in-out infinite;
+}
+
+/* =========================
+   STAGE 1 — MYSTERIOUS HAYSTACK
+
+   Phase 1: haystack only
+   Phase 2: pony peeks out
+========================= */
+
+.pony-pet-stage-1 {
+  overflow: visible;
+}
+
+.pony-stage1-rig {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  width: 320px;
+  height: 270px;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+
+/* Haystack stays in front so the pony can peek from behind it */
+.pony-stage1-haystack {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 6;
+  width: 270px;
+  height: auto;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 90%;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 14px 12px rgba(0, 0, 0, 0.26));
+  animation: ponyHaystackIdle 2.2s ease-in-out infinite;
+}
+
+/* Only head / ears / upper face should be visible from behind the hay */
+.pony-stage1-peek {
+  position: absolute;
+  left: 50%;
+  bottom: 140px;
+  z-index: 4;
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.16));
+  animation: ponyPeekIdle 1.8s ease-in-out infinite;
+}
+
+/* Phase visibility */
+.pony-stage1-phase-haystack .pony-stage1-peek {
+  display: none;
+}
+
+/* Small mysterious glow */
+.pony-stage1-magic {
+  position: absolute;
+  left: 50%;
+  bottom: 44px;
+  z-index: 2;
+  width: 220px;
+  height: 170px;
+  border-radius: 50%;
+  opacity: 0.22;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(216, 180, 254, 0.28) 35%,
+      rgba(244, 114, 182, 0.13) 58%,
+      transparent 76%
+    );
+  filter: blur(18px);
+  animation: ponyStage1MagicGlow 2.4s ease-in-out infinite alternate;
+}
+
+/* Stage 1 gift reactions */
+.pony-pet-state-walk .pony-stage1-haystack {
+  animation: ponyHaystackGiftShake 520ms ease-in-out infinite alternate;
+}
+
+.pony-pet-state-eat .pony-stage1-haystack,
+.pony-pet-state-happy .pony-stage1-haystack {
+  animation: ponyHaystackGiftShakeFast 340ms ease-in-out infinite alternate;
+}
+
+.pony-pet-state-happy .pony-stage1-peek {
+  animation: ponyPeekHappy 360ms ease-in-out infinite alternate;
+}
+
+.pony-pet-state-sleep .pony-stage1-haystack {
+  animation: ponyHaystackSleep 3.8s ease-in-out infinite;
+}
+
+.pony-pet-state-sleep .pony-stage1-peek {
+  animation: ponyPeekSleep 2.8s ease-in-out infinite;
+}
+
+.pony-pet-state-evolve .pony-stage1-rig {
+  animation: ponyStage1Evolve 620ms ease-in-out infinite alternate;
+}
+
+.pony-pet-state-evolve .pony-stage1-magic {
+  opacity: 1;
+  animation: ponyPetEvolutionGlow 650ms ease-in-out infinite alternate;
+}
+
+/* =========================
+   STAGE 2 — BABY PONY
+
+   Normal:
+   haystack + sitting pony
+
+   Gift reaction:
+   sitting pony dances first
+   then PonyPet.tsx can switch to kiss mode:
+   hide haystack + sitting pony
+   show pony-kiss.png + floating hearts
+========================= */
+
+.pony-stage2-rig {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 340px;
+  height: 330px;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+
+.pony-stage2-haystack {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 2;
+  width: 275px;
+  height: auto;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 90%;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 14px 12px rgba(0, 0, 0, 0.24));
+}
+
+.pony-stage2-pony {
+  position: absolute;
+  left: 50%;
+  bottom: 200px;
+  z-index: 5;
+  width: 215px;
+  height: auto;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 14px 12px rgba(0, 0, 0, 0.22));
+  animation: ponyStage2Idle 2.5s ease-in-out infinite;
+}
+
+/* Kiss pose is a separate full pony image, without haystack */
+.pony-stage2-kiss {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  z-index: 8;
+  width: 235px;
+  height: auto;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  user-select: none;
+  filter:
+    drop-shadow(0 14px 12px rgba(0, 0, 0, 0.22))
+    drop-shadow(0 0 16px rgba(244, 114, 182, 0.35));
+  animation: ponyStage2KissPop 360ms ease-out both;
+}
+
+/*
+  PonyPet.tsx should add this class during the kiss part
+  of the gift reaction:
+  pony-stage2-mode-kiss
+*/
+.pony-stage2-mode-reaction .pony-stage2-haystack,
+.pony-stage2-mode-reaction .pony-stage2-pony {
+  display: none;
+}
+
+.pony-stage2-rig:not(.pony-stage2-mode-reaction) .pony-stage2-kiss,
+.pony-stage2-rig:not(.pony-stage2-mode-kiss) .pony-stage2-mouth-hearts {
+  display: none;
+}
+
+/* During the long dance, pony-kiss.png is the image that dances */
+.pony-stage2-mode-dance .pony-stage2-kiss {
+  animation: ponyStage2KissDance 1.05s ease-in-out infinite;
+}
+
+/* During the kiss/heart phase, keep the same image visible with a soft pop */
+.pony-stage2-mode-kiss .pony-stage2-kiss {
+  animation: ponyStage2KissPop 360ms ease-out both;
+}
+
+/* Hearts coming from the kiss pose */
+.pony-stage2-mouth-hearts {
+  position: absolute;
+  left: 58%;
+  top: 82px;
+  z-index: 15;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.pony-stage2-mouth-heart {
+  position: absolute;
+  opacity: 0;
+  font-size: 26px;
+  line-height: 1;
+  animation: ponyMouthHeart 1.25s ease-out both;
+}
+
+.pony-stage2-mouth-heart-1 {
+  animation-delay: 0ms;
+}
+
+.pony-stage2-mouth-heart-2 {
+  animation-delay: 180ms;
+}
+
+.pony-stage2-mouth-heart-3 {
+  animation-delay: 360ms;
+}
+
+/* Fallback for future Stage 2 single-image usage */
+.pony-pet-stage-2 .pony-pet-image {
+  bottom: 8px;
+  width: 285px;
+  height: 300px;
+}
+
+/* =========================
+   STAGE 3 — YOUNG PONY
+
+   First ~10 XP inside Stage 3:
+   normal = pony-brown.png
+   gift   = pony-butt.png
+
+   After ~10 XP:
+   normal = pony.png
+   gift   = pony-shy.png
+========================= */
+
+/* Shared Stage 3 sizing */
+.pony-stage3-brown,
+.pony-stage3-butt,
+.pony-stage3-shy,
+.pony-pet-stage-3 .pony-pet-image {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 320px;
+  height: 330px;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Early Stage 3 — brown pony */
+.pony-stage3-brown {
+  z-index: 6;
+  filter: drop-shadow(0 15px 12px rgba(0, 0, 0, 0.24));
+  animation: ponyStage3BrownIdle 2.7s ease-in-out infinite;
+}
+
+/* Gift reaction during early Stage 3 */
+.pony-stage3-butt {
+  z-index: 9;
+  filter:
+    drop-shadow(0 15px 12px rgba(0, 0, 0, 0.24))
+    drop-shadow(0 0 12px rgba(251, 191, 36, 0.22));
+  animation: ponyStage3ButtWiggle 700ms ease-in-out infinite;
+}
+
+/* Magical pastel Stage 3 */
+.pony-pet-stage-3 .pony-pet-image {
+  z-index: 6;
+  filter: drop-shadow(0 15px 12px rgba(0, 0, 0, 0.24));
+}
+
+/* Shy reaction after the pastel transformation */
+.pony-stage3-shy {
+  z-index: 9;
+  filter:
+    drop-shadow(0 15px 12px rgba(0, 0, 0, 0.24))
+    drop-shadow(0 0 14px rgba(244, 114, 182, 0.28));
+  animation: ponyStage3ShyRun 3.8s ease-in-out both;
+}
+
+/* Mode helpers */
+.pony-stage3-mode-butt .pony-stage3-brown,
+.pony-stage3-mode-butt .pony-pet-image,
+.pony-stage3-mode-butt .pony-stage3-shy {
+  display: none;
+}
+
+.pony-stage3-mode-shy .pony-stage3-brown,
+.pony-stage3-mode-shy .pony-pet-image,
+.pony-stage3-mode-shy .pony-stage3-butt {
+  display: none;
+}
+
+/* Keep reaction assets hidden outside their active mode */
+.pony-pet-stage-3:not(.pony-stage3-mode-butt) .pony-stage3-butt {
+  display: none;
+}
+
+.pony-pet-stage-3:not(.pony-stage3-mode-shy) .pony-stage3-shy {
+  display: none;
+}
+
+/* =========================
+   STAGE 3 — BUTT WIGGLE SPARKLES
+   Shown while pony-butt.png is active
+========================= */
+
+.pony-stage3-butt-sparkles {
+  position: absolute;
+  left: 50%;
+  bottom: 55px;
+  z-index: 14;
+  width: 300px;
+  height: 250px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.pony-stage3-butt-sparkle {
+  position: absolute;
+  opacity: 0;
+  color: #ffffff;
+  line-height: 1;
+  text-shadow:
+    0 0 5px rgba(255, 255, 255, 1),
+    0 0 10px rgba(251, 191, 36, 0.95),
+    0 0 16px rgba(244, 114, 182, 0.9),
+    0 0 22px rgba(216, 180, 254, 0.82);
+  animation: ponyStage3ButtSparkle 700ms ease-in-out infinite;
+}
+
+/* Sparkles are concentrated around the rear / tail area. */
+.pony-stage3-butt-sparkle.sparkle-1 {
+  right: 48px;
+  top: 68px;
+  font-size: 28px;
+}
+
+.pony-stage3-butt-sparkle.sparkle-2 {
+  right: 92px;
+  top: 28px;
+  font-size: 20px;
+  animation-delay: 90ms;
+}
+
+.pony-stage3-butt-sparkle.sparkle-3 {
+  right: 18px;
+  top: 118px;
+  font-size: 24px;
+  animation-delay: 180ms;
+}
+
+.pony-stage3-butt-sparkle.sparkle-4 {
+  right: 78px;
+  bottom: 34px;
+  font-size: 22px;
+  animation-delay: 270ms;
+}
+
+.pony-stage3-butt-sparkle.sparkle-5 {
+  right: 128px;
+  top: 95px;
+  font-size: 17px;
+  animation-delay: 360ms;
+}
+
+.pony-stage3-butt-sparkle.sparkle-6 {
+  right: 34px;
+  bottom: 70px;
+  font-size: 18px;
+  animation-delay: 450ms;
+}
+
+/* =========================
+   STAGE 3 — COLOR TRANSFORMATION
+   Brown -> bright flash -> pastel magic pony
+========================= */
+
+.pony-stage3-transform-brown,
+.pony-stage3-transform-magic {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 320px;
+  height: 330px;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pony-stage3-transform-brown {
+  z-index: 9;
+  animation: ponyStage3BrownTransform 2.4s ease-in-out both;
+}
+
+.pony-stage3-transform-magic {
+  z-index: 10;
+  opacity: 0;
+  animation: ponyStage3MagicAppear 2.4s ease-in-out both;
+}
+
+.pony-stage3-transform-aura {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 11;
+  width: 330px;
+  height: 330px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(244, 114, 182, 0.8) 24%,
+      rgba(216, 180, 254, 0.75) 48%,
+      rgba(255, 255, 255, 0) 72%
+    );
+  mix-blend-mode: screen;
+  filter: blur(12px);
+  animation: ponyStage3TransformGlow 2.4s ease-in-out both;
+}
+
+.pony-stage3-transform-flash {
+  position: absolute;
+  inset: -80px;
+  z-index: 14;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.98) 24%,
+      rgba(244, 114, 182, 0.58) 45%,
+      rgba(216, 180, 254, 0.3) 62%,
+      transparent 78%
+    );
+  opacity: 0;
+  animation: ponyStage3Flash 2.4s ease-in-out both;
+}
+
+.pony-stage3-transform-sparkles {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.pony-stage3-transform-sparkles span {
+  position: absolute;
+  color: white;
+  opacity: 0;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 1),
+    0 0 16px rgba(244, 114, 182, 0.95),
+    0 0 24px rgba(216, 180, 254, 0.95);
+  animation: ponyStage3TransformSparkle 2.4s ease-out both;
+}
+
+.pony-stage3-transform-sparkles span:nth-child(1) {
+  left: 22%;
+  top: 18%;
+  font-size: 26px;
+  animation-delay: 0ms;
+}
+
+.pony-stage3-transform-sparkles span:nth-child(2) {
+  right: 20%;
+  top: 26%;
+  font-size: 22px;
+  animation-delay: 90ms;
+}
+
+.pony-stage3-transform-sparkles span:nth-child(3) {
+  left: 18%;
+  bottom: 30%;
+  font-size: 30px;
+  animation-delay: 160ms;
+}
+
+.pony-stage3-transform-sparkles span:nth-child(4) {
+  right: 22%;
+  bottom: 25%;
+  font-size: 24px;
+  animation-delay: 230ms;
+}
+
+.pony-stage3-transform-sparkles span:nth-child(5) {
+  left: 46%;
+  top: 8%;
+  font-size: 20px;
+  animation-delay: 310ms;
+}
+
+.pony-stage3-transform-sparkles span:nth-child(6) {
+  right: 35%;
+  bottom: 12%;
+  font-size: 28px;
+  animation-delay: 390ms;
+}
+
+/* =========================
+   STAGE 4 — DREAM UNICORN
+========================= */
+
+.pony-pet-stage-4 { overflow: visible; }
+
+.pony-stage4-normal,
+.pony-stage4-heart-eyes,
+.pony-stage4-horn,
+.pony-stage4-horn-love,
+.pony-stage4-transform-before,
+.pony-stage4-transform-after {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 340px;
+  height: 350px;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pony-stage4-normal,
+.pony-stage4-horn {
+  z-index: 6;
+  filter: drop-shadow(0 15px 12px rgba(0,0,0,.24));
+  animation: ponyStage4Idle 2.6s ease-in-out infinite;
+}
+
+.pony-stage4-horn {
+  filter: drop-shadow(0 15px 12px rgba(0,0,0,.24))
+          drop-shadow(0 0 20px rgba(167,139,250,.48));
+}
+
+.pony-stage4-heart-eyes {
+  z-index: 9;
+  filter: drop-shadow(0 15px 12px rgba(0,0,0,.22))
+          drop-shadow(0 0 18px rgba(244,114,182,.55));
+  animation: ponyStage4HeartEyes 650ms ease-in-out infinite alternate;
+}
+
+.pony-stage4-horn-love {
+  z-index: 9;
+  filter: drop-shadow(0 15px 12px rgba(0,0,0,.22))
+          drop-shadow(0 0 22px rgba(167,139,250,.5));
+  animation: ponyStage4HornLove 820ms ease-in-out infinite;
+}
+
+.pony-stage4-love-effects { position:absolute; inset:0; z-index:15; pointer-events:none; }
+.pony-stage4-love-heart,.pony-stage4-love-sparkle { position:absolute; opacity:0; line-height:1; }
+.pony-stage4-love-heart { font-size:25px; animation:ponyStage4LoveHeart 1.55s ease-out infinite; }
+.pony-stage4-love-heart.heart-1 { left:30%; bottom:105px; }
+.pony-stage4-love-heart.heart-2 { right:27%; bottom:125px; animation-delay:420ms; }
+.pony-stage4-love-heart.heart-3 { left:48%; bottom:75px; animation-delay:820ms; }
+.pony-stage4-love-sparkle {
+  color:white;
+  text-shadow:0 0 6px white,0 0 14px rgba(244,114,182,.95),0 0 22px rgba(167,139,250,.9);
+  animation:ponyStage4LoveSparkle 900ms ease-in-out infinite;
+}
+.love-sparkle-1 { left:24%; bottom:90px; font-size:26px; }
+.love-sparkle-2 { right:20%; bottom:105px; font-size:22px; animation-delay:180ms; }
+.love-sparkle-3 { left:37%; bottom:155px; font-size:18px; animation-delay:360ms; }
+.love-sparkle-4 { right:34%; bottom:175px; font-size:24px; animation-delay:540ms; }
+
+/* Stage 4 transformation: magical mist + aura + flash */
+.pony-stage4-transform-before,.pony-stage4-transform-after { z-index:8; }
+.pony-stage4-transform-before { animation:ponyStage4BeforeTransform 3.2s ease-in-out both; }
+.pony-stage4-transform-after { opacity:0; z-index:10; animation:ponyStage4AfterTransform 3.2s ease-in-out both; }
+
+.pony-stage4-transform-aura {
+  position:absolute; left:50%; top:50%; z-index:11;
+  width:350px; height:350px; border-radius:50%;
+  transform:translate(-50%,-50%); pointer-events:none;
+  background:radial-gradient(circle,rgba(255,255,255,.98),rgba(244,114,182,.65) 25%,rgba(167,139,250,.68) 48%,transparent 76%);
+  mix-blend-mode:screen; filter:blur(18px);
+  animation:ponyStage4TransformAura 3.2s ease-in-out both;
+}
+
+.pony-stage4-mist { position:absolute; inset:-30px; z-index:12; pointer-events:none; }
+.pony-stage4-mist-cloud {
+  position:absolute; border-radius:50%; opacity:0;
+  background:radial-gradient(ellipse,rgba(255,255,255,.9),rgba(233,213,255,.65) 30%,rgba(251,207,232,.38) 52%,transparent 74%);
+  filter:blur(22px); mix-blend-mode:screen;
+}
+.mist-1 { left:20px; bottom:20px; width:250px; height:115px; animation:ponyStage4MistLeft 3.2s ease-in-out both; }
+.mist-2 { right:10px; bottom:55px; width:270px; height:125px; animation:ponyStage4MistRight 3.2s ease-in-out both; }
+.mist-3 { left:80px; bottom:125px; width:290px; height:130px; animation:ponyStage4MistRise 3.2s ease-in-out both; }
+.mist-4 { left:125px; top:30px; width:220px; height:110px; animation:ponyStage4MistCrown 3.2s ease-in-out both; }
+
+.pony-stage4-transform-flash {
+  position:absolute; inset:-100px; z-index:16; opacity:0; pointer-events:none;
+  background:radial-gradient(circle,white,rgba(255,255,255,.98) 23%,rgba(233,213,255,.8) 42%,rgba(244,114,182,.45) 58%,transparent 78%);
+  mix-blend-mode:screen; animation:ponyStage4TransformFlash 3.2s ease-in-out both;
+}
+
+.pony-stage4-transform-sparkles { position:absolute; inset:0; z-index:17; pointer-events:none; }
+.pony-stage4-transform-sparkles span {
+  position:absolute; opacity:0; color:white;
+  text-shadow:0 0 7px white,0 0 16px rgba(244,114,182,.95),0 0 25px rgba(167,139,250,.95);
+  animation:ponyStage4TransformSparkle 3.2s ease-out both;
+}
+.pony-stage4-transform-sparkles span:nth-child(1){left:18%;top:25%;font-size:28px}
+.pony-stage4-transform-sparkles span:nth-child(2){right:17%;top:20%;font-size:23px;animation-delay:100ms}
+.pony-stage4-transform-sparkles span:nth-child(3){left:12%;bottom:30%;font-size:24px;animation-delay:180ms}
+.pony-stage4-transform-sparkles span:nth-child(4){right:15%;bottom:26%;font-size:30px;animation-delay:260ms}
+.pony-stage4-transform-sparkles span:nth-child(5){left:43%;top:8%;font-size:20px;animation-delay:340ms}
+.pony-stage4-transform-sparkles span:nth-child(6){right:35%;bottom:12%;font-size:27px;animation-delay:420ms}
+.pony-stage4-transform-sparkles span:nth-child(7){left:29%;top:44%;font-size:18px;animation-delay:500ms}
+.pony-stage4-transform-sparkles span:nth-child(8){right:28%;top:48%;font-size:21px;animation-delay:580ms}
+
+.pony-pet-stage-4 .pony-pet-image { bottom:0; width:340px; height:350px; }
+
+/* =========================
+   STAGE 5 — LEGENDARY ALICORN
+
+   0–27 XP:
+   pony.png = horned pony
+   gift = pony-flight-training.png
+
+   28 XP:
+   pony-transform.png + magical transformation
+
+   28+ XP:
+   pony-winged.png + separate left/right wings
+   gift = flying + faster wing flap
+========================= */
+
+.pony-pet-stage-5 {
+  overflow: visible;
+}
+
+.pony-stage5-normal,
+.pony-stage5-flight-training,
+.pony-stage5-transform-pony,
+.pony-stage5-winged-body {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 360px;
+  height: 370px;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pony-stage5-normal {
+  z-index: 7;
+  filter:
+    drop-shadow(0 15px 12px rgba(0, 0, 0, 0.24))
+    drop-shadow(0 0 20px rgba(216, 180, 254, 0.55));
+  animation: ponyStage5Idle 2.5s ease-in-out infinite;
+}
+
+/* Gift reaction before final evolution */
+.pony-stage5-flight-training {
+  z-index: 10;
+  filter:
+    drop-shadow(0 15px 12px rgba(0, 0, 0, 0.22))
+    drop-shadow(0 0 20px rgba(244, 114, 182, 0.55))
+    drop-shadow(0 0 28px rgba(216, 180, 254, 0.6));
+  animation: ponyStage5FlightTraining 900ms ease-in-out infinite;
+}
+
+.pony-stage5-training-sparkles {
+  position: absolute;
+  inset: 0;
+  z-index: 16;
+  pointer-events: none;
+}
+
+.pony-stage5-training-sparkles span {
+  position: absolute;
+  opacity: 0;
+  color: #fff;
+  text-shadow:
+    0 0 7px #fff,
+    0 0 15px rgba(244, 114, 182, 0.95),
+    0 0 24px rgba(216, 180, 254, 0.95);
+  animation: ponyStage5TrainingSparkle 1s ease-in-out infinite;
+}
+
+.pony-stage5-training-sparkles span:nth-child(1) {
+  left: 20%;
+  top: 30%;
+  font-size: 28px;
+}
+
+.pony-stage5-training-sparkles span:nth-child(2) {
+  right: 18%;
+  top: 22%;
+  font-size: 22px;
+  animation-delay: 180ms;
+}
+
+.pony-stage5-training-sparkles span:nth-child(3) {
+  left: 26%;
+  bottom: 22%;
+  font-size: 20px;
+  animation-delay: 360ms;
+}
+
+.pony-stage5-training-sparkles span:nth-child(4) {
+  right: 24%;
+  bottom: 28%;
+  font-size: 26px;
+  animation-delay: 540ms;
+}
+
+/* =========================
+   STAGE 5 — FINAL TRANSFORMATION
+========================= */
+
+.pony-stage5-transform-pony {
+  z-index: 10;
+  animation: ponyStage5TransformPony 4.4s ease-in-out both;
+}
+
+.pony-stage5-transform-aura {
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  z-index: 11;
+  width: 390px;
+  height: 390px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(18px);
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,255,255,1) 0%,
+      rgba(251,207,232,.82) 22%,
+      rgba(216,180,254,.8) 44%,
+      rgba(196,181,253,.48) 61%,
+      transparent 78%
+    );
+  animation: ponyStage5TransformAura 4.4s ease-in-out both;
+}
+
+.pony-stage5-transform-mist {
+  position: absolute;
+  inset: -45px;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.pony-stage5-mist {
+  position: absolute;
+  opacity: 0;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  filter: blur(25px);
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(255,255,255,.95),
+      rgba(233,213,255,.72) 31%,
+      rgba(251,207,232,.45) 54%,
+      transparent 76%
+    );
+}
+
+.pony-stage5-mist.mist-1 {
+  left: 0;
+  bottom: 15px;
+  width: 290px;
+  height: 130px;
+  animation: ponyStage5MistLeft 4.4s ease-in-out both;
+}
+
+.pony-stage5-mist.mist-2 {
+  right: -5px;
+  bottom: 65px;
+  width: 300px;
+  height: 135px;
+  animation: ponyStage5MistRight 4.4s ease-in-out both;
+}
+
+.pony-stage5-mist.mist-3 {
+  left: 75px;
+  bottom: 145px;
+  width: 320px;
+  height: 145px;
+  animation: ponyStage5MistRise 4.4s ease-in-out both;
+}
+
+.pony-stage5-mist.mist-4 {
+  left: 120px;
+  top: 5px;
+  width: 245px;
+  height: 120px;
+  animation: ponyStage5MistCrown 4.4s ease-in-out both;
+}
+
+/* Light silhouettes suggesting wings before the final reveal */
+.pony-stage5-wing-light {
+  position: absolute;
+  inset: 0;
+  z-index: 13;
+  pointer-events: none;
+}
+
+.pony-stage5-wing-light-left,
+.pony-stage5-wing-light-right {
+  position: absolute;
+  top: 92px;
+  width: 145px;
+  height: 205px;
+  opacity: 0;
+  border-radius: 75% 20% 70% 25%;
+  filter: blur(14px);
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255,255,255,.98),
+      rgba(216,180,254,.78) 42%,
+      rgba(244,114,182,.38) 64%,
+      transparent 78%
+    );
+  animation: ponyStage5WingLight 4.4s ease-in-out both;
+}
+
+.pony-stage5-wing-light-left {
+  left: 42px;
+  transform: rotate(-32deg);
+  transform-origin: 100% 70%;
+}
+
+.pony-stage5-wing-light-right {
+  right: 42px;
+  transform: rotate(32deg);
+  transform-origin: 0 70%;
+}
+
+.pony-stage5-transform-flash {
+  position: absolute;
+  inset: -120px;
+  z-index: 18;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,255,255,1) 0%,
+      rgba(255,255,255,1) 22%,
+      rgba(233,213,255,.9) 39%,
+      rgba(244,114,182,.56) 57%,
+      rgba(216,180,254,.28) 68%,
+      transparent 80%
+    );
+  animation: ponyStage5TransformFlash 4.4s ease-in-out both;
+}
+
+.pony-stage5-transform-sparkles {
+  position: absolute;
+  inset: 0;
+  z-index: 19;
+  pointer-events: none;
+}
+
+.pony-stage5-transform-sparkles span {
+  position: absolute;
+  opacity: 0;
+  color: white;
+  text-shadow:
+    0 0 8px white,
+    0 0 18px rgba(244,114,182,.98),
+    0 0 28px rgba(167,139,250,.98);
+  animation: ponyStage5TransformSparkle 4.4s ease-out both;
+}
+
+.pony-stage5-transform-sparkles span:nth-child(1) { left:12%; top:23%; font-size:30px; }
+.pony-stage5-transform-sparkles span:nth-child(2) { right:12%; top:18%; font-size:24px; animation-delay:120ms; }
+.pony-stage5-transform-sparkles span:nth-child(3) { left:10%; bottom:25%; font-size:25px; animation-delay:240ms; }
+.pony-stage5-transform-sparkles span:nth-child(4) { right:13%; bottom:24%; font-size:31px; animation-delay:360ms; }
+.pony-stage5-transform-sparkles span:nth-child(5) { left:44%; top:4%; font-size:22px; animation-delay:480ms; }
+.pony-stage5-transform-sparkles span:nth-child(6) { right:31%; bottom:8%; font-size:28px; animation-delay:600ms; }
+.pony-stage5-transform-sparkles span:nth-child(7) { left:25%; top:45%; font-size:20px; animation-delay:720ms; }
+.pony-stage5-transform-sparkles span:nth-child(8) { right:24%; top:47%; font-size:23px; animation-delay:840ms; }
+
+/* Winged form appears at the end of the transformation */
+.pony-stage5-final-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 17;
+  opacity: 0;
+  pointer-events: none;
+  animation: ponyStage5FinalReveal 4.4s ease-in-out both;
+}
+
+/* =========================
+   STAGE 5 — WINGED ALICORN RIG
+========================= */
+
+.pony-stage5-alicorn-rig {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 430px;
+  height: 380px;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  animation: ponyStage5AlicornIdle 2.6s ease-in-out infinite;
+}
+
+.pony-stage5-final-reveal .pony-stage5-winged-body,
+.pony-stage5-alicorn-rig .pony-stage5-winged-body {
+  left: 50%;
+  bottom: 0;
+  z-index: 9;
+  width: 360px;
+  height: 370px;
+}
+
+.pony-stage5-wing {
+  position: absolute;
+  z-index: 7;
+  width: 185px;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  filter:
+    drop-shadow(0 0 15px rgba(255,255,255,.75))
+    drop-shadow(0 0 24px rgba(216,180,254,.62));
+}
+
+.pony-stage5-wing-left {
+  left: 34px;
+  top: 82px;
+  transform-origin: 88% 72%;
+  animation: ponyStage5WingFlapLeft 1.45s ease-in-out infinite;
+}
+
+.pony-stage5-wing-right {
+  right: 34px;
+  top: 82px;
+  transform-origin: 12% 72%;
+  animation: ponyStage5WingFlapRight 1.45s ease-in-out infinite;
+}
+
+.pony-stage5-alicorn-rig .pony-stage5-winged-body {
+  filter:
+    drop-shadow(0 15px 12px rgba(0,0,0,.22))
+    drop-shadow(0 0 20px rgba(216,180,254,.72))
+    drop-shadow(0 0 32px rgba(244,114,182,.48));
+}
+
+/* Gift reaction after final evolution */
+.pony-stage5-alicorn-flying {
+  animation: ponyStage5FlyAround 5.6s ease-in-out both;
+}
+
+.pony-stage5-alicorn-flying .pony-stage5-wing-left {
+  animation: ponyStage5WingFlapLeftFast 360ms ease-in-out infinite;
+}
+
+.pony-stage5-alicorn-flying .pony-stage5-wing-right {
+  animation: ponyStage5WingFlapRightFast 360ms ease-in-out infinite;
+}
+
+.pony-stage5-flight-effects {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.pony-stage5-flight-sparkle,
+.pony-stage5-flight-heart {
+  position: absolute;
+  opacity: 0;
+  line-height: 1;
+}
+
+.pony-stage5-flight-sparkle {
+  color: white;
+  text-shadow:
+    0 0 7px white,
+    0 0 16px rgba(244,114,182,.95),
+    0 0 25px rgba(167,139,250,.95);
+  animation: ponyStage5FlightSparkle 1.15s ease-out infinite;
+}
+
+.flight-sparkle-1 { left:12%; top:30%; font-size:28px; }
+.flight-sparkle-2 { right:10%; top:24%; font-size:22px; animation-delay:320ms; }
+.flight-sparkle-3 { left:28%; bottom:14%; font-size:24px; animation-delay:640ms; }
+
+.pony-stage5-flight-heart {
+  font-size: 25px;
+  animation: ponyStage5FlightHeart 1.65s ease-out infinite;
+}
+
+.flight-heart-1 { right:20%; bottom:90px; animation-delay:150ms; }
+.flight-heart-2 { left:22%; bottom:120px; animation-delay:780ms; }
+
+/* Old generic Stage 5 fallback */
+.pony-pet-stage-5 .pony-pet-image {
+  bottom: -2px;
+  width: 360px;
+  height: 370px;
+  filter:
+    drop-shadow(0 15px 12px rgba(0, 0, 0, 0.24))
+    drop-shadow(0 0 20px rgba(216, 180, 254, 0.8))
+    drop-shadow(0 0 32px rgba(244, 114, 182, 0.55));
+}
+
+/* =========================
+   MAGIC GLOW
+========================= */
+
+.pony-pet-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 1;
+  width: 290px;
+  height: 270px;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(216, 180, 254, 0.45) 34%,
+      rgba(244, 114, 182, 0.2) 58%,
+      transparent 76%
+    );
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.pony-pet-stage-4 .pony-pet-glow {
+  opacity: 0.58;
+  animation: ponyPetGlow 2.2s ease-in-out infinite alternate;
+}
+
+.pony-pet-stage-5 .pony-pet-glow {
+  opacity: 0.92;
+  animation: ponyPetLegendaryGlow 1.35s ease-in-out infinite alternate;
+}
+
+/* =========================
+   SPARKLES
+========================= */
+
+.pony-pet-sparkles {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.pony-pet-sparkle {
+  position: absolute;
+  opacity: 0;
+  color: #f5d0fe;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 1),
+    0 0 14px rgba(244, 114, 182, 0.9);
+  animation: ponyPetSparkle 1.8s ease-in-out infinite;
+}
+
+.pony-pet-sparkle-1 {
+  left: 85px;
+  top: 80px;
+  font-size: 28px;
+}
+
+.pony-pet-sparkle-2 {
+  right: 75px;
+  top: 125px;
+  font-size: 22px;
+  animation-delay: 350ms;
+}
+
+.pony-pet-sparkle-3 {
+  left: 125px;
+  bottom: 85px;
+  font-size: 20px;
+  animation-delay: 720ms;
+}
+
+.pony-pet-sparkle-4 {
+  right: 105px;
+  bottom: 115px;
+  font-size: 26px;
+  animation-delay: 980ms;
+}
+
+/* =========================
+   STATES
+========================= */
+
+.pony-pet-state-walk .pony-pet-image {
+  animation: ponyPetWalk 520ms ease-in-out infinite alternate;
+}
+
+.pony-pet-state-eat .pony-pet-image {
+  animation: ponyPetEat 420ms ease-in-out infinite alternate;
+}
+
+.pony-pet-state-happy .pony-pet-image {
+  animation: ponyPetHappy 520ms ease-in-out infinite alternate;
+}
+
+.pony-pet-state-sleep .pony-pet-image {
+  animation: ponyPetSleep 3.4s ease-in-out infinite;
+}
+
+.pony-pet-state-evolve .pony-pet-image {
+  animation: ponyPetEvolve 650ms ease-in-out infinite alternate;
+  filter:
+    brightness(1.15)
+    drop-shadow(0 0 25px rgba(216, 180, 254, 1))
+    drop-shadow(0 0 42px rgba(244, 114, 182, 0.8));
+}
+
+.pony-pet-state-evolve .pony-pet-glow {
+  opacity: 1;
+  animation: ponyPetEvolutionGlow 650ms ease-in-out infinite alternate;
+}
+
+/* =========================
+   STAGE 1 ANIMATIONS
+========================= */
+
+@keyframes ponyHaystackIdle {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-3px) rotate(1deg);
+  }
+}
+
+@keyframes ponyHaystackGiftShake {
+  from {
+    transform: translateX(-50%) translateY(0) rotate(-3deg);
+  }
+
+  to {
+    transform: translateX(-50%) translateY(-7px) rotate(3deg);
+  }
+}
+
+@keyframes ponyHaystackGiftShakeFast {
+  from {
+    transform: translateX(calc(-50% - 3px)) translateY(0) rotate(-4deg);
+  }
+
+  to {
+    transform: translateX(calc(-50% + 3px)) translateY(-8px) rotate(4deg);
+  }
+}
+
+@keyframes ponyHaystackSleep {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(2px) rotate(-2deg)
+      scaleX(1.01) scaleY(0.99);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(4px) rotate(-2.5deg)
+      scaleX(1.02) scaleY(0.975);
+  }
+}
+
+@keyframes ponyPeekIdle {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(8px);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes ponyPeekHappy {
+  from {
+    transform: translateX(-50%) translateY(8px) rotate(-3deg);
+  }
+
+  to {
+    transform: translateX(-50%) translateY(-5px) rotate(3deg);
+  }
+}
+
+@keyframes ponyPeekSleep {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(11px) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(8px) rotate(1deg);
+  }
+}
+
+@keyframes ponyStage1MagicGlow {
+  from {
+    transform: translateX(-50%) scale(0.9);
+    opacity: 0.12;
+  }
+
+  to {
+    transform: translateX(-50%) scale(1.1);
+    opacity: 0.32;
+  }
+}
+
+@keyframes ponyStage1Evolve {
+  from {
+    transform: translateX(-50%) translateY(-4px) scale(0.96);
+    filter: brightness(1);
+  }
+
+  to {
+    transform: translateX(-50%) translateY(-24px) scale(1.06);
+    filter:
+      brightness(1.18)
+      drop-shadow(0 0 22px rgba(216, 180, 254, 0.95));
+  }
+}
+
+/* =========================
+   STAGE 2 ANIMATIONS
+========================= */
+
+@keyframes ponyStage2Idle {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-4px) rotate(1deg);
+  }
+}
+
+@keyframes ponyStage2KissDance {
+  0% {
+    transform:
+      translateX(-50%)
+      translateY(0)
+      rotate(0deg)
+      scale(1);
+  }
+
+  20% {
+    transform:
+      translateX(calc(-50% - 28px))
+      translateY(-30px)
+      rotate(-8deg)
+      scale(1.05);
+  }
+
+  40% {
+    transform:
+      translateX(calc(-50% + 20px))
+      translateY(-10px)
+      rotate(6deg)
+      scale(1.01);
+  }
+
+  60% {
+    transform:
+      translateX(calc(-50% + 30px))
+      translateY(-34px)
+      rotate(8deg)
+      scale(1.06);
+  }
+
+  80% {
+    transform:
+      translateX(calc(-50% - 18px))
+      translateY(-12px)
+      rotate(-5deg)
+      scale(1.02);
+  }
+
+  100% {
+    transform:
+      translateX(-50%)
+      translateY(0)
+      rotate(0deg)
+      scale(1);
+  }
+}
+
+@keyframes ponyStage2KissPop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px) scale(0.88);
+  }
+
+  65% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px) scale(1.06);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes ponyMouthHeart {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.35) rotate(-8deg);
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  60% {
+    opacity: 1;
+    transform: translate(24px, -42px) scale(0.95) rotate(8deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(46px, -86px) scale(1.3) rotate(18deg);
+  }
+}
+
+/* =========================
+   STAGE 3 ANIMATIONS
+========================= */
+
+@keyframes ponyStage3BrownIdle {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-5px) rotate(1deg);
+  }
+}
+
+/*
+ * pony-butt.png:
+ * happy rear-view wiggle after receiving a gift.
+ */
+@keyframes ponyStage3ButtWiggle {
+  0% {
+    transform:
+      translateX(calc(-50% - 24px))
+      translateY(0)
+      rotate(-5deg)
+      scale(1);
+  }
+
+  25% {
+    transform:
+      translateX(calc(-50% + 12px))
+      translateY(-13px)
+      rotate(4deg)
+      scale(1.035);
+  }
+
+  50% {
+    transform:
+      translateX(calc(-50% + 28px))
+      translateY(0)
+      rotate(6deg)
+      scale(1);
+  }
+
+  75% {
+    transform:
+      translateX(calc(-50% - 10px))
+      translateY(-13px)
+      rotate(-4deg)
+      scale(1.035);
+  }
+
+  100% {
+    transform:
+      translateX(calc(-50% - 24px))
+      translateY(0)
+      rotate(-5deg)
+      scale(1);
+  }
+}
+
+/*
+ * pony-shy.png:
+ * runs left/right bashfully after the pastel transformation.
+ */
+@keyframes ponyStage3ShyRun {
+  0% {
+    transform:
+      translateX(-50%)
+      translateY(0)
+      rotate(0deg)
+      scale(1);
+  }
+
+  12% {
+    transform:
+      translateX(calc(-50% - 34px))
+      translateY(-16px)
+      rotate(-5deg)
+      scale(1.02);
+  }
+
+  25% {
+    transform:
+      translateX(calc(-50% + 28px))
+      translateY(-8px)
+      rotate(4deg)
+      scale(1);
+  }
+
+  38% {
+    transform:
+      translateX(calc(-50% + 52px))
+      translateY(-20px)
+      rotate(6deg)
+      scale(1.03);
+  }
+
+  52% {
+    transform:
+      translateX(calc(-50% - 18px))
+      translateY(-10px)
+      rotate(-3deg)
+      scale(1.01);
+  }
+
+  66% {
+    transform:
+      translateX(calc(-50% - 48px))
+      translateY(-22px)
+      rotate(-6deg)
+      scale(1.03);
+  }
+
+  80% {
+    transform:
+      translateX(calc(-50% + 22px))
+      translateY(-9px)
+      rotate(4deg)
+      scale(1.01);
+  }
+
+  92% {
+    transform:
+      translateX(calc(-50% + 10px))
+      translateY(-14px)
+      rotate(2deg)
+      scale(1.02);
+  }
+
+  100% {
+    transform:
+      translateX(-50%)
+      translateY(0)
+      rotate(0deg)
+      scale(1);
+  }
+}
+
+@keyframes ponyStage3ButtSparkle {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) rotate(0deg) scale(0.25);
+  }
+
+  22% {
+    opacity: 1;
+    transform: translateY(1px) rotate(35deg) scale(0.95);
+  }
+
+  48% {
+    opacity: 1;
+    transform: translateY(-7px) rotate(85deg) scale(1.3);
+  }
+
+  72% {
+    opacity: 0.85;
+    transform: translateY(-14px) rotate(135deg) scale(0.9);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-27px) rotate(190deg) scale(0.3);
+  }
+}
+
+/* =========================
+   STAGE 3 TRANSFORMATION ANIMATIONS
+========================= */
+
+@keyframes ponyStage3BrownTransform {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+    filter:
+      brightness(1)
+      drop-shadow(0 15px 12px rgba(0, 0, 0, 0.24));
+  }
+
+  45% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px) scale(1.04);
+    filter:
+      brightness(1.55)
+      saturate(1.15)
+      drop-shadow(0 0 18px rgba(244, 114, 182, 0.65))
+      drop-shadow(0 0 28px rgba(216, 180, 254, 0.6));
+  }
+
+  68% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-12px) scale(1.09);
+    filter:
+      brightness(2.6)
+      saturate(0.7)
+      drop-shadow(0 0 28px rgba(255, 255, 255, 1))
+      drop-shadow(0 0 42px rgba(216, 180, 254, 0.95));
+  }
+
+  78% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-18px) scale(1.14);
+    filter: brightness(4);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.92);
+    filter: brightness(4);
+  }
+}
+
+@keyframes ponyStage3MagicAppear {
+  0%,
+  66% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.76);
+    filter: brightness(3) blur(8px);
+  }
+
+  76% {
+    opacity: 0.2;
+    transform: translateX(-50%) translateY(-12px) scale(0.9);
+    filter: brightness(2.5) blur(5px);
+  }
+
+  84% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-14px) scale(1.1);
+    filter:
+      brightness(1.8)
+      blur(0)
+      drop-shadow(0 0 28px rgba(255, 255, 255, 0.95))
+      drop-shadow(0 0 36px rgba(244, 114, 182, 0.78))
+      drop-shadow(0 0 44px rgba(216, 180, 254, 0.75));
+  }
+
+  92% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px) scale(0.98);
+    filter:
+      brightness(1.25)
+      drop-shadow(0 0 20px rgba(244, 114, 182, 0.5))
+      drop-shadow(0 0 26px rgba(216, 180, 254, 0.5));
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes ponyStage3TransformGlow {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.45);
+    filter: blur(18px);
+  }
+
+  28% {
+    opacity: 0.45;
+  }
+
+  58% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.05);
+    filter: blur(14px);
+  }
+
+  74% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.55);
+    filter: blur(22px);
+  }
+
+  84% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.9);
+    filter: blur(30px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.15);
+    filter: blur(34px);
+  }
+}
+
+@keyframes ponyStage3Flash {
+  0%,
+  56% {
+    opacity: 0;
+  }
+
+  66% {
+    opacity: 0.35;
+  }
+
+  73% {
+    opacity: 1;
+  }
+
+  79% {
+    opacity: 1;
+  }
+
+  86% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ponyStage3TransformSparkle {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateY(22px) rotate(0deg) scale(0.25);
+  }
+
+  42% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(-18px) rotate(110deg) scale(1.15);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) rotate(220deg) scale(0.5);
+  }
+}
+
+/* =========================
+   STAGE 4 ANIMATIONS
+========================= */
+@keyframes ponyStage4Idle {
+  0%,100%{transform:translateX(-50%) translateY(0) rotate(-1deg)}
+  50%{transform:translateX(-50%) translateY(-5px) rotate(1deg)}
+}
+@keyframes ponyStage4HeartEyes {
+  from{transform:translateX(-50%) translateY(0) rotate(-3deg) scale(1)}
+  to{transform:translateX(-50%) translateY(-15px) rotate(3deg) scale(1.04)}
+}
+@keyframes ponyStage4HornLove {
+  0%,100%{transform:translateX(-50%) translateY(0) rotate(-2deg)}
+  25%{transform:translateX(calc(-50% - 13px)) translateY(-7px) rotate(-4deg) scale(1.025)}
+  50%{transform:translateX(-50%) translateY(-3px) rotate(2deg) scaleX(1.035) scaleY(.98)}
+  75%{transform:translateX(calc(-50% + 13px)) translateY(-8px) rotate(4deg) scale(1.025)}
+}
+@keyframes ponyStage4LoveHeart {
+  0%{opacity:0;transform:translateY(10px) scale(.35)}
+  20%,65%{opacity:1}
+  65%{transform:translateY(-48px) translateX(10px) scale(1)}
+  100%{opacity:0;transform:translateY(-95px) translateX(20px) scale(1.35)}
+}
+@keyframes ponyStage4LoveSparkle {
+  0%,100%{opacity:0;transform:translateY(8px) rotate(0) scale(.3)}
+  35%{opacity:1;transform:translateY(0) rotate(60deg) scale(1.15)}
+  70%{opacity:.9;transform:translateY(-15px) rotate(130deg) scale(.85)}
+}
+@keyframes ponyStage4BeforeTransform {
+  0%,38%{opacity:1;transform:translateX(-50%) scale(1);filter:brightness(1)}
+  58%{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1.05);filter:brightness(1.6)}
+  72%{opacity:.9;transform:translateX(-50%) translateY(-16px) scale(1.1);filter:brightness(3.2) blur(2px)}
+  80%,100%{opacity:0;transform:translateX(-50%) translateY(-18px) scale(1.14);filter:brightness(4) blur(5px)}
+}
+@keyframes ponyStage4AfterTransform {
+  0%,72%{opacity:0;transform:translateX(-50%) scale(.72);filter:brightness(3.5) blur(9px)}
+  80%{opacity:.35;transform:translateX(-50%) translateY(-14px) scale(.9);filter:brightness(2.5) blur(5px)}
+  88%{opacity:1;transform:translateX(-50%) translateY(-18px) scale(1.1);filter:brightness(1.65) drop-shadow(0 0 38px rgba(167,139,250,.9))}
+  100%{opacity:1;transform:translateX(-50%) scale(1);filter:brightness(1)}
+}
+@keyframes ponyStage4TransformAura {
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}
+  32%{opacity:.35} 60%{opacity:.9;transform:translate(-50%,-50%) scale(1.05)}
+  76%{opacity:1;transform:translate(-50%,-50%) scale(1.65)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(2.15)}
+}
+@keyframes ponyStage4MistLeft {
+  0%,12%{opacity:0;transform:translate(-55px,30px) scale(.65)}
+  42%{opacity:.75} 72%{opacity:.95;transform:translate(55px,-30px) scale(1.2)}
+  100%{opacity:0;transform:translate(105px,-75px) scale(1.5)}
+}
+@keyframes ponyStage4MistRight {
+  0%,8%{opacity:0;transform:translate(65px,35px) scale(.7)}
+  38%{opacity:.7} 72%{opacity:.95;transform:translate(-60px,-40px) scale(1.25)}
+  100%{opacity:0;transform:translate(-115px,-85px) scale(1.55)}
+}
+@keyframes ponyStage4MistRise {
+  0%,18%{opacity:0;transform:translateY(70px) scale(.6)}
+  48%{opacity:.8} 75%{opacity:.9;transform:translateY(-25px) scale(1.25)}
+  100%{opacity:0;transform:translateY(-110px) scale(1.6)}
+}
+@keyframes ponyStage4MistCrown {
+  0%,28%{opacity:0;transform:translateY(45px) scale(.55)}
+  60%{opacity:.7} 82%{opacity:.85;transform:translateY(-18px) scale(1.15)}
+  100%{opacity:0;transform:translateY(-65px) scale(1.45)}
+}
+@keyframes ponyStage4TransformFlash {
+  0%,60%{opacity:0} 70%{opacity:.28} 76%{opacity:1} 82%{opacity:.95} 90%{opacity:.2} 100%{opacity:0}
+}
+@keyframes ponyStage4TransformSparkle {
+  0%,12%{opacity:0;transform:translateY(28px) rotate(0) scale(.2)}
+  40%{opacity:1}
+  72%{opacity:1;transform:translateY(-24px) rotate(120deg) scale(1.25)}
+  100%{opacity:0;transform:translateY(-78px) rotate(240deg) scale(.45)}
+}
+
+/* =========================
+   STAGE 5 ANIMATIONS
+========================= */
+
+@keyframes ponyStage5Idle {
+  0%,100% {
+    transform: translateX(-50%) translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-6px) rotate(1deg);
+  }
+}
+
+@keyframes ponyStage5FlightTraining {
+  0%,100% {
+    transform: translateX(-50%) translateY(0) rotate(-3deg) scale(1);
+  }
+  25% {
+    transform: translateX(calc(-50% - 14px)) translateY(-22px) rotate(-7deg) scale(1.03);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-38px) rotate(1deg) scale(1.055);
+  }
+  75% {
+    transform: translateX(calc(-50% + 14px)) translateY(-18px) rotate(7deg) scale(1.03);
+  }
+}
+
+@keyframes ponyStage5TrainingSparkle {
+  0%,100% {
+    opacity: 0;
+    transform: translateY(12px) rotate(0) scale(.25);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(0) rotate(70deg) scale(1.1);
+  }
+  70% {
+    opacity: .9;
+    transform: translateY(-22px) rotate(145deg) scale(.8);
+  }
+}
+
+@keyframes ponyStage5TransformPony {
+  0%,30% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-12px) scale(1.05);
+    filter:
+      brightness(1.6)
+      drop-shadow(0 0 22px rgba(216,180,254,.8));
+  }
+  67% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-24px) scale(1.11);
+    filter:
+      brightness(3)
+      blur(1px)
+      drop-shadow(0 0 38px rgba(255,255,255,1));
+  }
+  76%,100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-28px) scale(1.17);
+    filter: brightness(4.5) blur(6px);
+  }
+}
+
+@keyframes ponyStage5TransformAura {
+  0% {
+    opacity: 0;
+    transform: translate(-50%,-50%) scale(.3);
+  }
+  28% { opacity: .4; }
+  55% {
+    opacity: .92;
+    transform: translate(-50%,-50%) scale(1.05);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(-50%,-50%) scale(1.65);
+  }
+  88% {
+    opacity: .8;
+    transform: translate(-50%,-50%) scale(2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%,-50%) scale(2.35);
+  }
+}
+
+@keyframes ponyStage5MistLeft {
+  0%,8% { opacity:0; transform:translate(-70px,45px) scale(.55); }
+  38% { opacity:.75; }
+  68% { opacity:.98; transform:translate(65px,-35px) scale(1.25); }
+  100% { opacity:0; transform:translate(125px,-105px) scale(1.7); }
+}
+
+@keyframes ponyStage5MistRight {
+  0%,5% { opacity:0; transform:translate(75px,45px) scale(.6); }
+  35% { opacity:.72; }
+  70% { opacity:.98; transform:translate(-70px,-45px) scale(1.3); }
+  100% { opacity:0; transform:translate(-130px,-110px) scale(1.75); }
+}
+
+@keyframes ponyStage5MistRise {
+  0%,14% { opacity:0; transform:translateY(85px) scale(.55); }
+  42% { opacity:.82; }
+  72% { opacity:.95; transform:translateY(-35px) scale(1.3); }
+  100% { opacity:0; transform:translateY(-135px) scale(1.75); }
+}
+
+@keyframes ponyStage5MistCrown {
+  0%,24% { opacity:0; transform:translateY(55px) scale(.5); }
+  55% { opacity:.75; }
+  78% { opacity:.9; transform:translateY(-25px) scale(1.2); }
+  100% { opacity:0; transform:translateY(-85px) scale(1.55); }
+}
+
+@keyframes ponyStage5WingLight {
+  0%,38% { opacity:0; filter:blur(18px); }
+  55% { opacity:.25; }
+  68% { opacity:.95; filter:blur(10px); }
+  78% { opacity:1; filter:blur(18px); }
+  90%,100% { opacity:0; filter:blur(28px); }
+}
+
+@keyframes ponyStage5TransformFlash {
+  0%,55% { opacity:0; }
+  64% { opacity:.25; }
+  71% { opacity:1; }
+  77% { opacity:1; }
+  84% { opacity:.35; }
+  100% { opacity:0; }
+}
+
+@keyframes ponyStage5TransformSparkle {
+  0%,12% {
+    opacity:0;
+    transform:translateY(30px) rotate(0) scale(.2);
+  }
+  40% { opacity:1; }
+  70% {
+    opacity:1;
+    transform:translateY(-30px) rotate(125deg) scale(1.3);
+  }
+  100% {
+    opacity:0;
+    transform:translateY(-95px) rotate(250deg) scale(.4);
+  }
+}
+
+@keyframes ponyStage5FinalReveal {
+  0%,72% {
+    opacity:0;
+    transform:translateY(15px) scale(.72);
+    filter:brightness(3.5) blur(8px);
+  }
+  80% {
+    opacity:.35;
+    transform:translateY(-14px) scale(.9);
+    filter:brightness(2.5) blur(4px);
+  }
+  88% {
+    opacity:1;
+    transform:translateY(-20px) scale(1.08);
+    filter:
+      brightness(1.55)
+      drop-shadow(0 0 38px rgba(216,180,254,.95));
+  }
+  100% {
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:brightness(1);
+  }
+}
+
+@keyframes ponyStage5AlicornIdle {
+  0%,100% {
+    transform:translateX(-50%) translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform:translateX(-50%) translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes ponyStage5WingFlapLeft {
+  0%,100% { transform:rotate(-8deg) scaleY(1); }
+  50% { transform:rotate(17deg) scaleY(.82); }
+}
+
+@keyframes ponyStage5WingFlapRight {
+  0%,100% { transform:rotate(8deg) scaleY(1); }
+  50% { transform:rotate(-17deg) scaleY(.82); }
+}
+
+@keyframes ponyStage5WingFlapLeftFast {
+  0%,100% { transform:rotate(-15deg) scaleY(1.04); }
+  50% { transform:rotate(27deg) scaleY(.72); }
+}
+
+@keyframes ponyStage5WingFlapRightFast {
+  0%,100% { transform:rotate(15deg) scaleY(1.04); }
+  50% { transform:rotate(-27deg) scaleY(.72); }
+}
+
+@keyframes ponyStage5FlyAround {
+  0% {
+    transform:translateX(-50%) translateY(0) rotate(0) scale(1);
+  }
+  12% {
+    transform:translateX(calc(-50% - 48px)) translateY(-42px) rotate(-7deg) scale(1.02);
+  }
+  25% {
+    transform:translateX(calc(-50% + 22px)) translateY(-72px) rotate(4deg) scale(1.05);
+  }
+  38% {
+    transform:translateX(calc(-50% + 65px)) translateY(-42px) rotate(8deg) scale(1.03);
+  }
+  52% {
+    transform:translateX(calc(-50% + 12px)) translateY(-88px) rotate(1deg) scale(1.07);
+  }
+  66% {
+    transform:translateX(calc(-50% - 62px)) translateY(-52px) rotate(-8deg) scale(1.04);
+  }
+  80% {
+    transform:translateX(calc(-50% - 18px)) translateY(-76px) rotate(-3deg) scale(1.05);
+  }
+  92% {
+    transform:translateX(calc(-50% + 28px)) translateY(-28px) rotate(4deg) scale(1.02);
+  }
+  100% {
+    transform:translateX(-50%) translateY(0) rotate(0) scale(1);
+  }
+}
+
+@keyframes ponyStage5FlightSparkle {
+  0% {
+    opacity:0;
+    transform:translateY(15px) rotate(0) scale(.25);
+  }
+  30% { opacity:1; }
+  65% {
+    opacity:1;
+    transform:translateY(-25px) rotate(115deg) scale(1.2);
+  }
+  100% {
+    opacity:0;
+    transform:translateY(-65px) rotate(220deg) scale(.45);
+  }
+}
+
+@keyframes ponyStage5FlightHeart {
+  0% {
+    opacity:0;
+    transform:translateY(12px) scale(.3) rotate(-8deg);
+  }
+  22%,62% { opacity:1; }
+  65% {
+    transform:translateY(-48px) translateX(12px) scale(1) rotate(8deg);
+  }
+  100% {
+    opacity:0;
+    transform:translateY(-95px) translateX(25px) scale(1.35) rotate(18deg);
+  }
+}
+
+/* =========================
+   GENERAL ANIMATIONS
+========================= */
+
+@keyframes ponyPetIdle {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-4px) rotate(1deg);
+  }
+}
+
+@keyframes ponyPetWalk {
+  from {
+    transform: translateX(-50%) translateY(0) rotate(-2deg);
+  }
+
+  to {
+    transform: translateX(-50%) translateY(-12px) rotate(2deg);
+  }
+}
+
+@keyframes ponyPetEat {
+  from {
+    transform: translateX(-50%) translateY(0) rotate(-1deg) scaleY(1);
+  }
+
+  to {
+    transform: translateX(-50%) translateY(5px) rotate(1deg) scaleY(0.98);
+  }
+}
+
+@keyframes ponyPetHappy {
+  from {
+    transform: translateX(-50%) translateY(0) rotate(-2deg) scale(1);
+  }
+
+  to {
+    transform: translateX(-50%) translateY(-19px) rotate(2deg) scale(1.035);
+  }
+}
+
+@keyframes ponyPetSleep {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(4px) rotate(-4deg)
+      scaleX(1.01) scaleY(0.99);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(7px) rotate(-5deg)
+      scaleX(1.025) scaleY(0.975);
+  }
+}
+
+@keyframes ponyPetEvolve {
+  from {
+    transform: translateX(-50%) translateY(-5px) scale(0.96);
+  }
+
+  to {
+    transform: translateX(-50%) translateY(-28px) scale(1.06);
+  }
+}
+
+@keyframes ponyPetGlow {
+  from {
+    transform: translateX(-50%) scale(0.9);
+    opacity: 0.4;
+  }
+
+  to {
+    transform: translateX(-50%) scale(1.08);
+    opacity: 0.72;
+  }
+}
+
+@keyframes ponyPetLegendaryGlow {
+  from {
+    transform: translateX(-50%) scale(0.92);
+    opacity: 0.68;
+  }
+
+  to {
+    transform: translateX(-50%) scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes ponyPetEvolutionGlow {
+  from {
+    transform: translateX(-50%) scale(1);
+    filter: blur(18px);
+  }
+
+  to {
+    transform: translateX(-50%) scale(1.45);
+    filter: blur(28px);
+  }
+}
+
+@keyframes ponyPetSparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(12px) rotate(0deg) scale(0.45);
+  }
+
+  38% {
+    opacity: 1;
+  }
+
+  68% {
+    opacity: 0.9;
+    transform: translateY(-14px) rotate(90deg) scale(1.1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-28px) rotate(180deg) scale(0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pony-pet-rig,
+  .pony-pet-rig * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,1108 @@
+/* =========================================================
+   HUSKY PET
+   Stage 1-5 = Full-frame animation system
+   ========================================================= */
+
+
+/* =========================================================
+   LEGACY HUSKY RIG — STAGE 3-5
+   ========================================================= */
+
+.husky-pet-rig {
+  position: relative;
+  overflow: visible;
+}
+
+.husky-pet-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  width: 245px;
+  height: 34px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  filter: blur(12px);
+  z-index: 1;
+}
+
+.husky-pet-tail-layer {
+  position: absolute;
+  left: 278px;
+  bottom: 54px;
+  width: 145px;
+  height: 205px;
+  z-index: 2;
+  transform-origin: 20% 82%;
+  animation: huskyPetTailIdle 2.4s ease-in-out infinite alternate;
+}
+
+.husky-pet-body-layer {
+  position: absolute;
+  left: 82px;
+  bottom: 24px;
+  width: 270px;
+  height: 285px;
+  z-index: 3;
+  transform-origin: 50% 100%;
+  animation: huskyPetBodyBreath 2.8s ease-in-out infinite;
+}
+
+.husky-pet-scarf-layer {
+  position: absolute;
+  left: 120px;
+  top: 174px;
+  width: 180px;
+  height: 126px;
+  z-index: 7;
+  transform-origin: 50% 20%;
+  animation: huskyPetScarfBreath 2.8s ease-in-out infinite;
+}
+
+.husky-pet-head-group {
+  position: absolute;
+  left: 78px;
+  top: 50px;
+  width: 276px;
+  height: 250px;
+  z-index: 7;
+  transform-origin: 50% 72%;
+  animation: huskyPetHeadIdle 3.2s ease-in-out infinite;
+}
+
+.husky-pet-head-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.husky-pet-ear {
+  position: absolute;
+  top: -28px;
+  width: 92px;
+  height: 120px;
+  z-index: 2;
+  transform-origin: 50% 100%;
+}
+
+.husky-pet-ear-left {
+  left: 22px;
+  animation: huskyPetEarLeft 3.4s ease-in-out infinite;
+}
+
+.husky-pet-ear-right {
+  right: 22px;
+  animation: huskyPetEarRight 3.7s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   STAGE 3 — YOUNG HUSKY
+   ========================================================= */
+
+.husky-pet-stage-3 .husky-pet-body-layer {
+  left: 76px;
+  bottom: 22px;
+  width: 282px;
+  height: 300px;
+}
+
+.husky-pet-stage-3 .husky-pet-head-group {
+  left: 84px;
+  top: 46px;
+  width: 266px;
+  height: 242px;
+}
+
+.husky-pet-stage-3 .husky-pet-head-layer {
+  inset: 0;
+}
+
+.husky-pet-stage-3 .husky-pet-ear {
+  top: -30px;
+  width: 96px;
+  height: 124px;
+}
+
+.husky-pet-stage-3 .husky-pet-ear-left {
+  left: 20px;
+}
+
+.husky-pet-stage-3 .husky-pet-ear-right {
+  right: 20px;
+}
+
+.husky-pet-stage-3 .husky-pet-tail-layer {
+  left: 292px;
+  bottom: 54px;
+  width: 158px;
+  height: 225px;
+  transform-origin: 20% 82%;
+}
+
+.husky-pet-stage-3 .husky-pet-scarf-layer {
+  left: 108px;
+  top: 220px;
+  width: 210px;
+  height: 148px;
+  z-index: 6;
+}
+
+
+/* =========================================================
+   STAGE 4 — ROYAL HUSKY
+   ========================================================= */
+
+.husky-pet-stage-4 .husky-pet-body-layer {
+  left: 70px;
+  bottom: 18px;
+  width: 292px;
+  height: 350px;
+}
+
+.husky-pet-stage-4 .husky-pet-head-group {
+  left: 70px;
+  top: -70px;
+  width: 272px;
+  height: 248px;
+}
+
+.husky-pet-stage-4 .husky-pet-head-layer {
+  inset: 0;
+}
+
+.husky-pet-stage-4 .husky-pet-ear {
+  top: -34px;
+  width: 100px;
+  height: 130px;
+}
+
+.husky-pet-stage-4 .husky-pet-ear-left {
+  left: 18px;
+}
+
+.husky-pet-stage-4 .husky-pet-ear-right {
+  right: 18px;
+}
+
+.husky-pet-stage-4 .husky-pet-tail-layer {
+  left: 300px;
+  bottom: 48px;
+  width: 168px;
+  height: 238px;
+  transform-origin: 20% 82%;
+}
+
+.husky-pet-stage-4 .husky-pet-scarf-layer {
+  left: 90px;
+  top: 100px;
+  width: 220px;
+  height: 155px;
+  z-index: 6;
+}
+
+
+/* =========================================================
+   STAGE 5 — LEGENDARY HUSKY
+   ========================================================= */
+
+.husky-pet-stage-5 .husky-pet-body-layer {
+  left: 66px;
+  bottom: 16px;
+  width: 300px;
+  height: 400px;
+}
+
+.husky-pet-stage-5 .husky-pet-head-group {
+  left: 60px;
+  top: -130px;
+  width: 276px;
+  height: 252px;
+}
+
+.husky-pet-stage-5 .husky-pet-head-layer {
+  inset: 0;
+}
+
+.husky-pet-stage-5 .husky-pet-ear {
+  top: -36px;
+  width: 102px;
+  height: 132px;
+}
+
+.husky-pet-stage-5 .husky-pet-ear-left {
+  left: 16px;
+}
+
+.husky-pet-stage-5 .husky-pet-ear-right {
+  right: 16px;
+}
+
+.husky-pet-stage-5 .husky-pet-tail-layer {
+  left: 304px;
+  bottom: 46px;
+  width: 174px;
+  height: 246px;
+  transform-origin: 20% 82%;
+}
+
+.husky-pet-stage-5 .husky-pet-scarf-layer {
+  left: 80px;
+  top: 35px;
+  width: 226px;
+  height: 160px;
+  z-index: 6;
+}
+
+
+/* =========================================================
+   LEGACY STATES — STAGE 3-5
+   ========================================================= */
+
+.husky-pet-state-walk .husky-pet-body-layer {
+  animation: huskyPetWalkBody 520ms ease-in-out infinite alternate;
+}
+
+.husky-pet-state-walk .husky-pet-head-group {
+  animation: huskyPetWalkHead 520ms ease-in-out infinite alternate;
+}
+
+.husky-pet-state-walk .husky-pet-scarf-layer {
+  animation: huskyPetWalkScarf 520ms ease-in-out infinite alternate;
+}
+
+.husky-pet-state-eat .husky-pet-body-layer {
+  animation: huskyPetEatBody 520ms ease-in-out infinite alternate;
+}
+
+.husky-pet-state-eat .husky-pet-head-group {
+  animation: huskyPetEatHead 520ms ease-in-out infinite alternate;
+}
+
+.husky-pet-state-eat .husky-pet-scarf-layer {
+  animation: huskyPetEatScarf 520ms ease-in-out infinite alternate;
+}
+
+.husky-pet-state-happy .husky-pet-tail-layer {
+  animation: huskyPetTailHappy 240ms ease-in-out infinite alternate;
+}
+
+.husky-pet-state-happy .husky-pet-body-layer {
+  animation:
+    huskyPetHappyBounce 520ms cubic-bezier(0.2, 0.8, 0.3, 1)
+    infinite alternate;
+}
+
+.husky-pet-state-happy .husky-pet-head-group {
+  animation: huskyPetHappyHead 520ms ease-in-out infinite alternate;
+}
+
+.husky-pet-state-sleep .husky-pet-head-group {
+  animation: huskyPetSleepHead 3.4s ease-in-out infinite;
+}
+
+.husky-pet-state-sleep .husky-pet-body-layer {
+  animation: huskyPetSleepBreath 3.4s ease-in-out infinite;
+}
+
+.husky-pet-state-sleep .husky-pet-scarf-layer {
+  animation: huskyPetSleepScarf 3.4s ease-in-out infinite;
+}
+
+.husky-pet-state-evolve {
+  animation: huskyPetEvolveFloat 700ms ease-in-out infinite alternate;
+}
+
+
+/* =========================================================
+   LEGACY KEYFRAMES
+   ========================================================= */
+
+@keyframes huskyPetBodyBreath {
+  0%,
+  100% {
+    transform: scaleY(1) scaleX(1);
+  }
+
+  50% {
+    transform: scaleY(1.018) scaleX(0.994);
+  }
+}
+
+@keyframes huskyPetScarfBreath {
+  0%,
+  100% {
+    transform: scaleY(1) scaleX(1);
+  }
+
+  50% {
+    transform: scaleY(1.018) scaleX(0.995);
+  }
+}
+
+@keyframes huskyPetHeadIdle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+
+  50% {
+    transform: translateY(-3px) rotate(0.8deg);
+  }
+}
+
+@keyframes huskyPetEarLeft {
+  0%,
+  82%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  88% {
+    transform: rotate(-5deg);
+  }
+
+  94% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes huskyPetEarRight {
+  0%,
+  76%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  84% {
+    transform: rotate(5deg);
+  }
+
+  92% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes huskyPetTailIdle {
+  from {
+    transform: rotate(-3deg);
+  }
+
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes huskyPetTailHappy {
+  from {
+    transform: rotate(-15deg);
+  }
+
+  to {
+    transform: rotate(17deg);
+  }
+}
+
+@keyframes huskyPetWalkBody {
+  from {
+    transform: translateY(0) rotate(-1deg);
+  }
+
+  to {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes huskyPetWalkHead {
+  from {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  to {
+    transform: translateY(-5px) rotate(2deg);
+  }
+}
+
+@keyframes huskyPetWalkScarf {
+  from {
+    transform: translateY(0) rotate(-1deg);
+  }
+
+  to {
+    transform: translateY(-6px) rotate(1deg);
+  }
+}
+
+@keyframes huskyPetEatBody {
+  from {
+    transform: scaleY(1);
+  }
+
+  to {
+    transform: scaleY(0.985);
+  }
+}
+
+@keyframes huskyPetEatHead {
+  from {
+    transform: translateY(0) rotate(-1deg);
+  }
+
+  to {
+    transform: translateY(12px) rotate(1deg);
+  }
+}
+
+@keyframes huskyPetEatScarf {
+  from {
+    transform: translateY(0) scaleY(1);
+  }
+
+  to {
+    transform: translateY(4px) scaleY(0.99);
+  }
+}
+
+@keyframes huskyPetHappyBounce {
+  from {
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    transform: translateY(-13px) scale(1.025);
+  }
+}
+
+@keyframes huskyPetHappyHead {
+  from {
+    transform: rotate(-4deg) translateY(0);
+  }
+
+  to {
+    transform: rotate(4deg) translateY(-5px);
+  }
+}
+
+@keyframes huskyPetSleepHead {
+  0%,
+  100% {
+    transform: translateY(12px) rotate(-3deg);
+  }
+
+  50% {
+    transform: translateY(15px) rotate(-4deg);
+  }
+}
+
+@keyframes huskyPetSleepBreath {
+  0%,
+  100% {
+    transform: scaleY(0.98) scaleX(1.02);
+  }
+
+  50% {
+    transform: scaleY(1.01) scaleX(1);
+  }
+}
+
+@keyframes huskyPetSleepScarf {
+  0%,
+  100% {
+    transform: translateY(4px) rotate(-2deg) scale(1);
+  }
+
+  50% {
+    transform: translateY(6px) rotate(-2.5deg) scale(1.015);
+  }
+}
+
+@keyframes huskyPetEvolveFloat {
+  from {
+    transform: translateY(-5px) scale(0.97);
+  }
+
+  to {
+    transform: translateY(-26px) scale(1.04);
+  }
+}
+
+
+/* =========================================================
+   FULL FRAME HUSKY — STAGE 1 + STAGE 2
+   ========================================================= */
+
+.husky-full-frame {
+  position: relative;
+  overflow: visible;
+}
+
+.husky-full-image {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+  pointer-events: none;
+  user-select: none;
+  z-index: 3;
+}
+
+.husky-full-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  width: 210px;
+  height: 25px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Stage 1 size */
+.husky-stage-1 .husky-full-image {
+  width: 390px;
+  height: 390px;
+}
+
+/* Stage 2 size — slightly bigger than Stage 1 */
+.husky-stage-2-new .husky-full-image {
+  width: 420px;
+  height: 420px;
+}
+
+/* =========================================================
+   FULL FRAME — IDLE
+   ========================================================= */
+
+.husky-full-state-idle .husky-full-image {
+  animation: huskyFullIdle 2.8s ease-in-out infinite;
+}
+
+@keyframes huskyFullIdle {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-3px) scale(1.006);
+  }
+}
+
+/* =========================================================
+   FULL FRAME — RUN
+   ========================================================= */
+
+.husky-full-state-walk .husky-full-image {
+  animation: huskyFullRunBounce 260ms ease-in-out infinite;
+}
+
+@keyframes huskyFullRunBounce {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) rotate(-0.6deg);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-7px) rotate(0.8deg);
+  }
+}
+
+/* =========================================================
+   FULL FRAME — EAT / MILK
+   ========================================================= */
+
+.husky-full-state-eat .husky-full-image {
+  animation: huskyFullEat 620ms ease-in-out infinite alternate;
+}
+
+@keyframes huskyFullEat {
+  from {
+    transform: translateX(-50%) translateY(0) rotate(-0.4deg);
+  }
+  to {
+    transform: translateX(-50%) translateY(-3px) rotate(0.5deg);
+  }
+}
+
+/* =========================================================
+   FULL FRAME — HAPPY / THANK YOU
+   ========================================================= */
+
+.husky-full-state-happy .husky-full-image {
+  animation: huskyFullHappy 430ms cubic-bezier(0.2, 0.85, 0.3, 1.2) infinite alternate;
+}
+
+@keyframes huskyFullHappy {
+  from {
+    transform: translateX(-50%) translateY(0) rotate(-1.5deg) scale(1);
+  }
+  to {
+    transform: translateX(-50%) translateY(-10px) rotate(1.5deg) scale(1.018);
+  }
+}
+
+/* =========================================================
+   FULL FRAME — EVOLVE
+   ========================================================= */
+
+.husky-full-state-evolve .husky-full-image {
+  animation: huskyFullEvolve 620ms ease-in-out infinite alternate;
+}
+
+@keyframes huskyFullEvolve {
+  from {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  to {
+    transform: translateX(-50%) translateY(-22px) scale(1.06);
+  }
+}
+
+/* =========================================================
+   FULL FRAME — SLEEP
+   ========================================================= */
+
+.husky-full-state-sleep .husky-full-image {
+  animation: huskyFullSleep 3.2s ease-in-out infinite;
+}
+
+@keyframes huskyFullSleep {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(3px) scaleY(0.99);
+  }
+  50% {
+    transform: translateX(-50%) translateY(5px) scaleY(1.006);
+  }
+}
+
+/* =========================================================
+   STAGE 1 — FLOATING HEARTS
+   ========================================================= */
+
+.husky-heart-zone {
+  position: absolute;
+  left: 50%;
+  top: 80px;
+  width: 280px;
+  height: 270px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.husky-heart {
+  position: absolute;
+  bottom: 20px;
+  opacity: 0;
+  line-height: 1;
+  animation: huskyHeartFloat 1.7s ease-out infinite;
+}
+
+.husky-heart-1 {
+  left: 12%;
+  font-size: 30px;
+  animation-delay: 0ms;
+}
+
+.husky-heart-2 {
+  left: 30%;
+  font-size: 39px;
+  animation-delay: 220ms;
+}
+
+.husky-heart-3 {
+  left: 48%;
+  font-size: 27px;
+  animation-delay: 440ms;
+}
+
+.husky-heart-4 {
+  left: 64%;
+  font-size: 42px;
+  animation-delay: 660ms;
+}
+
+.husky-heart-5 {
+  left: 78%;
+  font-size: 29px;
+  animation-delay: 880ms;
+}
+
+.husky-heart-6 {
+  left: 42%;
+  font-size: 34px;
+  animation-delay: 1100ms;
+}
+
+@keyframes huskyHeartFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0) scale(0.55) rotate(-8deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  58% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-175px) translateX(12px) scale(1.35) rotate(10deg);
+  }
+}
+
+
+/* =========================================================
+   FULL FRAME HUSKY — STAGE 4 ROYAL
+   ========================================================= */
+
+.husky-stage-4-new {
+  position: relative;
+  overflow: visible;
+}
+
+.husky-stage-4-new .husky-full-image {
+  width: 455px;
+  height: 455px;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  object-fit: contain;
+}
+
+.husky-stage-4-new .husky-full-shadow {
+   bottom: 12px;
+  width: 230px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.22);
+  filter: blur(12px);
+}
+
+.husky-stage-4-new.husky-full-state-walk .husky-full-image {
+  animation: huskyStage4RoyalWalk 340ms ease-in-out infinite;
+}
+
+.husky-stage-4-new.husky-full-state-eat .husky-full-image {
+  animation: huskyStage4Eat 520ms ease-in-out infinite alternate;
+}
+
+.husky-stage-4-new.husky-full-state-happy .husky-full-image {
+  animation: huskyStage4Happy 430ms cubic-bezier(0.2, 0.85, 0.3, 1.15) infinite alternate;
+}
+
+.husky-stage-4-new.husky-full-state-sleep .husky-full-image {
+  width: 460px;
+  height: 460px;
+  bottom: 0;
+  animation: huskyStage4Sleep 3.4s ease-in-out infinite;
+}
+
+.husky-stage-4-new.husky-full-state-evolve .husky-full-image {
+  width: 500px;
+  height: 500px;
+  bottom: 0;
+  animation: huskyStage4Evolve 640ms ease-in-out infinite alternate;
+}
+
+.husky-stage-4-crown-glow {
+  position: absolute;
+  left: 50%;
+  top: 34px;
+  width: 280px;
+  height: 280px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,238,150,.6) 0%, rgba(250,204,21,.22) 38%, transparent 72%);
+  filter: blur(5px);
+  pointer-events: none;
+  z-index: 2;
+  animation: huskyStage4CrownGlow 650ms ease-in-out infinite alternate;
+}
+
+.husky-stage-4-evolve-glow {
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.48) 0%, rgba(250,204,21,.22) 42%, transparent 72%);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 2;
+  animation: huskyStage4EvolveGlow 700ms ease-in-out infinite alternate;
+}
+
+@keyframes huskyStage4RoyalWalk {
+  0%, 100% { transform: translateX(-50%) translateY(0) rotate(-0.45deg); }
+  50% { transform: translateX(-50%) translateY(-6px) rotate(0.55deg); }
+}
+
+@keyframes huskyStage4Eat {
+  from { transform: translateX(-50%) translateY(0) rotate(-0.5deg); }
+  to { transform: translateX(-50%) translateY(-4px) rotate(0.5deg); }
+}
+
+@keyframes huskyStage4Happy {
+  from {
+    transform: translateX(-50%) translateY(0) scale(1) rotate(-0.8deg);
+    filter: drop-shadow(0 0 0 rgba(250,204,21,0));
+  }
+  to {
+    transform: translateX(-50%) translateY(-11px) scale(1.018) rotate(0.8deg);
+    filter: drop-shadow(0 0 14px rgba(250,204,21,.42));
+  }
+}
+
+@keyframes huskyStage4Sleep {
+  0%, 100% { transform: translateX(-50%) translateY(3px) scaleY(.992); }
+  50% { transform: translateX(-50%) translateY(6px) scaleY(1.008); }
+}
+
+@keyframes huskyStage4Evolve {
+  from {
+    transform: translateX(-50%) translateY(0) scale(.985);
+    filter: brightness(1) drop-shadow(0 0 10px rgba(250,204,21,.35));
+  }
+  to {
+    transform: translateX(-50%) translateY(-18px) scale(1.04);
+    filter: brightness(1.2) drop-shadow(0 0 30px rgba(250,204,21,.85));
+  }
+}
+
+@keyframes huskyStage4CrownGlow {
+  from { opacity: .45; transform: translateX(-50%) scale(.92); }
+  to { opacity: .9; transform: translateX(-50%) scale(1.08); }
+}
+
+@keyframes huskyStage4EvolveGlow {
+  from { opacity: .35; transform: scale(.92); }
+  to { opacity: .85; transform: scale(1.07); }
+}
+
+/* =========================================================
+   FULL FRAME HUSKY — STAGE 5 LEGENDARY
+   ปรับให้เห็นทั้งตัวใน OBS Preview
+   ========================================================= */
+
+.husky-stage-5-new {
+  position: relative;
+  overflow: visible;
+}
+
+.husky-stage-5-new .husky-full-image {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  object-position: center bottom;
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+}
+
+.husky-stage-5-new .husky-full-shadow {
+  bottom: 22px;
+  width: 210px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.18);
+  filter: blur(11px);
+}
+
+/* ทุกสถานะใช้กรอบใกล้เคียงกัน เพื่อไม่ให้หัว หาง หรือเท้าถูกตัด */
+.husky-stage-5-new.husky-full-state-idle .husky-full-image {
+  width: 400px;
+  height: 400px;
+  bottom: 18px;
+  animation: huskyStage5Idle 3s ease-in-out infinite;
+}
+
+.husky-stage-5-new.husky-full-state-walk .husky-full-image {
+  width: 410px;
+  height: 410px;
+  bottom: 16px;
+  animation: huskyStage5Run 330ms ease-in-out infinite;
+}
+
+.husky-stage-5-new.husky-full-state-eat .husky-full-image {
+  width: 415px;
+  height: 415px;
+  bottom: 14px;
+  animation: huskyStage5Eat 560ms ease-in-out infinite alternate;
+}
+
+.husky-stage-5-new.husky-full-state-happy .husky-full-image {
+  width: 405px;
+  height: 405px;
+  bottom: 17px;
+  animation: huskyStage5Happy 440ms cubic-bezier(0.2, 0.85, 0.3, 1.15)
+    infinite alternate;
+}
+
+.husky-stage-5-new.husky-full-state-sleep .husky-full-image {
+  width: 420px;
+  height: 420px;
+  bottom: 12px;
+  animation: huskyStage5Sleep 3.6s ease-in-out infinite;
+}
+
+.husky-stage-5-new.husky-full-state-evolve .husky-full-image {
+  width: 400px;
+  height: 400px;
+  bottom: 18px;
+  animation: huskyStage5Evolve 700ms ease-in-out infinite alternate;
+  z-index: 4;
+}
+
+.husky-stage-5-evolve-ring {
+  position: absolute;
+  left: 50%;
+  bottom: 38px;
+  width: 330px;
+  height: 330px;
+  transform: translateX(-50%);
+  border: 3px solid rgba(96, 165, 250, 0.52);
+  border-radius: 50%;
+  box-shadow:
+    0 0 22px rgba(59, 130, 246, 0.5),
+    inset 0 0 24px rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+  z-index: 2;
+  animation: huskyStage5Ring 1.15s linear infinite;
+}
+
+.husky-stage-5-evolve-ring::before,
+.husky-stage-5-evolve-ring::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.husky-stage-5-evolve-ring::before {
+  inset: 22px;
+  border: 2px dashed rgba(250, 204, 21, 0.56);
+}
+
+.husky-stage-5-evolve-ring::after {
+  inset: 62px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.34) 0%,
+    rgba(96, 165, 250, 0.14) 45%,
+    transparent 72%
+  );
+  filter: blur(8px);
+}
+
+.husky-stage-5-evolve-sparkles {
+  position: absolute;
+  inset: 70px;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.husky-stage-5-evolve-sparkles span {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 0 8px #ffffff,
+    0 0 18px rgba(96, 165, 250, 0.95);
+  animation: huskyStage5Sparkle 1.4s ease-in-out infinite;
+}
+
+.husky-stage-5-evolve-sparkles span:nth-child(1) { left: 18%; top: 27%; animation-delay: 0ms; }
+.husky-stage-5-evolve-sparkles span:nth-child(2) { left: 72%; top: 18%; animation-delay: 180ms; }
+.husky-stage-5-evolve-sparkles span:nth-child(3) { left: 84%; top: 54%; animation-delay: 360ms; }
+.husky-stage-5-evolve-sparkles span:nth-child(4) { left: 64%; top: 78%; animation-delay: 540ms; }
+.husky-stage-5-evolve-sparkles span:nth-child(5) { left: 24%; top: 74%; animation-delay: 720ms; }
+.husky-stage-5-evolve-sparkles span:nth-child(6) { left: 10%; top: 50%; animation-delay: 900ms; }
+
+@keyframes huskyStage5Idle {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-3px) scale(1.005);
+  }
+}
+
+@keyframes huskyStage5Run {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) rotate(-0.45deg);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-6px) rotate(0.55deg);
+  }
+}
+
+@keyframes huskyStage5Eat {
+  from {
+    transform: translateX(-50%) translateY(0) rotate(-0.35deg);
+  }
+  to {
+    transform: translateX(-50%) translateY(-3px) rotate(0.35deg);
+  }
+}
+
+@keyframes huskyStage5Happy {
+  from {
+    transform: translateX(-50%) translateY(0) scale(1) rotate(-0.6deg);
+    filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.24));
+  }
+  to {
+    transform: translateX(-50%) translateY(-6px) scale(1.01) rotate(0.5deg);
+    filter: drop-shadow(0 0 15px rgba(96, 165, 250, 0.48));
+  }
+}
+
+@keyframes huskyStage5Sleep {
+  0%, 100% {
+    transform: translateX(-50%) translateY(3px) scaleY(0.994);
+  }
+  50% {
+    transform: translateX(-50%) translateY(5px) scaleY(1.006);
+  }
+}
+
+@keyframes huskyStage5Evolve {
+  from {
+    transform: translateX(-50%) translateY(0) scale(0.99);
+    filter: brightness(1) drop-shadow(0 0 10px rgba(96, 165, 250, 0.4));
+  }
+  to {
+    transform: translateX(-50%) translateY(-12px) scale(1.025);
+    filter: brightness(1.14) drop-shadow(0 0 24px rgba(96, 165, 250, 0.8));
+  }
+}
+
+@keyframes huskyStage5Ring {
+  from {
+    transform: translateX(-50%) rotate(0deg) scale(0.96);
+    opacity: 0.52;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  to {
+    transform: translateX(-50%) rotate(360deg) scale(1.04);
+    opacity: 0.52;
+  }
+}
+
+@keyframes huskyStage5Sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.45);
+  }
+  35%, 65% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.1);
+  }
+}

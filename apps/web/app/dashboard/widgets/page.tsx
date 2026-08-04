@@ -49,6 +49,15 @@ const LANTERNS = [
   { id: "rabbit", name: "Rabbit", image: "/assets/lantern/rabbit-back.png" },
 ];
 
+const PETS = [
+  { id: "cat", name: "Cat", emoji: "🐱" },
+  { id: "husky", name: "Siberian Husky", emoji: "🐺" },
+  // { id: "trex", name: "Tiny T-Rex", emoji: "🦖" },
+  { id: "pony", name: "Magic Pony", emoji: "🦄" },
+] as const;
+
+type PetType = (typeof PETS)[number]["id"];
+
 type WidgetCategory = "creator" | "seller";
 type WidgetReleaseStatus = "stable" | "beta" | "new";
 
@@ -74,6 +83,7 @@ type WidgetItem = {
   basketPicker?: boolean;
   vehiclePicker?: boolean;
   lanternPicker?: boolean;
+  petPicker?: boolean;
 };
 
 type Profile = {
@@ -153,20 +163,32 @@ export default function DashboardPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [selectedVehicle, setSelectedVehicle] = useState("tuktuk");
   const [selectedLantern, setSelectedLantern] = useState("phoenix");
+  const [selectedPet, setSelectedPet] = useState<PetType>("cat");
   const [status, setStatus] = useState<
     "idle" | "not-live" | "success" | "server-error"
   >("idle");
   const [mobilePreviewId, setMobilePreviewId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<
-    "all" | WidgetCategory
-  >("all");
+  const [categoryFilter, setCategoryFilter] = useState<"all" | WidgetCategory>(
+    "all",
+  );
   const [favoriteWidgetIds, setFavoriteWidgetIds] = useState<string[]>([]);
 
   useEffect(() => {
-    const savedFavorites = window.localStorage.getItem(
-      "omsw-widget-favorites",
-    );
+    const savedPet = window.localStorage.getItem("omsw-evolution-pet");
+
+    if (
+      savedPet === "cat" ||
+      savedPet === "husky" ||
+      // savedPet === "trex" ||
+      savedPet === "pony"
+    ) {
+      setSelectedPet(savedPet);
+    }
+  }, []);
+
+  useEffect(() => {
+    const savedFavorites = window.localStorage.getItem("omsw-widget-favorites");
 
     if (!savedFavorites) return;
 
@@ -406,37 +428,75 @@ export default function DashboardPage() {
       return;
     }
 
-    const sendEvent = () => {
-      console.log("📤 Widget event:", eventName, overlayId);
+    /*
+     * Use a short-lived socket for widget controls.
+     * This avoids sending through a stale Dashboard connection and remains
+     * compatible with both older and newer server payload handlers.
+     */
+    const controlSocket = io(SERVER_URL, {
+      autoConnect: true,
+      transports: ["polling", "websocket"],
+      reconnection: false,
+      timeout: 20000,
+      forceNew: true,
+    });
 
-      socket.emit(eventName, {
+    let finished = false;
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+
+      window.clearTimeout(disconnectTimer);
+      controlSocket.removeAllListeners();
+      controlSocket.disconnect();
+    };
+
+    const disconnectTimer = window.setTimeout(() => {
+      console.warn("Widget control socket timed out:", {
+        eventName,
         overlayId,
       });
-    };
 
-    if (socket.connected) {
-      sendEvent();
-      return;
-    }
+      finish();
+    }, 5000);
 
-    const handleConnect = () => {
-      socket.off("connect_error", handleConnectError);
-      sendEvent();
-    };
+    controlSocket.on("connect", () => {
+      console.log("📤 Widget event sending:", {
+        eventName,
+        overlayId,
+        socketId: controlSocket.id,
+        transport: controlSocket.io.engine.transport.name,
+        serverUrl: SERVER_URL,
+      });
 
-    const handleConnectError = (error: Error) => {
-      socket.off("connect", handleConnect);
+      // Send a string for maximum compatibility with deployed server versions.
+      controlSocket.emit(eventName, overlayId);
 
-      console.error("Dashboard socket connection failed:", error.message);
+      /*
+       * Keep the socket alive briefly so the Socket.IO packet can be flushed,
+       * especially when the Render server falls back to HTTP polling.
+       */
+      window.setTimeout(() => {
+        console.log("✅ Widget event sent:", eventName, overlayId);
+        finish();
+      }, 1200);
+    });
+
+    controlSocket.on("connect_error", (error: Error) => {
+      console.error("Widget control socket failed:", {
+        eventName,
+        overlayId,
+        message: error.message,
+        serverUrl: SERVER_URL,
+      });
+
+      finish();
 
       alert(
-        "The widget server is waking up or unavailable. Open the Render server URL, wait until it responds, then try again.",
+        "Unable to reach the widget server. Please wait a moment, refresh the page, and try again.",
       );
-    };
-
-    socket.once("connect", handleConnect);
-    socket.once("connect_error", handleConnectError);
-    socket.connect();
+    });
   };
 
   const saveWidgetSettings = async (settings: Partial<WidgetSettings>) => {
@@ -475,6 +535,11 @@ export default function DashboardPage() {
     saveWidgetSettings({ lantern: lanternId });
   };
 
+  const selectPet = (petType: PetType) => {
+    setSelectedPet(petType);
+    window.localStorage.setItem("omsw-evolution-pet", petType);
+  };
+
   const widgets: WidgetItem[] =
     overlayId && origin
       ? [
@@ -488,10 +553,10 @@ export default function DashboardPage() {
             category: "creator",
             releaseStatus: "stable",
             version: "v1.0",
-            previewZoom: 0.80,
+            previewZoom: 0.8,
             badge: "Creator",
             configureHref: "/dashboard/widgets/gift-goal",
-            
+
             testEvent: "test-goal",
             resetEvent: "reset-goal",
             testLabel: "🎯 Test Goal",
@@ -574,6 +639,28 @@ export default function DashboardPage() {
             testLabel: "🙏 Test Fortune",
             resetLabel: "🔄 Reset Fortune",
             testButtonClass: "bg-orange-600 hover:bg-orange-500",
+            resetButtonClass: "bg-red-600 hover:bg-red-500",
+          },
+          {
+            id: "evolution-pet",
+            name: "🐱 Evolution Pet",
+            description: "Raise and evolve a living pet with viewer gifts.",
+            url: `${origin}/widget/pet/${overlayId}?pet=${selectedPet}`,
+            petPicker: true,
+            // ใช้สิทธิ์ Creator เดิมชั่วคราว เพื่อไม่ให้ TypeScript ขึ้นแดง
+            // หลังจากเพิ่ม evolutionPet ใน permissions แล้วค่อยเปลี่ยนเป็น "evolutionPet"
+            requiredFeature: "magicLantern",
+            active: true,
+            category: "creator",
+            releaseStatus: "new",
+            version: "v1.0",
+            previewZoom: 0.62,
+            badge: "Creator",
+            testEvent: "test-pet",
+            resetEvent: "reset-pet",
+            testLabel: "🐾 Test Pet",
+            resetLabel: "🔄 Reset Pet",
+            testButtonClass: "bg-cyan-600 hover:bg-cyan-500",
             resetButtonClass: "bg-red-600 hover:bg-red-500",
           },
           {
@@ -960,7 +1047,13 @@ export default function DashboardPage() {
                                   />
                                 )}
 
-                           
+                                {widget.petPicker && (
+                                  <PetPicker
+                                    selectedPet={selectedPet}
+                                    onSelect={selectPet}
+                                    disabled={!widgetUnlocked}
+                                  />
+                                )}
                               </div>
 
                               {widgetUnlocked ? (
@@ -1012,8 +1105,8 @@ export default function DashboardPage() {
                                     Creator Feature
                                   </div>
                                   <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-300">
-                                    Upgrade to unlock the live preview,
-                                    settings and OBS controls.
+                                    Upgrade to unlock the live preview, settings
+                                    and OBS controls.
                                   </p>
                                   <Button
                                     onClick={() => setUpgradeModalOpen(true)}
@@ -1218,7 +1311,38 @@ function PickerGrid({
   );
 }
 
+type PetPickerProps = {
+  selectedPet: PetType;
+  disabled: boolean;
+  onSelect: (petType: PetType) => void;
+};
 
+function PetPicker({ selectedPet, disabled, onSelect }: PetPickerProps) {
+  return (
+    <div className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+      <div className="mb-3 font-bold">Choose Pet</div>
+
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {PETS.map((pet) => (
+          <button
+            key={pet.id}
+            type="button"
+            onClick={() => onSelect(pet.id)}
+            disabled={disabled}
+            className={`rounded-2xl border p-4 text-center transition disabled:cursor-not-allowed disabled:opacity-50 ${
+              selectedPet === pet.id
+                ? "border-cyan-500 bg-cyan-500/20"
+                : "border-zinc-700 bg-zinc-900 hover:bg-zinc-800"
+            }`}
+          >
+            <div className="text-4xl">{pet.emoji}</div>
+            <div className="mt-2 text-sm font-black">{pet.name}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 type WidgetPreviewProps = {
   widget: WidgetItem;

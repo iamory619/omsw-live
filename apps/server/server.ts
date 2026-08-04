@@ -321,6 +321,7 @@ app.post("/connect", async (req, res) => {
       io.to(overlayId).emit("basket-gift", giftPayload);
       io.to(overlayId).emit("fortune-gift", giftPayload);
       io.to(overlayId).emit("wheel-gift", giftPayload);
+      io.to(overlayId).emit("pet-gift", giftPayload);
     });
 
     tiktok.on("chat", (data: any) => {
@@ -364,9 +365,21 @@ app.post("/connect", async (req, res) => {
 io.on("connection", (socket) => {
   console.log("✅ Socket connected:", socket.id);
 
-  socket.on("join-overlay", (overlayId: string) => {
-    console.log("📺 Overlay joined:", overlayId, socket.id);
+  socket.on("join-overlay", (payload: string | TestPayload) => {
+    const overlayId = getOverlayId(payload);
+
+    if (!overlayId) {
+      console.log("❌ Missing overlayId when joining room:", payload);
+      return;
+    }
+
     socket.join(overlayId);
+
+    console.log("📺 Overlay joined:", {
+      overlayId,
+      socketId: socket.id,
+      roomSize: io.sockets.adapter.rooms.get(overlayId)?.size ?? 0,
+    });
   });
 
   socket.on("test-goal", async (payload: string | TestPayload) => {
@@ -506,6 +519,46 @@ io.on("connection", (socket) => {
     if (!overlayId) return;
 
     io.to(overlayId).emit("reset-wheel");
+  });
+
+  socket.on("test-pet", (payload: string | TestPayload) => {
+    const overlayId = getOverlayId(payload);
+
+    if (!overlayId) {
+      console.log("❌ Missing overlayId for test-pet:", payload);
+      return;
+    }
+
+    const petTestPayload = {
+      user: "Mimi",
+      uniqueId: "mimi",
+      giftName: "Rose",
+      diamond: 1,
+      repeatCount: 1,
+      amount: 1,
+      giftImage: "/assets/rose.png",
+    };
+
+    // ส่งผ่าน Event เดียวกับของขวัญจริง
+    io.to(overlayId).emit("pet-gift", petTestPayload);
+
+    console.log("🐾 Test Evolution Pet:", {
+      overlayId,
+      roomSize: io.sockets.adapter.rooms.get(overlayId)?.size ?? 0,
+    });
+  });
+
+  socket.on("reset-pet", (payload: string | TestPayload) => {
+    const overlayId = getOverlayId(payload);
+
+    if (!overlayId) return;
+
+    io.to(overlayId).emit("reset-pet");
+
+    console.log("🔄 Reset Evolution Pet:", {
+      overlayId,
+      roomSize: io.sockets.adapter.rooms.get(overlayId)?.size ?? 0,
+    });
   });
 
   socket.on("disconnect", (reason) => {
