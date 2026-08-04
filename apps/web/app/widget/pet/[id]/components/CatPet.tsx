@@ -3,7 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "../styles/cat.css";
 
-export type PetState = "idle" | "walk" | "eat" | "happy" | "sleep" | "evolve";
+export type PetState =
+  | "idle"
+  | "walk"
+  | "eat"
+  | "happy"
+  | "sleep"
+  | "evolve";
 
 type CatPetProps = {
   state: PetState;
@@ -27,14 +33,18 @@ type StageFivePose = {
 };
 
 const ASSET_ROOT = "/assets/pet/cat";
+
 const BLINK_INTERVAL_MS = 5_000;
 const BLINK_FRAME_DURATION_MS = 180;
 const GIFT_FRAME_DURATION_MS = 700;
+
 const SPECIAL_IDLE_MIN_DELAY_MS = 8_000;
 const SPECIAL_IDLE_MAX_DELAY_MS = 14_000;
 const SPECIAL_IDLE_FRAME_DURATION_MS = 550;
 const SINGLE_SPECIAL_IDLE_DURATION_MS = 1_800;
+
 const STAGE_FIVE_POSE_XP = 51;
+
 const CAT_WIDTH = 500;
 const CAT_HEIGHT = 500;
 
@@ -98,8 +108,12 @@ function getStageFivePoses(): readonly StageFivePose[] {
 
 function getStageFiveAssets(stageXp: number): StageAssets {
   const poses = getStageFivePoses();
+
   const safeXp = Math.max(0, Math.trunc(stageXp));
-  const poseIndex = Math.floor(safeXp / STAGE_FIVE_POSE_XP) % poses.length;
+
+  const poseIndex =
+    Math.floor(safeXp / STAGE_FIVE_POSE_XP) % poses.length;
+
   const pose = poses[poseIndex];
 
   return {
@@ -109,28 +123,51 @@ function getStageFiveAssets(stageXp: number): StageAssets {
   };
 }
 
-function getStageAssets(stage: number, stageXp: number): StageAssets {
+function getStageAssets(
+  stage: number,
+  stageXp: number,
+): StageAssets {
   const normalizedStage = normalizeStage(stage);
-  const stageBase = `${ASSET_ROOT}/stage-${normalizedStage}`;
+
+  const stageBase =
+    `${ASSET_ROOT}/stage-${normalizedStage}`;
 
   if (normalizedStage === 5) {
     return getStageFiveAssets(stageXp);
   }
 
   if (normalizedStage === 4) {
-    const activity1 = `${stageBase}/stage-4-idle-Activity1.png`;
-    const activity2 = `${stageBase}/stage-4-idle-Activity2.png`;
-    const activity3 = `${stageBase}/stage-4-idle-Activity3.png`;
-    const activity4 = `${stageBase}/stage-4-idle-Activity4.png`;
-    const activity5 = `${stageBase}/stage-4-idle-Activity5.png`;
+    const activity1 =
+      `${stageBase}/stage-4-idle-Activity1.png`;
+
+    const activity2 =
+      `${stageBase}/stage-4-idle-Activity2.png`;
+
+    const activity3 =
+      `${stageBase}/stage-4-idle-Activity3.png`;
+
+    const activity4 =
+      `${stageBase}/stage-4-idle-Activity4.png`;
+
+    const activity5 =
+      `${stageBase}/stage-4-idle-Activity5.png`;
 
     return {
       master: `${stageBase}/stage-4-master.png`,
+
       blinkFrames: [
         `${stageBase}/stage-4-idle-blink1.png`,
         `${stageBase}/stage-4-idle-blink2.png`,
       ],
-      giftFrames: [activity1, activity2, activity3, activity4, activity5],
+
+      giftFrames: [
+        activity1,
+        activity2,
+        activity3,
+        activity4,
+        activity5,
+      ],
+
       idleSpecialFrames: [
         [activity1],
         [activity2],
@@ -142,28 +179,51 @@ function getStageAssets(stage: number, stageXp: number): StageAssets {
   }
 
   if (normalizedStage === 3) {
-    const pao1 = `${stageBase}/stage-3-idle-pao1.png`;
-    const pao2 = `${stageBase}/stage-3-idle-pao2.png`;
-    const pao3 = `${stageBase}/stage-3-idle-pao3.png`;
+    const pao1 =
+      `${stageBase}/stage-3-idle-pao1.png`;
+
+    const pao2 =
+      `${stageBase}/stage-3-idle-pao2.png`;
+
+    const pao3 =
+      `${stageBase}/stage-3-idle-pao3.png`;
 
     return {
       master: `${stageBase}/stage-3-master.png`,
+
       blinkFrames: [
         `${stageBase}/stage-3-idle-blink1.png`,
         `${stageBase}/stage-3-idle-blink2.png`,
       ],
-      giftFrames: [pao1, pao2, pao3],
+
+      giftFrames: [
+        pao1,
+        pao2,
+        pao3,
+      ],
+
       idleSpecialFrames: [
-        [pao1, pao2, pao3],
-        [`${stageBase}/stage-3-idle-flower.png`],
+        [
+          pao1,
+          pao2,
+          pao3,
+        ],
+        [
+          `${stageBase}/stage-3-idle-flower.png`,
+        ],
       ],
     };
   }
 
   if (normalizedStage === 2) {
     return {
-      master: `${stageBase}/stage-2-master.png`,
-      blinkFrames: [`${stageBase}/stage-2-idle-blink.png`],
+      master:
+        `${stageBase}/stage-2-master.png`,
+
+      blinkFrames: [
+        `${stageBase}/stage-2-idle-blink.png`,
+      ],
+
       giftFrames: [
         `${stageBase}/stage-2-love1.png`,
         `${stageBase}/stage-2-love2.png`,
@@ -174,8 +234,13 @@ function getStageAssets(stage: number, stageXp: number): StageAssets {
   }
 
   return {
-    master: `${stageBase}/stage-1-master.png`,
-    blinkFrames: [`${stageBase}/stage-1-idle-blink.png`],
+    master:
+      `${stageBase}/stage-1-master.png`,
+
+    blinkFrames: [
+      `${stageBase}/stage-1-idle-blink.png`,
+    ],
+
     giftFrames: [
       `${stageBase}/stage-1-box1.png`,
       `${stageBase}/stage-1-box2.png`,
@@ -185,40 +250,96 @@ function getStageAssets(stage: number, stageXp: number): StageAssets {
   };
 }
 
-export function CatPet({ state, scale, stage, stageXp }: CatPetProps) {
-  const normalizedStage = normalizeStage(stage);
+export function CatPet({
+  state,
+  scale,
+  stage,
+  stageXp,
+}: CatPetProps) {
+  const normalizedStage =
+    normalizeStage(stage);
+
   const assets = useMemo(
-    () => getStageAssets(normalizedStage, stageXp),
-    [normalizedStage, stageXp],
+    () =>
+      getStageAssets(
+        normalizedStage,
+        stageXp,
+      ),
+    [
+      normalizedStage,
+      stageXp,
+    ],
   );
 
-  const [currentImage, setCurrentImage] = useState(assets.master);
-  const [isSequencePlaying, setIsSequencePlaying] = useState(false);
-  const previousStateRef = useRef<PetState>("idle");
-  const blinkIndexRef = useRef(0);
-  const blinkIntervalRef = useRef<number | null>(null);
-  const blinkTimeoutsRef = useRef<number[]>([]);
-  const actionTimeoutsRef = useRef<number[]>([]);
-  const specialIdleTimeoutRef = useRef<number | null>(null);
+  const [
+    currentImage,
+    setCurrentImage,
+  ] = useState(assets.master);
+
+  const [
+    isSequencePlaying,
+    setIsSequencePlaying,
+  ] = useState(false);
+
+  const previousStateRef =
+    useRef<PetState>("idle");
+
+  const blinkIndexRef =
+    useRef(0);
+
+  const blinkIntervalRef =
+    useRef<number | null>(null);
+
+  const blinkTimeoutsRef =
+    useRef<number[]>([]);
+
+  const actionTimeoutsRef =
+    useRef<number[]>([]);
+
+  const specialIdleTimeoutRef =
+    useRef<number | null>(null);
 
   const clearBlinkTimers = () => {
-    if (blinkIntervalRef.current !== null) {
-      window.clearInterval(blinkIntervalRef.current);
+    if (
+      blinkIntervalRef.current !== null
+    ) {
+      window.clearInterval(
+        blinkIntervalRef.current,
+      );
+
       blinkIntervalRef.current = null;
     }
-    blinkTimeoutsRef.current.forEach(window.clearTimeout);
+
+    blinkTimeoutsRef.current.forEach(
+      (timeoutId) => {
+        window.clearTimeout(timeoutId);
+      },
+    );
+
     blinkTimeoutsRef.current = [];
   };
 
   const clearActionTimers = () => {
-    actionTimeoutsRef.current.forEach(window.clearTimeout);
+    actionTimeoutsRef.current.forEach(
+      (timeoutId) => {
+        window.clearTimeout(timeoutId);
+      },
+    );
+
     actionTimeoutsRef.current = [];
   };
 
   const clearSpecialIdleTimer = () => {
-    if (specialIdleTimeoutRef.current !== null) {
-      window.clearTimeout(specialIdleTimeoutRef.current);
-      specialIdleTimeoutRef.current = null;
+    if (
+      specialIdleTimeoutRef.current !==
+      null
+    ) {
+      window.clearTimeout(
+        specialIdleTimeoutRef.current,
+      );
+
+      specialIdleTimeoutRef.current =
+        null;
     }
   };
 
@@ -228,33 +349,55 @@ export function CatPet({ state, scale, stage, stageXp }: CatPetProps) {
     onComplete?: () => void,
   ) => {
     clearActionTimers();
+
     setIsSequencePlaying(true);
 
-    frames.forEach((image, index) => {
-      const timeoutId = window.setTimeout(() => {
-        setCurrentImage(image);
-      }, index * frameDuration);
-      actionTimeoutsRef.current.push(timeoutId);
-    });
+    frames.forEach(
+      (image, index) => {
+        const timeoutId =
+          window.setTimeout(() => {
+            setCurrentImage(image);
+          }, index * frameDuration);
 
-    const totalDuration = Math.max(1, frames.length) * frameDuration;
-    const finishTimeoutId = window.setTimeout(() => {
-      setCurrentImage(assets.master);
-      setIsSequencePlaying(false);
-      actionTimeoutsRef.current = [];
-      onComplete?.();
-    }, totalDuration);
+        actionTimeoutsRef.current.push(
+          timeoutId,
+        );
+      },
+    );
 
-    actionTimeoutsRef.current.push(finishTimeoutId);
+    const totalDuration =
+      Math.max(1, frames.length) *
+      frameDuration;
+
+    const finishTimeoutId =
+      window.setTimeout(() => {
+        setCurrentImage(
+          assets.master,
+        );
+
+        setIsSequencePlaying(false);
+
+        actionTimeoutsRef.current = [];
+
+        onComplete?.();
+      }, totalDuration);
+
+    actionTimeoutsRef.current.push(
+      finishTimeoutId,
+    );
   };
 
   useEffect(() => {
     clearBlinkTimers();
     clearActionTimers();
     clearSpecialIdleTimer();
+
     setIsSequencePlaying(false);
     setCurrentImage(assets.master);
-    previousStateRef.current = "idle";
+
+    previousStateRef.current =
+      "idle";
+
     blinkIndexRef.current = 0;
   }, [assets]);
 
@@ -268,21 +411,41 @@ export function CatPet({ state, scale, stage, stageXp }: CatPetProps) {
     }
 
     clearBlinkTimers();
-    blinkIntervalRef.current = window.setInterval(() => {
-      const blinkFrame =
-        assets.blinkFrames[blinkIndexRef.current % assets.blinkFrames.length];
-      blinkIndexRef.current =
-        (blinkIndexRef.current + 1) % assets.blinkFrames.length;
-      setCurrentImage(blinkFrame);
 
-      const returnTimeoutId = window.setTimeout(() => {
-        setCurrentImage(assets.master);
-      }, BLINK_FRAME_DURATION_MS);
-      blinkTimeoutsRef.current.push(returnTimeoutId);
-    }, BLINK_INTERVAL_MS);
+    blinkIntervalRef.current =
+      window.setInterval(() => {
+        const blinkFrame =
+          assets.blinkFrames[
+            blinkIndexRef.current %
+              assets.blinkFrames.length
+          ];
+
+        blinkIndexRef.current =
+          (
+            blinkIndexRef.current + 1
+          ) %
+          assets.blinkFrames.length;
+
+        setCurrentImage(blinkFrame);
+
+        const returnTimeoutId =
+          window.setTimeout(() => {
+            setCurrentImage(
+              assets.master,
+            );
+          }, BLINK_FRAME_DURATION_MS);
+
+        blinkTimeoutsRef.current.push(
+          returnTimeoutId,
+        );
+      }, BLINK_INTERVAL_MS);
 
     return clearBlinkTimers;
-  }, [assets, isSequencePlaying, state]);
+  }, [
+    assets,
+    isSequencePlaying,
+    state,
+  ]);
 
   useEffect(() => {
     if (
@@ -298,44 +461,79 @@ export function CatPet({ state, scale, stage, stageXp }: CatPetProps) {
     const scheduleNext = () => {
       const delay =
         SPECIAL_IDLE_MIN_DELAY_MS +
-        Math.random() * (SPECIAL_IDLE_MAX_DELAY_MS - SPECIAL_IDLE_MIN_DELAY_MS);
+        Math.random() *
+          (
+            SPECIAL_IDLE_MAX_DELAY_MS -
+            SPECIAL_IDLE_MIN_DELAY_MS
+          );
 
-      specialIdleTimeoutRef.current = window.setTimeout(() => {
-        const sequences = assets.idleSpecialFrames;
-        if (!sequences?.length) return;
+      specialIdleTimeoutRef.current =
+        window.setTimeout(() => {
+          const sequences =
+            assets.idleSpecialFrames;
 
-        const sequence =
-          sequences[Math.floor(Math.random() * sequences.length)];
+          if (!sequences?.length) {
+            return;
+          }
 
-        clearBlinkTimers();
-        playFrames(
-          sequence,
-          sequence.length === 1
-            ? SINGLE_SPECIAL_IDLE_DURATION_MS
-            : SPECIAL_IDLE_FRAME_DURATION_MS,
-          scheduleNext,
-        );
-      }, delay);
+          const sequence =
+            sequences[
+              Math.floor(
+                Math.random() *
+                  sequences.length,
+              )
+            ];
+
+          clearBlinkTimers();
+
+          playFrames(
+            sequence,
+            sequence.length === 1
+              ? SINGLE_SPECIAL_IDLE_DURATION_MS
+              : SPECIAL_IDLE_FRAME_DURATION_MS,
+            scheduleNext,
+          );
+        }, delay);
     };
 
     scheduleNext();
+
     return clearSpecialIdleTimer;
-  }, [assets, isSequencePlaying, state]);
+  }, [
+    assets,
+    isSequencePlaying,
+    state,
+  ]);
 
   useEffect(() => {
-    const previousState = previousStateRef.current;
+    const previousState =
+      previousStateRef.current;
+
     previousStateRef.current = state;
 
-    const shouldPlayGift = isGiftState(state) && !isGiftState(previousState);
+    const shouldPlayGift =
+      isGiftState(state) &&
+      !isGiftState(previousState);
 
-    if (!shouldPlayGift) return;
+    if (!shouldPlayGift) {
+      return;
+    }
 
     clearBlinkTimers();
     clearSpecialIdleTimer();
-    setCurrentImage(assets.master);
 
-    playFrames(assets.giftFrames, GIFT_FRAME_DURATION_MS);
-  }, [assets, state]);
+    setCurrentImage(
+      assets.master,
+    );
+
+    playFrames(
+      assets.giftFrames,
+      GIFT_FRAME_DURATION_MS,
+    );
+  }, [
+    assets,
+    state,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -347,27 +545,43 @@ export function CatPet({ state, scale, stage, stageXp }: CatPetProps) {
 
   return (
     <div
-      className={`cat-pet-rig cat-pet-stage-${normalizedStage} cat-pet-state-${state}`}
+      className={[
+        "cat-pet-rig",
+        `cat-pet-stage-${normalizedStage}`,
+        `cat-pet-state-${state}`,
+      ].join(" ")}
       style={{
         width: CAT_WIDTH,
         height: CAT_HEIGHT,
         transform: `scale(${scale})`,
-        transformOrigin: "bottom center",
+        transformOrigin:
+          "bottom center",
+        background:
+          "transparent",
       }}
     >
-      <div className="cat-pet-shadow" />
-
       <img
         src={currentImage}
         alt="Japanese calico cat"
         draggable={false}
         className="cat-pet-image pointer-events-none select-none"
         onError={(event) => {
-          const image = event.currentTarget;
-          const masterFileName = assets.master.split("/").pop();
+          const image =
+            event.currentTarget;
 
-          if (masterFileName && !image.src.endsWith(`/${masterFileName}`)) {
-            image.src = assets.master;
+          const masterFileName =
+            assets.master
+              .split("/")
+              .pop();
+
+          if (
+            masterFileName &&
+            !image.src.endsWith(
+              `/${masterFileName}`,
+            )
+          ) {
+            image.src =
+              assets.master;
           }
         }}
       />

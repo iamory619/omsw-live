@@ -380,11 +380,7 @@ export default function EvolutionPetWidget() {
         }
       `}</style>
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_75%,rgba(56,189,248,0.20),transparent_45%)]" />
-
       <div className="absolute inset-x-0 bottom-[7%] h-[48%]">
-        <div className="absolute bottom-0 left-1/2 h-16 w-[52%] -translate-x-1/2 rounded-[50%] bg-black/35 blur-xl" />
-
         {/* Gift is intentionally in front of the pet. */}
         {giftEffect && (
           <div
@@ -489,42 +485,7 @@ export default function EvolutionPetWidget() {
         </div>
       )}
 
-      <section className="absolute left-1/2 top-[6%] w-[min(92vw,620px)] -translate-x-1/2 rounded-3xl border border-white/10 bg-black/50 px-6 py-5 backdrop-blur-md">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-              Evolution Pet
-            </div>
-            <div className="mt-1 text-2xl font-black">{stage.name}</div>
-          </div>
 
-          <div className="rounded-full bg-white/10 px-4 py-2 text-sm font-black">
-            Stage {stage.stage}/5
-          </div>
-        </div>
-
-        <div className="mt-4 h-4 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 transition-[width] duration-700"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        <div className="mt-2 flex items-center justify-between text-xs font-bold text-white/65">
-          <span>{xp} XP</span>
-          <span>{stage.stage === 5 ? "MAX" : `${stage.nextXp} XP`}</span>
-        </div>
-
-        <div className="mt-3 text-center text-sm font-black text-white/85">
-          {message}
-        </div>
-
-        {lastSupporter && (
-          <div className="mt-1 text-center text-xs text-pink-200">
-            Latest supporter: {lastSupporter}
-          </div>
-        )}
-      </section>
     </main>
   );
 }
