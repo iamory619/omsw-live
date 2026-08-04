@@ -221,7 +221,7 @@ export default function DashboardHomePage() {
               </Card>
             </section>
 
-            <section className="mt-8 grid gap-6 xl:grid-cols-3">
+            <section className="mt-8 grid gap-6 xl:grid-cols-4">
               <Link
                 href="/dashboard/widgets"
                 prefetch={false}
@@ -244,6 +244,18 @@ export default function DashboardHomePage() {
                 <h2 className="mt-4 text-2xl font-black">OBS Overlays</h2>
                 <p className="mt-2 text-sm text-zinc-400">
                   Copy and manage your OBS Browser Source overlays.
+                </p>
+              </Link>
+
+              <Link
+                href="/dashboard/live-decorations"
+                prefetch={false}
+                className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-cyan-500/20 to-zinc-950 p-6 transition hover:border-cyan-500"
+              >
+                <div className="text-4xl">✨</div>
+                <h2 className="mt-4 text-2xl font-black">Live Decorations</h2>
+                <p className="mt-2 text-sm text-zinc-400">
+                  Add ambient lighting, frames and visual effects to your livestream.
                 </p>
               </Link>
 

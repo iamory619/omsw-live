@@ -24,3 +24,29 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes roomLightPreview {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: saturate(1);
+  }
+
+  50% {
+    transform: scale(1.08) rotate(2deg);
+    filter: saturate(1.25);
+  }
+}
+
+@keyframes roomLightOverlay {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: saturate(1);
+  }
+
+  50% {
+    transform: scale(1.1) rotate(3deg);
+    filter: saturate(1.3);
+  }
+}

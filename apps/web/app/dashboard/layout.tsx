@@ -9,6 +9,8 @@ type NavItem = {
   label: string;
   icon: string;
   exact?: boolean;
+  badge?: string;
+  indent?: boolean;
 };
 
 const NAV_ITEMS: NavItem[] = [
@@ -28,11 +30,19 @@ const NAV_ITEMS: NavItem[] = [
     href: "/dashboard/widgets/gift-wheel",
     label: "Gift Wheel Settings",
     icon: "🎡",
+    badge: "SETUP",
+    indent: true,
   },
   {
     href: "/dashboard/overlays",
     label: "OBS Overlays",
     icon: "🔗",
+  },
+  {
+    href: "/dashboard/live-decorations",
+    label: "Live Decorations",
+    icon: "✨",
+    badge: "NEW",
   },
   {
     href: "/dashboard/analytics",
@@ -102,17 +112,13 @@ export default function DashboardLayout({
           {NAV_ITEMS.map((item) => {
             const active = isNavItemActive(pathname, item);
 
-            const isGiftWheelSettings =
-              item.href ===
-              "/dashboard/widgets/gift-wheel";
-
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 prefetch={false}
                 className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition ${
-                  isGiftWheelSettings ? "ml-5" : ""
+                  item.indent ? "ml-5" : ""
                 } ${
                   active
                     ? "border border-pink-500/40 bg-pink-500/20 text-pink-100"
@@ -125,9 +131,9 @@ export default function DashboardLayout({
                   {item.label}
                 </span>
 
-                {isGiftWheelSettings && (
+                {item.badge && (
                   <span className="rounded-full bg-pink-500/20 px-2 py-1 text-[10px] font-black text-pink-200">
-                    SETUP
+                    {item.badge}
                   </span>
                 )}
               </Link>
@@ -179,6 +185,12 @@ export default function DashboardLayout({
                 }`}
               >
                 {item.icon} {item.label}
+
+                {item.badge && (
+                  <span className="ml-2 rounded-full bg-pink-500/20 px-2 py-0.5 text-[9px] font-black text-pink-200">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}

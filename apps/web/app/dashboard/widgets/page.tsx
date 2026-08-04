@@ -687,6 +687,7 @@ export default function DashboardPage() {
             testButtonClass: "bg-fuchsia-600 hover:bg-fuchsia-500",
             resetButtonClass: "bg-red-600 hover:bg-red-500",
           },
+          
         ]
       : [];
 
@@ -886,14 +887,14 @@ export default function DashboardPage() {
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                         <div>
                           <div className="text-sm font-black uppercase tracking-[0.2em] text-pink-300">
-                            Widget Center V3
+                            Widget Center V4
                           </div>
                           <h2 className="mt-2 text-3xl font-black sm:text-4xl">
-                            Creator Widgets
+                            Widget Center
                           </h2>
                           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
-                            Preview, configure and control every overlay from
-                            one responsive workspace.
+                            Preview, configure and control creator widgets,
+                            live decorations and seller tools from one workspace.
                           </p>
                         </div>
 
@@ -925,7 +926,7 @@ export default function DashboardPage() {
                           />
                         </label>
 
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                           {(
                             [
                               ["all", "All"],
