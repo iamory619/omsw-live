@@ -1,10 +1,12 @@
 "use client";
 
-import { Aurora } from "@/components/decorations";
+import {
+  Aurora,
+  GlowLight,
+} from "@/components/decorations";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { RoomLightSettings } from "../types";
-import { GlowLight } from "./GlowLight";
 import { MultipleLightsPreview } from "./MultipleLightsPreview";
 
 type Props = {

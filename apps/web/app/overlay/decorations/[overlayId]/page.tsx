@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { GlowLight } from "@/components/decorations";
 
 type LightEffect =
   | "studio-softbox"
@@ -194,13 +195,7 @@ export default function DecorationOverlayPage() {
       data-placement={settings.placement}
       className="fixed inset-0 overflow-hidden bg-transparent"
     >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={getPlacementStyle(
-          settings.canvasMode,
-          settings.placement,
-        )}
-      >
+      <div className="pointer-events-none absolute inset-0">
         {settings.multiLightEnabled ? (
           <MultipleLightsOverlay
             settings={settings}
@@ -466,146 +461,19 @@ function FreeLightBlob({
     );
   }
 
-  if (settings.effect === "stage-light") {
-    return (
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className={`absolute top-[-12%] -rotate-[12deg] ${getCanvasBlobClass(settings.canvasMode, "stage-left")}`}
-          style={{
-            background: `linear-gradient(
-              to bottom,
-              ${hexToRgba(settings.primaryColor, opacity * 0.9)} 0%,
-              ${hexToRgba(settings.primaryColor, opacity * 0.34)} 44%,
-              transparent 88%
-            )`,
-            filter: `blur(${Math.max(20, settings.blur * 0.72)}px)`,
-            opacity,
-            animation,
-            transition,
-            mixBlendMode: "screen",
-          }}
-        />
-
-        <div
-          className={`absolute top-[-12%] rotate-[12deg] ${getCanvasBlobClass(settings.canvasMode, "stage-right")}`}
-          style={{
-            background: `linear-gradient(
-              to bottom,
-              ${hexToRgba(settings.secondaryColor, opacity * 0.9)} 0%,
-              ${hexToRgba(settings.secondaryColor, opacity * 0.34)} 44%,
-              transparent 88%
-            )`,
-            filter: `blur(${Math.max(20, settings.blur * 0.72)}px)`,
-            opacity,
-            animation: settings.animation
-              ? `roomLightOverlay ${duration}s ease-in-out infinite reverse`
-              : undefined,
-            transition,
-            mixBlendMode: "screen",
-          }}
-        />
-      </div>
-    );
-  }
-
-  if (settings.effect === "rgb-studio") {
-    return (
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className={`absolute top-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "rgb-left")}`}
-          style={{
-            background: `radial-gradient(
-              ellipse,
-              ${hexToRgba(settings.primaryColor, opacity)} 0%,
-              ${hexToRgba(settings.primaryColor, opacity * 0.48)} 38%,
-              transparent 74%
-            )`,
-            filter: `blur(${settings.blur}px)`,
-            animation,
-            transition,
-            mixBlendMode: "screen",
-          }}
-        />
-
-        <div
-          className={`absolute top-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "rgb-right")}`}
-          style={{
-            background: `radial-gradient(
-              ellipse,
-              ${hexToRgba(settings.secondaryColor, opacity)} 0%,
-              ${hexToRgba(settings.secondaryColor, opacity * 0.48)} 38%,
-              transparent 74%
-            )`,
-            filter: `blur(${settings.blur}px)`,
-            animation: settings.animation
-              ? `roomLightOverlay ${duration}s ease-in-out infinite reverse`
-              : undefined,
-            transition,
-            mixBlendMode: "screen",
-          }}
-        />
-      </div>
-    );
-  }
-
-  if (settings.effect === "streamer-room") {
-    return (
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className={`absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "streamer-main")}`}
-          style={{
-            background: `
-              radial-gradient(
-                ellipse at 28% 42%,
-                ${hexToRgba(settings.primaryColor, opacity * 0.95)} 0%,
-                transparent 56%
-              ),
-              radial-gradient(
-                ellipse at 72% 42%,
-                ${hexToRgba(settings.secondaryColor, opacity * 0.92)} 0%,
-                transparent 56%
-              )
-            `,
-            filter: `blur(${settings.blur}px)`,
-            animation,
-            transition,
-            mixBlendMode: "screen",
-          }}
-        />
-
-        <div
-          className={`absolute bottom-[5%] left-1/2 -translate-x-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "streamer-bottom")}`}
-          style={{
-            background: `linear-gradient(
-              90deg,
-              ${hexToRgba(settings.primaryColor, opacity * 0.7)},
-              ${hexToRgba(settings.secondaryColor, opacity * 0.7)}
-            )`,
-            filter: `blur(${Math.max(24, settings.blur * 0.82)}px)`,
-            opacity: opacity * 0.75,
-            transition,
-            mixBlendMode: "screen",
-          }}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div
-      className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "softbox")}`}
-      style={{
-        background: `radial-gradient(
-          ellipse,
-          ${hexToRgba(settings.primaryColor, opacity)} 0%,
-          ${hexToRgba(settings.secondaryColor, opacity * 0.62)} 34%,
-          transparent 74%
-        )`,
-        filter: `blur(${settings.blur}px)`,
-        animation,
-        transition,
-        mixBlendMode: "screen",
-      }}
+    <GlowLight
+      effect={settings.effect}
+      canvasMode={settings.canvasMode}
+      placement={settings.placement}
+      primaryColor={settings.primaryColor}
+      secondaryColor={settings.secondaryColor}
+      intensity={settings.intensity}
+      blur={settings.blur}
+      opacity={settings.opacity}
+      speed={settings.speed}
+      animation={settings.animation}
+      smooth={settings.smooth}
     />
   );
 }
@@ -719,39 +587,6 @@ function getCanvasBlobClass(
   }
 
   return portrait ? "h-[54%] w-[92%]" : "h-[72%] w-[72%]";
-}
-
-function getPlacementStyle(
-  canvasMode: CanvasMode,
-  placement: LightPlacement,
-): React.CSSProperties {
-  const portrait = canvasMode === "portrait";
-
-  const scale = portrait ? 0.84 : 0.92;
-
-  let translateX = 0;
-  let translateY = 0;
-
-  if (placement === "left") {
-    translateX = portrait ? -22 : -26;
-  }
-
-  if (placement === "right") {
-    translateX = portrait ? 22 : 26;
-  }
-
-  if (placement === "top") {
-    translateY = portrait ? -28 : -20;
-  }
-
-  if (placement === "bottom") {
-    translateY = portrait ? 28 : 20;
-  }
-
-  return {
-    transform: `translate(${translateX}%, ${translateY}%) scale(${scale})`,
-    transformOrigin: "center center",
-  };
 }
 
 function getOpacity(settings: RoomLightSettings): number {

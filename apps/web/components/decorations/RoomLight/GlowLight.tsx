@@ -4,7 +4,7 @@ import type {
   CanvasMode,
   LightEffect,
   LightPlacement,
-} from "../types";
+} from "@/app/dashboard/live-decorations/room-light/types";
 
 type GlowLightProps = {
   effect: LightEffect;
@@ -33,16 +33,9 @@ export function GlowLight({
   animation: _animation,
   smooth,
 }: GlowLightProps) {
-  const safeOpacity = clamp(
-    (opacity / 100) * (intensity / 100),
-    0,
-    1,
-  );
+  const safeOpacity = clamp((opacity / 100) * (intensity / 100), 0, 1);
 
-  const position = getPlacementPosition(
-    canvasMode,
-    placement,
-  );
+  const position = getPlacementPosition(canvasMode, placement);
 
   const transition = smooth
     ? "left 700ms ease, top 700ms ease, width 700ms ease, height 700ms ease, filter 700ms ease, opacity 700ms ease"
@@ -62,10 +55,7 @@ export function GlowLight({
                   ? "34%"
                   : "38%"
                 : position.left,
-            top:
-              placement === "bottom"
-                ? "58%"
-                : position.top,
+            top: placement === "bottom" ? "58%" : position.top,
             width: beamSize.width,
             height: beamSize.height,
             background: `linear-gradient(
@@ -89,10 +79,7 @@ export function GlowLight({
                   ? "66%"
                   : "62%"
                 : mirrorPercent(position.left),
-            top:
-              placement === "bottom"
-                ? "58%"
-                : position.top,
+            top: placement === "bottom" ? "58%" : position.top,
             width: beamSize.width,
             height: beamSize.height,
             background: `linear-gradient(
@@ -207,18 +194,9 @@ export function GlowLight({
           className="absolute -translate-x-1/2 -translate-y-1/2 rounded-[999px]"
           style={{
             left: "50%",
-            top:
-              canvasMode === "portrait"
-                ? "84%"
-                : "88%",
-            width:
-              canvasMode === "portrait"
-                ? "92%"
-                : "72%",
-            height:
-              canvasMode === "portrait"
-                ? "12%"
-                : "16%",
+            top: canvasMode === "portrait" ? "84%" : "88%",
+            width: canvasMode === "portrait" ? "92%" : "72%",
+            height: canvasMode === "portrait" ? "12%" : "16%",
             background: `linear-gradient(
               90deg,
               transparent 0%,
@@ -236,10 +214,7 @@ export function GlowLight({
   }
 
   const softboxSize = getSoftboxSize(canvasMode);
-  const softboxTop = getSoftboxTop(
-    canvasMode,
-    placement,
-  );
+  const softboxTop = getSoftboxTop(canvasMode, placement);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20">
@@ -247,20 +222,46 @@ export function GlowLight({
         className="absolute -translate-x-1/2 -translate-y-1/2 rounded-[50%]"
         style={{
           left: "50%",
-          top: softboxTop,
+          top:
+            placement === "top"
+              ? "16%"
+              : placement === "bottom"
+                ? "84%"
+                : "20%",
           width: softboxSize.width,
           height: softboxSize.height,
           background: `
             radial-gradient(
-              ellipse at center,
-              ${hexToRgba(primaryColor, safeOpacity * 0.34)} 0%,
-              ${hexToRgba(secondaryColor, safeOpacity * 0.3)} 24%,
-              ${hexToRgba(primaryColor, safeOpacity * 0.14)} 52%,
-              transparent 82%
+              ellipse at 32% 34%,
+              ${hexToRgba(primaryColor, safeOpacity)} 0%,
+              ${hexToRgba(primaryColor, safeOpacity * 0.88)} 28%,
+              ${hexToRgba(primaryColor, safeOpacity * 0.36)} 56%,
+              ${hexToRgba(primaryColor, safeOpacity * 0.1)} 72%,
+              transparent 90%
+            ),
+            radial-gradient(
+              ellipse at 68% 34%,
+              ${hexToRgba(secondaryColor, safeOpacity)} 0%,
+              ${hexToRgba(secondaryColor, safeOpacity * 0.88)} 28%,
+              ${hexToRgba(secondaryColor, safeOpacity * 0.36)} 56%,
+              ${hexToRgba(secondaryColor, safeOpacity * 0.1)} 72%,
+              transparent 90%
+            ),
+            radial-gradient(
+              ellipse at 50% 46%,
+              ${hexToRgba(primaryColor, safeOpacity * 0.24)} 0%,
+              ${hexToRgba(secondaryColor, safeOpacity * 0.22)} 34%,
+              transparent 76%
+            ),
+            linear-gradient(
+              180deg,
+              ${hexToRgba(primaryColor, safeOpacity * 0.2)} 0%,
+              ${hexToRgba(secondaryColor, safeOpacity * 0.18)} 46%,
+              transparent 100%
             )
           `,
-          filter: `blur(${Math.max(34, blur * 0.58)}px)`,
-          opacity: 0.9,
+          filter: `blur(${Math.max(48, blur * 0.82)}px)`,
+          opacity: 1,
           transition,
         }}
       />
@@ -351,17 +352,18 @@ function getPlacementPosition(
   };
 }
 
-function getSoftboxSize(
-  canvasMode: CanvasMode,
-): { width: string; height: string } {
+function getSoftboxSize(canvasMode: CanvasMode): {
+  width: string;
+  height: string;
+} {
   return canvasMode === "portrait"
     ? {
-        width: "112%",
-        height: "28%",
+        width: "165%",
+        height: "60%",
       }
     : {
-        width: "88%",
-        height: "34%",
+        width: "132%",
+        height: "58%",
       };
 }
 
@@ -383,28 +385,31 @@ function getSoftboxTop(
     return portrait ? "50%" : "50%";
   }
 
-  return portrait ? "18%" : "16%";
+  return portrait ? "20%" : "18%";
 }
 
-function getEdgeGlowSize(
-  canvasMode: CanvasMode,
-): { width: string; height: string } {
+function getEdgeGlowSize(canvasMode: CanvasMode): {
+  width: string;
+  height: string;
+} {
   return canvasMode === "portrait"
     ? { width: "48%", height: "22%" }
     : { width: "34%", height: "34%" };
 }
 
-function getStreamerGlowSize(
-  canvasMode: CanvasMode,
-): { width: string; height: string } {
+function getStreamerGlowSize(canvasMode: CanvasMode): {
+  width: string;
+  height: string;
+} {
   return canvasMode === "portrait"
     ? { width: "54%", height: "20%" }
     : { width: "38%", height: "28%" };
 }
 
-function getBeamSize(
-  canvasMode: CanvasMode,
-): { width: string; height: string } {
+function getBeamSize(canvasMode: CanvasMode): {
+  width: string;
+  height: string;
+} {
   return canvasMode === "portrait"
     ? { width: "28%", height: "82%" }
     : { width: "20%", height: "92%" };
@@ -420,18 +425,11 @@ function mirrorPercent(value: string): string {
   return `${100 - numeric}%`;
 }
 
-function clamp(
-  value: number,
-  minimum: number,
-  maximum: number,
-): number {
+function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(Math.max(value, minimum), maximum);
 }
 
-function hexToRgba(
-  hex: string,
-  alpha: number,
-): string {
+function hexToRgba(hex: string, alpha: number): string {
   const cleanHex = hex.replace("#", "").trim();
 
   const normalized =
@@ -448,18 +446,9 @@ function hexToRgba(
     return `rgba(255, 255, 255, ${safeAlpha})`;
   }
 
-  const red = Number.parseInt(
-    normalized.slice(0, 2),
-    16,
-  );
-  const green = Number.parseInt(
-    normalized.slice(2, 4),
-    16,
-  );
-  const blue = Number.parseInt(
-    normalized.slice(4, 6),
-    16,
-  );
+  const red = Number.parseInt(normalized.slice(0, 2), 16);
+  const green = Number.parseInt(normalized.slice(2, 4), 16);
+  const blue = Number.parseInt(normalized.slice(4, 6), 16);
 
   return `rgba(${red}, ${green}, ${blue}, ${safeAlpha})`;
 }
