@@ -47,25 +47,50 @@ export function Aurora({
   return (
     <div
       aria-hidden="true"
-      className={`aurora-effect pointer-events-none absolute inset-0 overflow-hidden ${className}`}
+      className={[
+        "aurora-effect",
+        "pointer-events-none",
+        "absolute",
+        "inset-0",
+        "overflow-hidden",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={style}
     >
       <div
-        className={`aurora-effect__sheet aurora-effect__sheet--one ${
-          animated ? "aurora-effect__sheet--animated" : ""
-        }`}
+        className={[
+          "aurora-effect__sheet",
+          "aurora-effect__sheet--one",
+          animated ? "aurora-effect__sheet--animated" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       />
 
       <div
-        className={`aurora-effect__sheet aurora-effect__sheet--two ${
-          animated ? "aurora-effect__sheet--animated-reverse" : ""
-        }`}
+        className={[
+          "aurora-effect__sheet",
+          "aurora-effect__sheet--two",
+          animated
+            ? "aurora-effect__sheet--animated-reverse"
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       />
 
       <div
-        className={`aurora-effect__sheet aurora-effect__sheet--three ${
-          animated ? "aurora-effect__sheet--animated-slow" : ""
-        }`}
+        className={[
+          "aurora-effect__sheet",
+          "aurora-effect__sheet--three",
+          animated
+            ? "aurora-effect__sheet--animated-slow"
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       />
 
       <div className="aurora-effect__glow aurora-effect__glow--left" />
