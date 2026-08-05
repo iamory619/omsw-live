@@ -77,59 +77,40 @@ export default function DecorationOverlayPage() {
     }
 
     let cancelled = false;
-    let userId = "";
-
-    const loadProfileAndSettings = async () => {
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("overlay_id", overlayId)
-        .maybeSingle();
-
-      if (profileError) {
-        console.error("Decoration overlay profile error:", profileError);
-        if (!cancelled) setLoading(false);
-        return;
-      }
-
-      if (!profile?.id) {
-        console.warn("Decoration overlay not found:", overlayId);
-        if (!cancelled) setLoading(false);
-        return;
-      }
-
-      userId = profile.id;
-      await loadSettings();
-    };
 
     const loadSettings = async () => {
-      if (!userId) return;
-
-      const { data, error } = await supabase
-        .from("decoration_settings")
-        .select(
-          "enabled,effect,primary_color,secondary_color,intensity,blur,speed,opacity,animation,smooth",
-        )
-        .eq("user_id", userId)
-        .maybeSingle();
+      const { data, error } = await supabase.rpc(
+        "get_decoration_settings_by_overlay",
+        {
+          p_overlay_id: overlayId,
+        },
+      );
 
       if (error) {
-        console.error("Decoration overlay settings error:", error);
-        if (!cancelled) setLoading(false);
+        console.error("Decoration overlay RPC error:", error);
+
+        if (!cancelled) {
+          setLoading(false);
+        }
+
         return;
       }
+
+      const row = Array.isArray(data)
+        ? data[0]
+        : data;
 
       if (!cancelled) {
         setSettings(
-          data
-            ? rowToSettings(data as DecorationSettingsRow)
+          row
+            ? rowToSettings(row as DecorationSettingsRow)
             : DEFAULT_SETTINGS,
         );
         setLoading(false);
       }
     };
 
-    void loadProfileAndSettings();
+    void loadSettings();
 
     const intervalId = window.setInterval(() => {
       void loadSettings();

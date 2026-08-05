@@ -23,8 +23,19 @@ type LightEffect =
   | "stage-light"
   | "aurora";
 
+type PresetId =
+  | "custom"
+  | "tiktok-pink"
+  | "gaming-neon"
+  | "warm-studio"
+  | "cool-blue"
+  | "concert-stage"
+  | "aurora-blue"
+  | "aurora-purple";
+
 type RoomLightSettings = {
   enabled: boolean;
+  preset: PresetId;
   effect: LightEffect;
   primaryColor: string;
   secondaryColor: string;
@@ -39,6 +50,7 @@ type RoomLightSettings = {
 type DecorationSettingsRow = {
   user_id: string;
   enabled: boolean;
+  preset: string | null;
   effect: LightEffect;
   primary_color: string;
   secondary_color: string;
@@ -52,6 +64,7 @@ type DecorationSettingsRow = {
 
 const DEFAULT_SETTINGS: RoomLightSettings = {
   enabled: true,
+  preset: "custom",
   effect: "studio-softbox",
   primaryColor: "#ff4da6",
   secondaryColor: "#7c3aed",
@@ -102,7 +115,7 @@ const EFFECT_OPTIONS: Array<{
 ];
 
 const LIGHT_PRESETS: Array<{
-  id: string;
+  id: Exclude<PresetId, "custom">;
   name: string;
   description: string;
   icon: string;
@@ -230,7 +243,7 @@ export default function RoomLightSettingsPage() {
       const { data: settingsData, error: settingsError } = await supabase
         .from("decoration_settings")
         .select(
-          "user_id,enabled,effect,primary_color,secondary_color,intensity,blur,speed,opacity,animation,smooth",
+          "user_id,enabled,preset,effect,primary_color,secondary_color,intensity,blur,speed,opacity,animation,smooth",
         )
         .eq("user_id", user.id)
         .maybeSingle();
@@ -288,17 +301,34 @@ export default function RoomLightSettingsPage() {
     setSettings((current) => ({
       ...current,
       [key]: value,
+      ...(key !== "enabled" &&
+      key !== "effect" &&
+      key !== "preset"
+        ? { preset: "custom" as PresetId }
+        : {}),
     }));
   };
 
-  const applyPreset = (presetSettings: Partial<RoomLightSettings>) => {
+  const applyPreset = (
+    presetId: Exclude<PresetId, "custom">,
+    presetSettings: Partial<RoomLightSettings>,
+  ) => {
+    const {
+      effect: _presetEffect,
+      preset: _presetName,
+      ...visualSettings
+    } = presetSettings;
+
     setSettings((current) => ({
       ...current,
-      ...presetSettings,
+      ...visualSettings,
+      preset: presetId,
       enabled: true,
     }));
 
-    setMessage("Preset applied. Press Save Settings to use it in OBS.");
+    setMessage(
+      "Preset applied. Lighting Style stays separate. Press Save Settings to use it in OBS.",
+    );
   };
 
   const saveSettings = async () => {
@@ -311,14 +341,21 @@ export default function RoomLightSettingsPage() {
       setSaving(true);
       setMessage("");
 
-      const { error } = await supabase
+      const payload = settingsToRow(profile.id, settings);
+
+      const { data: savedRow, error } = await supabase
         .from("decoration_settings")
-        .upsert(settingsToRow(profile.id, settings), {
-          onConflict: "user_id",
-        });
+        .update(payload)
+        .eq("user_id", profile.id)
+        .select("preset,effect,primary_color,secondary_color")
+        .single();
 
       if (error) {
         throw error;
+      }
+
+      if (!savedRow) {
+        throw new Error("Decoration settings were not returned after saving.");
       }
 
       window.localStorage.setItem(
@@ -327,7 +364,9 @@ export default function RoomLightSettingsPage() {
       );
 
       setPreviewKey((current) => current + 1);
-      setMessage("Room Light settings saved successfully.");
+      setMessage(
+        `Saved preset: ${savedRow.preset || "custom"} · Effect: ${savedRow.effect}`,
+      );
     } catch (error) {
       console.error("Save room light settings error:", error);
       setMessage("Unable to save settings. Please try again.");
@@ -348,9 +387,8 @@ export default function RoomLightSettingsPage() {
 
       const { error } = await supabase
         .from("decoration_settings")
-        .upsert(settingsToRow(profile.id, DEFAULT_SETTINGS), {
-          onConflict: "user_id",
-        });
+        .update(settingsToRow(profile.id, DEFAULT_SETTINGS))
+        .eq("user_id", profile.id);
 
       if (error) {
         throw error;
@@ -488,12 +526,22 @@ export default function RoomLightSettingsPage() {
                 </p>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                  {LIGHT_PRESETS.map((preset) => (
+                  {LIGHT_PRESETS.map((preset) => {
+                    const selected =
+                      settings.preset === preset.id;
+
+                    return (
                     <button
                       key={preset.id}
                       type="button"
-                      onClick={() => applyPreset(preset.settings)}
-                      className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-left transition hover:border-pink-500/50 hover:bg-pink-500/5"
+                      onClick={() =>
+                        applyPreset(preset.id, preset.settings)
+                      }
+                      className={`rounded-2xl border p-4 text-left transition ${
+                        selected
+                          ? "border-pink-500 bg-pink-500/15"
+                          : "border-zinc-800 bg-zinc-950 hover:border-pink-500/50 hover:bg-pink-500/5"
+                      }`}
                     >
                       <div className="flex items-start gap-3">
                         <div className="text-3xl">{preset.icon}</div>
@@ -505,7 +553,8 @@ export default function RoomLightSettingsPage() {
                         </div>
                       </div>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </Card>
 
@@ -846,6 +895,7 @@ function settingsToRow(
   return {
     user_id: userId,
     enabled: settings.enabled,
+    preset: settings.preset,
     effect: settings.effect,
     primary_color: settings.primaryColor,
     secondary_color: settings.secondaryColor,
@@ -862,6 +912,17 @@ function settingsToRow(
 function rowToSettings(
   row: DecorationSettingsRow,
 ): RoomLightSettings {
+  const validPresets: PresetId[] = [
+    "custom",
+    "tiktok-pink",
+    "gaming-neon",
+    "warm-studio",
+    "cool-blue",
+    "concert-stage",
+    "aurora-blue",
+    "aurora-purple",
+  ];
+
   const validEffects: LightEffect[] = [
     "studio-softbox",
     "rgb-studio",
@@ -872,6 +933,9 @@ function rowToSettings(
 
   return {
     enabled: row.enabled,
+    preset: validPresets.includes(row.preset as PresetId)
+      ? (row.preset as PresetId)
+      : DEFAULT_SETTINGS.preset,
     effect: validEffects.includes(row.effect)
       ? row.effect
       : DEFAULT_SETTINGS.effect,
