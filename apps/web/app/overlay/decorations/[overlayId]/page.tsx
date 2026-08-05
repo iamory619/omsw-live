@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Aurora } from "@/components/decorations";
 
 type LightEffect =
   | "studio-softbox"
@@ -12,8 +11,31 @@ type LightEffect =
   | "stage-light"
   | "aurora";
 
+type CanvasMode = "landscape" | "portrait";
+
+type LightPlacement =
+  | "left"
+  | "right"
+  | "top"
+  | "bottom"
+  | "center";
+
+type LightLayer = {
+  id: "light-1" | "light-2" | "light-3";
+  enabled: boolean;
+  color: string;
+  placement: LightPlacement;
+  intensity: number;
+  blur: number;
+  size: number;
+};
+
 type RoomLightSettings = {
   enabled: boolean;
+  canvasMode: CanvasMode;
+  placement: LightPlacement;
+  multiLightEnabled: boolean;
+  lights: LightLayer[];
   effect: LightEffect;
   primaryColor: string;
   secondaryColor: string;
@@ -27,6 +49,10 @@ type RoomLightSettings = {
 
 type DecorationSettingsRow = {
   enabled: boolean;
+  canvas_mode: string | null;
+  placement: string | null;
+  multi_light_enabled: boolean | null;
+  lights: unknown;
   effect: string;
   primary_color: string;
   secondary_color: string;
@@ -40,6 +66,38 @@ type DecorationSettingsRow = {
 
 const DEFAULT_SETTINGS: RoomLightSettings = {
   enabled: true,
+  canvasMode: "portrait",
+  placement: "center",
+  multiLightEnabled: false,
+  lights: [
+    {
+      id: "light-1",
+      enabled: true,
+      color: "#ff2d95",
+      placement: "left",
+      intensity: 72,
+      blur: 100,
+      size: 76,
+    },
+    {
+      id: "light-2",
+      enabled: true,
+      color: "#38bdf8",
+      placement: "right",
+      intensity: 72,
+      blur: 100,
+      size: 76,
+    },
+    {
+      id: "light-3",
+      enabled: false,
+      color: "#a855f7",
+      placement: "top",
+      intensity: 60,
+      blur: 110,
+      size: 64,
+    },
+  ],
   effect: "studio-softbox",
   primaryColor: "#ff4da6",
   secondaryColor: "#7c3aed",
@@ -132,50 +190,215 @@ export default function DecorationOverlayPage() {
   return (
     <main
       data-overlay-id={overlayId}
+      data-canvas-mode={settings.canvasMode}
+      data-placement={settings.placement}
       className="fixed inset-0 overflow-hidden bg-transparent"
     >
-      {settings.effect === "aurora" ? (
-        <Aurora
-          primaryColor={settings.primaryColor}
-          secondaryColor={settings.secondaryColor}
-          accentColor="#38bdf8"
-          opacity={opacity}
-          blur={settings.blur}
-          speed={Math.max(4, 16 - (settings.speed / 100) * 11)}
-          intensity={Math.max(0.3, settings.intensity / 70)}
-          animated={settings.animation}
-        />
-      ) : (
-        <>
-          <div
-            className={getEffectClassName(settings)}
-            style={getEffectStyle(settings)}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={getPlacementStyle(
+          settings.canvasMode,
+          settings.placement,
+        )}
+      >
+        {settings.multiLightEnabled ? (
+          <MultipleLightsOverlay
+            settings={settings}
+            duration={duration}
           />
-
-          <StudioLightLayers
+        ) : (
+          <FreeLightBlob
             settings={settings}
             opacity={opacity}
             duration={duration}
           />
-
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              boxShadow: `
-                inset 0 0 ${settings.blur * 1.6}px
-                  ${hexToRgba(settings.primaryColor, opacity * 0.58)},
-                inset 0 0 ${settings.blur * 1.05}px
-                  ${hexToRgba(settings.secondaryColor, opacity * 0.48)}
-              `,
-            }}
-          />
-        </>
-      )}
+        )}
+      </div>
     </main>
   );
 }
 
-function StudioLightLayers({
+
+function MultipleLightsOverlay({
+  settings,
+  duration,
+}: {
+  settings: RoomLightSettings;
+  duration: number;
+}) {
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      {settings.lights
+        .filter((light) => light.enabled)
+        .map((light, index) => {
+          const position = getLightPosition(
+            settings.canvasMode,
+            light.placement,
+          );
+
+          const opacity = clamp(
+            light.intensity / 100,
+            0,
+            1,
+          );
+
+          return (
+            <div
+              key={light.id}
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                left: position.left,
+                top: position.top,
+                width: `${light.size}%`,
+                height: `${light.size}%`,
+                background: `radial-gradient(
+                  circle,
+                  ${hexToRgba(light.color, opacity)} 0%,
+                  ${hexToRgba(
+                    light.color,
+                    opacity * 0.46,
+                  )} 38%,
+                  transparent 74%
+                )`,
+                filter: `blur(${light.blur}px)`,
+                mixBlendMode: "screen",
+                animation: settings.animation
+                  ? `roomLightOverlay ${
+                      duration + index * 0.35
+                    }s ease-in-out infinite ${
+                      index % 2 === 1 ? "reverse" : ""
+                    }`
+                  : undefined,
+                transition: settings.smooth
+                  ? "filter 700ms ease, opacity 700ms ease, transform 700ms ease"
+                  : undefined,
+              }}
+            />
+          );
+        })}
+    </div>
+  );
+}
+
+function parseLightLayers(value: unknown): LightLayer[] {
+  if (!Array.isArray(value)) {
+    return DEFAULT_SETTINGS.lights;
+  }
+
+  const validPlacements: LightPlacement[] = [
+    "left",
+    "right",
+    "top",
+    "bottom",
+    "center",
+  ];
+
+  return DEFAULT_SETTINGS.lights.map((fallback, index) => {
+    const candidate = value[index];
+
+    if (
+      !candidate ||
+      typeof candidate !== "object"
+    ) {
+      return fallback;
+    }
+
+    const row = candidate as Partial<LightLayer>;
+
+    return {
+      id: fallback.id,
+      enabled:
+        typeof row.enabled === "boolean"
+          ? row.enabled
+          : fallback.enabled,
+      color:
+        typeof row.color === "string"
+          ? row.color
+          : fallback.color,
+      placement: validPlacements.includes(
+        row.placement as LightPlacement,
+      )
+        ? (row.placement as LightPlacement)
+        : fallback.placement,
+      intensity: clampNumber(
+        row.intensity,
+        10,
+        100,
+        fallback.intensity,
+      ),
+      blur: clampNumber(
+        row.blur,
+        20,
+        180,
+        fallback.blur,
+      ),
+      size: clampNumber(
+        row.size,
+        30,
+        140,
+        fallback.size,
+      ),
+    };
+  });
+}
+
+function getLightPosition(
+  canvasMode: CanvasMode,
+  placement: LightPlacement,
+): { left: string; top: string } {
+  const portrait = canvasMode === "portrait";
+
+  if (placement === "left") {
+    return {
+      left: portrait ? "18%" : "14%",
+      top: "50%",
+    };
+  }
+
+  if (placement === "right") {
+    return {
+      left: portrait ? "82%" : "86%",
+      top: "50%",
+    };
+  }
+
+  if (placement === "top") {
+    return {
+      left: "50%",
+      top: portrait ? "16%" : "12%",
+    };
+  }
+
+  if (placement === "bottom") {
+    return {
+      left: "50%",
+      top: portrait ? "84%" : "88%",
+    };
+  }
+
+  return { left: "50%", top: "50%" };
+}
+
+function clampNumber(
+  value: unknown,
+  minimum: number,
+  maximum: number,
+  fallback: number,
+): number {
+  if (
+    typeof value !== "number" ||
+    !Number.isFinite(value)
+  ) {
+    return fallback;
+  }
+
+  return Math.min(
+    Math.max(value, minimum),
+    maximum,
+  );
+}
+
+function FreeLightBlob({
   settings,
   opacity,
   duration,
@@ -184,129 +407,206 @@ function StudioLightLayers({
   opacity: number;
   duration: number;
 }) {
-  if (settings.effect === "studio-softbox") {
+  const animation = settings.animation
+    ? `roomLightOverlay ${duration}s ease-in-out infinite`
+    : undefined;
+
+  const transition = settings.smooth
+    ? "filter 700ms ease, opacity 700ms ease, transform 700ms ease"
+    : undefined;
+
+  if (settings.effect === "aurora") {
     return (
-      <>
+      <div className="pointer-events-none absolute inset-0">
         <div
-          className="pointer-events-none absolute -left-[8%] top-[8%] h-[74%] w-[30%] rounded-[50%] blur-3xl"
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "aurora-main")}`}
           style={{
-            background: settings.primaryColor,
-            opacity: opacity * 0.48,
+            background: `
+              radial-gradient(
+                ellipse at 30% 50%,
+                ${hexToRgba(settings.primaryColor, opacity * 0.95)} 0%,
+                ${hexToRgba(settings.primaryColor, opacity * 0.45)} 32%,
+                transparent 70%
+              ),
+              radial-gradient(
+                ellipse at 70% 48%,
+                ${hexToRgba(settings.secondaryColor, opacity * 0.9)} 0%,
+                ${hexToRgba(settings.secondaryColor, opacity * 0.4)} 34%,
+                transparent 72%
+              )
+            `,
+            filter: `blur(${settings.blur}px) saturate(1.25)`,
+            opacity,
+            animation,
+            transition,
+            mixBlendMode: "screen",
           }}
         />
 
         <div
-          className="pointer-events-none absolute -right-[8%] top-[8%] h-[74%] w-[30%] rounded-[50%] blur-3xl"
+          className={`absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "aurora-wave")}`}
           style={{
-            background: settings.secondaryColor,
-            opacity: opacity * 0.48,
+            background: `linear-gradient(
+              90deg,
+              transparent 0%,
+              ${hexToRgba(settings.primaryColor, opacity * 0.55)} 25%,
+              ${hexToRgba(settings.secondaryColor, opacity * 0.5)} 70%,
+              transparent 100%
+            )`,
+            filter: `blur(${Math.max(24, settings.blur * 0.7)}px)`,
+            opacity: opacity * 0.85,
+            animation: settings.animation
+              ? `roomLightPreview ${duration * 1.15}s ease-in-out infinite`
+              : undefined,
+            transition,
+            mixBlendMode: "screen",
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (settings.effect === "stage-light") {
+    return (
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className={`absolute top-[-12%] -rotate-[12deg] ${getCanvasBlobClass(settings.canvasMode, "stage-left")}`}
+          style={{
+            background: `linear-gradient(
+              to bottom,
+              ${hexToRgba(settings.primaryColor, opacity * 0.9)} 0%,
+              ${hexToRgba(settings.primaryColor, opacity * 0.34)} 44%,
+              transparent 88%
+            )`,
+            filter: `blur(${Math.max(20, settings.blur * 0.72)}px)`,
+            opacity,
+            animation,
+            transition,
+            mixBlendMode: "screen",
           }}
         />
 
         <div
-          className="pointer-events-none absolute left-1/2 top-[-18%] h-[56%] w-[48%] -translate-x-1/2 rounded-[50%] bg-white blur-3xl"
-          style={{ opacity: opacity * 0.2 }}
+          className={`absolute top-[-12%] rotate-[12deg] ${getCanvasBlobClass(settings.canvasMode, "stage-right")}`}
+          style={{
+            background: `linear-gradient(
+              to bottom,
+              ${hexToRgba(settings.secondaryColor, opacity * 0.9)} 0%,
+              ${hexToRgba(settings.secondaryColor, opacity * 0.34)} 44%,
+              transparent 88%
+            )`,
+            filter: `blur(${Math.max(20, settings.blur * 0.72)}px)`,
+            opacity,
+            animation: settings.animation
+              ? `roomLightOverlay ${duration}s ease-in-out infinite reverse`
+              : undefined,
+            transition,
+            mixBlendMode: "screen",
+          }}
         />
-      </>
+      </div>
     );
   }
 
   if (settings.effect === "rgb-studio") {
     return (
-      <>
+      <div className="pointer-events-none absolute inset-0">
         <div
-          className="pointer-events-none absolute -left-[8%] inset-y-[10%] w-[26%] rounded-[50%] blur-3xl"
+          className={`absolute top-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "rgb-left")}`}
           style={{
-            background: settings.primaryColor,
-            opacity: opacity * 0.66,
+            background: `radial-gradient(
+              ellipse,
+              ${hexToRgba(settings.primaryColor, opacity)} 0%,
+              ${hexToRgba(settings.primaryColor, opacity * 0.48)} 38%,
+              transparent 74%
+            )`,
+            filter: `blur(${settings.blur}px)`,
+            animation,
+            transition,
+            mixBlendMode: "screen",
           }}
         />
 
         <div
-          className="pointer-events-none absolute -right-[8%] inset-y-[10%] w-[26%] rounded-[50%] blur-3xl"
+          className={`absolute top-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "rgb-right")}`}
           style={{
-            background: settings.secondaryColor,
-            opacity: opacity * 0.66,
+            background: `radial-gradient(
+              ellipse,
+              ${hexToRgba(settings.secondaryColor, opacity)} 0%,
+              ${hexToRgba(settings.secondaryColor, opacity * 0.48)} 38%,
+              transparent 74%
+            )`,
+            filter: `blur(${settings.blur}px)`,
+            animation: settings.animation
+              ? `roomLightOverlay ${duration}s ease-in-out infinite reverse`
+              : undefined,
+            transition,
+            mixBlendMode: "screen",
           }}
         />
-
-        <div
-          className="pointer-events-none absolute inset-x-[18%] bottom-[-8%] h-[26%] rounded-[50%] blur-3xl"
-          style={{
-            background: `linear-gradient(90deg, ${settings.primaryColor}, ${settings.secondaryColor})`,
-            opacity: opacity * 0.45,
-          }}
-        />
-      </>
+      </div>
     );
   }
 
   if (settings.effect === "streamer-room") {
     return (
-      <>
+      <div className="pointer-events-none absolute inset-0">
         <div
-          className="pointer-events-none absolute left-[7%] top-[8%] h-[34%] w-[34%] rounded-full blur-3xl"
+          className={`absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "streamer-main")}`}
           style={{
-            background: settings.primaryColor,
-            opacity: opacity * 0.55,
+            background: `
+              radial-gradient(
+                ellipse at 28% 42%,
+                ${hexToRgba(settings.primaryColor, opacity * 0.95)} 0%,
+                transparent 56%
+              ),
+              radial-gradient(
+                ellipse at 72% 42%,
+                ${hexToRgba(settings.secondaryColor, opacity * 0.92)} 0%,
+                transparent 56%
+              )
+            `,
+            filter: `blur(${settings.blur}px)`,
+            animation,
+            transition,
+            mixBlendMode: "screen",
           }}
         />
 
         <div
-          className="pointer-events-none absolute right-[7%] top-[12%] h-[34%] w-[34%] rounded-full blur-3xl"
+          className={`absolute bottom-[5%] left-1/2 -translate-x-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "streamer-bottom")}`}
           style={{
-            background: settings.secondaryColor,
-            opacity: opacity * 0.55,
+            background: `linear-gradient(
+              90deg,
+              ${hexToRgba(settings.primaryColor, opacity * 0.7)},
+              ${hexToRgba(settings.secondaryColor, opacity * 0.7)}
+            )`,
+            filter: `blur(${Math.max(24, settings.blur * 0.82)}px)`,
+            opacity: opacity * 0.75,
+            transition,
+            mixBlendMode: "screen",
           }}
         />
-
-        <div
-          className="pointer-events-none absolute inset-x-[12%] bottom-[-10%] h-[35%] rounded-[50%] blur-3xl"
-          style={{
-            background: `linear-gradient(90deg, ${settings.primaryColor}, ${settings.secondaryColor})`,
-            opacity: opacity * 0.52,
-          }}
-        />
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <div
-        className="pointer-events-none absolute left-[5%] top-[-20%] h-[105%] w-[30%] origin-top -rotate-[12deg] blur-2xl"
-        style={{
-          background: `linear-gradient(to bottom, ${hexToRgba(
-            settings.primaryColor,
-            opacity * 0.72,
-          )}, transparent 74%)`,
-          animation: settings.animation
-            ? `roomLightBeam ${duration}s ease-in-out infinite`
-            : undefined,
-        }}
-      />
-
-      <div
-        className="pointer-events-none absolute right-[5%] top-[-20%] h-[105%] w-[30%] origin-top rotate-[12deg] blur-2xl"
-        style={{
-          background: `linear-gradient(to bottom, ${hexToRgba(
-            settings.secondaryColor,
-            opacity * 0.72,
-          )}, transparent 74%)`,
-          animation: settings.animation
-            ? `roomLightBeam ${duration}s ease-in-out infinite reverse`
-            : undefined,
-        }}
-      />
-
-      <div
-        className="pointer-events-none absolute inset-x-[18%] bottom-[-12%] h-[32%] rounded-[50%] blur-3xl"
-        style={{
-          background: settings.primaryColor,
-          opacity: opacity * 0.48,
-        }}
-      />
-    </>
+    <div
+      className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[50%] ${getCanvasBlobClass(settings.canvasMode, "softbox")}`}
+      style={{
+        background: `radial-gradient(
+          ellipse,
+          ${hexToRgba(settings.primaryColor, opacity)} 0%,
+          ${hexToRgba(settings.secondaryColor, opacity * 0.62)} 34%,
+          transparent 74%
+        )`,
+        filter: `blur(${settings.blur}px)`,
+        animation,
+        transition,
+        mixBlendMode: "screen",
+      }}
+    />
   );
 }
 
@@ -317,8 +617,36 @@ function rowToSettings(
     ? (row.effect as LightEffect)
     : DEFAULT_SETTINGS.effect;
 
+  const canvasMode: CanvasMode =
+    row.canvas_mode === "landscape"
+      ? "landscape"
+      : "portrait";
+
+  const validPlacements: LightPlacement[] = [
+    "left",
+    "right",
+    "top",
+    "bottom",
+    "center",
+  ];
+
+  const placement: LightPlacement =
+    validPlacements.includes(
+      row.placement as LightPlacement,
+    )
+      ? (row.placement as LightPlacement)
+      : DEFAULT_SETTINGS.placement;
+
+  const lights = parseLightLayers(row.lights);
+
   return {
     enabled: row.enabled ?? DEFAULT_SETTINGS.enabled,
+    canvasMode,
+    placement,
+    multiLightEnabled:
+      row.multi_light_enabled ??
+      DEFAULT_SETTINGS.multiLightEnabled,
+    lights,
     effect,
     primaryColor:
       row.primary_color || DEFAULT_SETTINGS.primaryColor,
@@ -333,6 +661,99 @@ function rowToSettings(
   };
 }
 
+
+
+function getCanvasBlobClass(
+  canvasMode: CanvasMode,
+  layer:
+    | "aurora-main"
+    | "aurora-wave"
+    | "stage-left"
+    | "stage-right"
+    | "rgb-left"
+    | "rgb-right"
+    | "streamer-main"
+    | "streamer-bottom"
+    | "softbox",
+): string {
+  const portrait = canvasMode === "portrait";
+
+  if (layer === "aurora-main") {
+    return portrait ? "h-[46%] w-[92%]" : "h-[62%] w-[78%]";
+  }
+
+  if (layer === "aurora-wave") {
+    return portrait ? "h-[22%] w-[88%]" : "h-[30%] w-[66%]";
+  }
+
+  if (layer === "stage-left") {
+    return portrait
+      ? "left-[10%] h-[82%] w-[38%]"
+      : "left-[22%] h-[90%] w-[30%]";
+  }
+
+  if (layer === "stage-right") {
+    return portrait
+      ? "right-[10%] h-[82%] w-[38%]"
+      : "right-[22%] h-[90%] w-[30%]";
+  }
+
+  if (layer === "rgb-left") {
+    return portrait
+      ? "left-[-8%] h-[54%] w-[62%]"
+      : "left-[8%] h-[70%] w-[44%]";
+  }
+
+  if (layer === "rgb-right") {
+    return portrait
+      ? "right-[-8%] h-[54%] w-[62%]"
+      : "right-[8%] h-[70%] w-[44%]";
+  }
+
+  if (layer === "streamer-main") {
+    return portrait ? "h-[50%] w-[94%]" : "h-[68%] w-[74%]";
+  }
+
+  if (layer === "streamer-bottom") {
+    return portrait ? "h-[20%] w-[86%]" : "h-[28%] w-[62%]";
+  }
+
+  return portrait ? "h-[54%] w-[92%]" : "h-[72%] w-[72%]";
+}
+
+function getPlacementStyle(
+  canvasMode: CanvasMode,
+  placement: LightPlacement,
+): React.CSSProperties {
+  const portrait = canvasMode === "portrait";
+
+  const scale = portrait ? 0.84 : 0.92;
+
+  let translateX = 0;
+  let translateY = 0;
+
+  if (placement === "left") {
+    translateX = portrait ? -22 : -26;
+  }
+
+  if (placement === "right") {
+    translateX = portrait ? 22 : 26;
+  }
+
+  if (placement === "top") {
+    translateY = portrait ? -28 : -20;
+  }
+
+  if (placement === "bottom") {
+    translateY = portrait ? 28 : 20;
+  }
+
+  return {
+    transform: `translate(${translateX}%, ${translateY}%) scale(${scale})`,
+    transformOrigin: "center center",
+  };
+}
+
 function getOpacity(settings: RoomLightSettings): number {
   return clamp(
     (settings.opacity / 100) * (settings.intensity / 100),
@@ -343,82 +764,6 @@ function getOpacity(settings: RoomLightSettings): number {
 
 function getDuration(settings: RoomLightSettings): number {
   return Math.max(1.5, 8 - (settings.speed / 100) * 6);
-}
-
-function getEffectStyle(
-  settings: RoomLightSettings,
-): React.CSSProperties {
-  return {
-    "--room-light-primary": settings.primaryColor,
-    "--room-light-secondary": settings.secondaryColor,
-    "--room-light-opacity": getOpacity(settings),
-    "--room-light-blur": `${settings.blur}px`,
-    "--room-light-duration": `${getDuration(settings)}s`,
-  } as React.CSSProperties;
-}
-
-function getEffectClassName(
-  settings: RoomLightSettings,
-): string {
-  const base = "pointer-events-none absolute inset-[-18%]";
-
-  const smooth = settings.smooth
-    ? "transition-all duration-700"
-    : "";
-
-  const animation = settings.animation
-    ? "animate-[roomLightOverlay_var(--room-light-duration)_ease-in-out_infinite]"
-    : "";
-
-  if (settings.effect === "studio-softbox") {
-    return [
-      base,
-      smooth,
-      animation,
-      "bg-[radial-gradient(ellipse_at_18%_42%,var(--room-light-primary)_0%,transparent_38%),radial-gradient(ellipse_at_82%_42%,var(--room-light-secondary)_0%,transparent_38%),radial-gradient(ellipse_at_50%_8%,rgba(255,255,255,.32)_0%,transparent_30%)]",
-      "opacity-[var(--room-light-opacity)]",
-      "blur-[var(--room-light-blur)]",
-    ]
-      .filter(Boolean)
-      .join(" ");
-  }
-
-  if (settings.effect === "rgb-studio") {
-    return [
-      base,
-      smooth,
-      animation,
-      "bg-[radial-gradient(circle_at_7%_50%,var(--room-light-primary)_0%,transparent_40%),radial-gradient(circle_at_93%_50%,var(--room-light-secondary)_0%,transparent_40%),linear-gradient(115deg,transparent_30%,rgba(255,255,255,.07)_50%,transparent_70%)]",
-      "opacity-[var(--room-light-opacity)]",
-      "blur-[var(--room-light-blur)]",
-    ]
-      .filter(Boolean)
-      .join(" ");
-  }
-
-  if (settings.effect === "streamer-room") {
-    return [
-      base,
-      smooth,
-      animation,
-      "bg-[radial-gradient(circle_at_18%_24%,var(--room-light-primary)_0%,transparent_36%),radial-gradient(circle_at_82%_28%,var(--room-light-secondary)_0%,transparent_36%),radial-gradient(ellipse_at_50%_100%,var(--room-light-primary)_0%,transparent_44%)]",
-      "opacity-[var(--room-light-opacity)]",
-      "blur-[var(--room-light-blur)]",
-    ]
-      .filter(Boolean)
-      .join(" ");
-  }
-
-  return [
-    base,
-    smooth,
-    animation,
-    "bg-[conic-gradient(from_205deg_at_22%_0%,transparent_0deg,var(--room-light-primary)_18deg,transparent_43deg),conic-gradient(from_137deg_at_78%_0%,transparent_0deg,var(--room-light-secondary)_18deg,transparent_43deg),radial-gradient(ellipse_at_50%_100%,var(--room-light-primary)_0%,transparent_46%)]",
-    "opacity-[var(--room-light-opacity)]",
-    "blur-[var(--room-light-blur)]",
-  ]
-    .filter(Boolean)
-    .join(" ");
 }
 
 function clamp(
