@@ -109,6 +109,20 @@ export default function RoomLightSettingsPage() {
     void load();
   }, [router, supabase]);
 
+  useEffect(() => {
+    if (!message) {
+      return;
+    }
+
+    const timerId = window.setTimeout(() => {
+      setMessage("");
+    }, 3000);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [message]);
+
   const overlayUrl =
     origin && profile?.overlay_id
       ? `${origin}/overlay/decorations/${profile.overlay_id}`
@@ -189,7 +203,12 @@ export default function RoomLightSettingsPage() {
       );
 
       setPreviewKey((current) => current + 1);
-      setMessage("Room Light settings saved successfully.");
+      setMessage("✨ Lighting saved successfully.");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     } catch (error) {
       console.error("Save Room Light settings error:", error);
       setMessage("Unable to save settings.");
@@ -212,13 +231,23 @@ export default function RoomLightSettingsPage() {
 
       if (error) throw error;
 
-      setSettings(DEFAULT_SETTINGS);
+      setSettings({
+        ...DEFAULT_SETTINGS,
+      });
+
       window.localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify(DEFAULT_SETTINGS),
       );
+
       setPreviewKey((current) => current + 1);
-      setMessage("Settings restored to default.");
+      setOpenSection("presets");
+      setMessage("✨ Room Light has been reset.");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     } catch (error) {
       console.error("Reset Room Light settings error:", error);
       setMessage("Unable to reset settings.");

@@ -29,10 +29,10 @@ export function Aurora({
   animated = true,
   className = "",
 }: AuroraProps) {
-  const safeOpacity = clamp(opacity, 0, 1);
-  const safeBlur = clamp(blur, 20, 220);
+  const safeOpacity = clamp(opacity * 1.22, 0, 1);
+  const safeBlur = clamp(blur * 0.82, 20, 180);
   const safeSpeed = clamp(speed, 3, 30);
-  const safeIntensity = clamp(intensity, 0.2, 1.8);
+  const safeIntensity = clamp(intensity * 1.28, 0.35, 2);
 
   const style = {
     "--aurora-primary": primaryColor,

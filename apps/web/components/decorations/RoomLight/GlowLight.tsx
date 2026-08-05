@@ -33,7 +33,13 @@ export function GlowLight({
   animation: _animation,
   smooth,
 }: GlowLightProps) {
-  const safeOpacity = clamp((opacity / 100) * (intensity / 100), 0, 1);
+  const safeOpacity = clamp(
+    (opacity / 100) *
+      (intensity / 100) *
+      1.18,
+    0,
+    1,
+  );
 
   const position = getPlacementPosition(canvasMode, placement);
 
@@ -60,11 +66,12 @@ export function GlowLight({
             height: beamSize.height,
             background: `linear-gradient(
               to bottom,
-              ${hexToRgba(primaryColor, safeOpacity * 0.52)} 0%,
-              ${hexToRgba(primaryColor, safeOpacity * 0.22)} 34%,
-              transparent 82%
+              ${hexToRgba(primaryColor, safeOpacity * 0.94)} 0%,
+              ${hexToRgba(primaryColor, safeOpacity * 0.58)} 36%,
+              ${hexToRgba(primaryColor, safeOpacity * 0.18)} 62%,
+              transparent 88%
             )`,
-            filter: `blur(${Math.max(18, blur * 0.55)}px)`,
+            filter: `blur(${Math.max(16, blur * 0.46)}px)`,
             mixBlendMode: "screen",
             transition,
           }}
@@ -84,11 +91,12 @@ export function GlowLight({
             height: beamSize.height,
             background: `linear-gradient(
               to bottom,
-              ${hexToRgba(secondaryColor, safeOpacity * 0.52)} 0%,
-              ${hexToRgba(secondaryColor, safeOpacity * 0.22)} 34%,
-              transparent 82%
+              ${hexToRgba(secondaryColor, safeOpacity * 0.94)} 0%,
+              ${hexToRgba(secondaryColor, safeOpacity * 0.58)} 36%,
+              ${hexToRgba(secondaryColor, safeOpacity * 0.18)} 62%,
+              transparent 88%
             )`,
-            filter: `blur(${Math.max(18, blur * 0.55)}px)`,
+            filter: `blur(${Math.max(16, blur * 0.46)}px)`,
             mixBlendMode: "screen",
             transition,
           }}
@@ -104,7 +112,7 @@ export function GlowLight({
       <div className="pointer-events-none absolute inset-0 z-20">
         <SoftGlowStrip
           color={primaryColor}
-          opacity={safeOpacity * 0.58}
+          opacity={safeOpacity * 0.92}
           blur={blur}
           left={
             placement === "center"
@@ -121,7 +129,7 @@ export function GlowLight({
 
         <SoftGlowStrip
           color={secondaryColor}
-          opacity={safeOpacity * 0.58}
+          opacity={safeOpacity * 0.92}
           blur={blur}
           left={
             placement === "center"
@@ -146,7 +154,7 @@ export function GlowLight({
       <div className="pointer-events-none absolute inset-0 z-20">
         <SoftGlowStrip
           color={primaryColor}
-          opacity={safeOpacity * 0.46}
+          opacity={safeOpacity * 0.84}
           blur={blur}
           left={
             placement === "center"
@@ -169,7 +177,7 @@ export function GlowLight({
 
         <SoftGlowStrip
           color={secondaryColor}
-          opacity={safeOpacity * 0.46}
+          opacity={safeOpacity * 0.84}
           blur={blur}
           left={
             placement === "center"
@@ -200,11 +208,11 @@ export function GlowLight({
             background: `linear-gradient(
               90deg,
               transparent 0%,
-              ${hexToRgba(primaryColor, safeOpacity * 0.26)} 26%,
-              ${hexToRgba(secondaryColor, safeOpacity * 0.26)} 74%,
+              ${hexToRgba(primaryColor, safeOpacity * 0.56)} 24%,
+              ${hexToRgba(secondaryColor, safeOpacity * 0.56)} 76%,
               transparent 100%
             )`,
-            filter: `blur(${Math.max(20, blur * 0.72)}px)`,
+            filter: `blur(${Math.max(18, blur * 0.58)}px)`,
             mixBlendMode: "screen",
             transition,
           }}
@@ -299,12 +307,12 @@ function SoftGlowStrip({
         background: `linear-gradient(
           90deg,
           transparent 0%,
-          ${hexToRgba(color, opacity * 0.18)} 18%,
-          ${hexToRgba(color, opacity * 0.52)} 48%,
-          ${hexToRgba(color, opacity * 0.18)} 82%,
+          ${hexToRgba(color, opacity * 0.28)} 16%,
+          ${hexToRgba(color, opacity * 0.82)} 48%,
+          ${hexToRgba(color, opacity * 0.28)} 84%,
           transparent 100%
         )`,
-        filter: `blur(${Math.max(20, blur * 0.8)}px)`,
+        filter: `blur(${Math.max(18, blur * 0.62)}px)`,
         mixBlendMode: "screen",
         transition,
       }}
