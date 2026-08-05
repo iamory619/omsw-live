@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LoadingCard } from "@/components/ui/LoadingCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Aurora } from "@/components/decorations";
 
 type Profile = {
   id: string;
@@ -16,10 +17,11 @@ type Profile = {
 };
 
 type LightEffect =
-  | "ambient"
-  | "pulse"
-  | "wave"
-  | "spotlight";
+  | "studio-softbox"
+  | "rgb-studio"
+  | "streamer-room"
+  | "stage-light"
+  | "aurora";
 
 type RoomLightSettings = {
   enabled: boolean;
@@ -50,7 +52,7 @@ type DecorationSettingsRow = {
 
 const DEFAULT_SETTINGS: RoomLightSettings = {
   enabled: true,
-  effect: "ambient",
+  effect: "studio-softbox",
   primaryColor: "#ff4da6",
   secondaryColor: "#7c3aed",
   intensity: 70,
@@ -68,28 +70,92 @@ const EFFECT_OPTIONS: Array<{
   icon: string;
 }> = [
   {
-    id: "ambient",
-    name: "Ambient Glow",
-    description: "แสงฟุ้งนุ่ม ๆ รอบขอบหน้าจอ",
-    icon: "✨",
+    id: "studio-softbox",
+    name: "Studio Softbox",
+    description: "ไฟนุ่มซ้าย–ขวา เหมาะกับไลฟ์ขายของและพูดคุย",
+    icon: "💡",
   },
   {
-    id: "pulse",
-    name: "Neon Pulse",
-    description: "แสงค่อย ๆ หายใจและเรืองขึ้นลง",
-    icon: "💗",
-  },
-  {
-    id: "wave",
-    name: "RGB Wave",
-    description: "แสงสีเคลื่อนที่ช้า ๆ รอบหน้าจอ",
+    id: "rgb-studio",
+    name: "RGB Studio",
+    description: "ไฟสีสองฝั่งแบบห้องเกม สตรีมเพลง และไลฟ์วัยรุ่น",
     icon: "🌈",
   },
   {
-    id: "spotlight",
-    name: "Spotlight",
-    description: "แสงสปอตไลต์จากด้านบนของหน้าจอ",
-    icon: "🔦",
+    id: "streamer-room",
+    name: "Streamer Room",
+    description: "ไฟหลังฉาก ไฟโต๊ะ และแสงบรรยากาศแบบสตรีมเมอร์",
+    icon: "🎮",
+  },
+  {
+    id: "stage-light",
+    name: "Stage Light",
+    description: "ลำแสงด้านบนและแสงพื้น เหมาะกับร้องเพลงและโชว์",
+    icon: "🎤",
+  },
+  {
+    id: "aurora",
+    name: "Aurora",
+    description: "ริ้วแสงเหนือเคลื่อนไหว เหมาะกับไลฟ์เพลง เกม และบรรยากาศแฟนตาซี",
+    icon: "🌌",
+  },
+];
+
+const LIGHT_PRESETS: Array<{
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  settings: Partial<RoomLightSettings>;
+}> = [
+  {
+    id: "tiktok-pink",
+    name: "TikTok Pink",
+    description: "ชมพู–ม่วง สดใส เหมาะกับไลฟ์บิวตี้",
+    icon: "🩷",
+    settings: { effect: "rgb-studio", primaryColor: "#ff2d95", secondaryColor: "#7c3aed", intensity: 78, blur: 105, speed: 38, opacity: 72 },
+  },
+  {
+    id: "gaming-neon",
+    name: "Gaming Neon",
+    description: "ฟ้า–ม่วง เข้มคมแบบห้องเกม",
+    icon: "🎮",
+    settings: { effect: "streamer-room", primaryColor: "#00d9ff", secondaryColor: "#8b5cf6", intensity: 82, blur: 88, speed: 48, opacity: 76 },
+  },
+  {
+    id: "warm-studio",
+    name: "Warm Studio",
+    description: "แสงอุ่นนุ่ม ดูผิวสวยและเป็นธรรมชาติ",
+    icon: "🧡",
+    settings: { effect: "studio-softbox", primaryColor: "#ffd3a1", secondaryColor: "#ff8a4c", intensity: 68, blur: 120, speed: 22, opacity: 62 },
+  },
+  {
+    id: "cool-blue",
+    name: "Cool Blue",
+    description: "สะอาด โมเดิร์น เหมาะกับไลฟ์เทคและพูดคุย",
+    icon: "🩵",
+    settings: { effect: "studio-softbox", primaryColor: "#8be9ff", secondaryColor: "#3b82f6", intensity: 72, blur: 110, speed: 28, opacity: 64 },
+  },
+  {
+    id: "concert-stage",
+    name: "Concert Stage",
+    description: "ลำแสงม่วง–ชมพูสำหรับร้องเพลงและโชว์",
+    icon: "🎤",
+    settings: { effect: "stage-light", primaryColor: "#ff3cac", secondaryColor: "#784ba0", intensity: 90, blur: 70, speed: 58, opacity: 80 },
+  },
+  {
+    id: "aurora-blue",
+    name: "Aurora Blue",
+    description: "แสงเหนือฟ้า–เขียว ดูสะอาดและลึกลับ",
+    icon: "🌌",
+    settings: { effect: "aurora", primaryColor: "#52f7d4", secondaryColor: "#38bdf8", intensity: 82, blur: 95, speed: 40, opacity: 76 },
+  },
+  {
+    id: "aurora-purple",
+    name: "Aurora Purple",
+    description: "แสงเหนือม่วง–ชมพู แฟนตาซีและโรแมนติก",
+    icon: "💜",
+    settings: { effect: "aurora", primaryColor: "#a855f7", secondaryColor: "#ff4da6", intensity: 84, blur: 100, speed: 46, opacity: 78 },
   },
 ];
 
@@ -225,6 +291,16 @@ export default function RoomLightSettingsPage() {
     }));
   };
 
+  const applyPreset = (presetSettings: Partial<RoomLightSettings>) => {
+    setSettings((current) => ({
+      ...current,
+      ...presetSettings,
+      enabled: true,
+    }));
+
+    setMessage("Preset applied. Press Save Settings to use it in OBS.");
+  };
+
   const saveSettings = async () => {
     if (!profile?.id) {
       setMessage("User profile not found. Please refresh the page.");
@@ -320,8 +396,8 @@ export default function RoomLightSettingsPage() {
         <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <SectionHeader
             badge="Live Decorations"
-            title="💡 Room Light"
-            description="Create ambient lighting for your livestream without connecting it to gifts."
+            title="💡 Studio Room Light"
+            description="Create studio lighting, RGB ambience and Aurora effects for your livestream without connecting to gifts."
           />
 
           <div className="flex flex-wrap gap-3">
@@ -404,11 +480,42 @@ export default function RoomLightSettingsPage() {
 
               <Card>
                 <h2 className="text-xl font-black">
-                  Lighting Effect
+                  Studio Presets
                 </h2>
 
                 <p className="mt-1 text-sm text-zinc-400">
-                  Choose the lighting movement and atmosphere.
+                  เลือกบรรยากาศสำเร็จรูป แล้วปรับรายละเอียดต่อได้ทันที
+                </p>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                  {LIGHT_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => applyPreset(preset.settings)}
+                      className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-left transition hover:border-pink-500/50 hover:bg-pink-500/5"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="text-3xl">{preset.icon}</div>
+                        <div>
+                          <div className="font-black">{preset.name}</div>
+                          <div className="mt-1 text-xs leading-5 text-zinc-400">
+                            {preset.description}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+
+              <Card>
+                <h2 className="text-xl font-black">
+                  Studio Lighting Style
+                </h2>
+
+                <p className="mt-1 text-sm text-zinc-400">
+                  เลือกรูปแบบการจัดไฟให้เหมาะกับห้องไลฟ์ของคุณ
                 </p>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
@@ -574,36 +681,45 @@ export default function RoomLightSettingsPage() {
                   key={previewKey}
                   className="relative mt-5 aspect-video overflow-hidden rounded-3xl border border-zinc-700 bg-[#08080d]"
                 >
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#20202a_0%,#09090b_72%)]" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,#14141d_0%,#09090d_68%,#050507_100%)]" />
 
-                  <div className="absolute inset-[10%] rounded-[2rem] border border-white/10 bg-black/25 shadow-2xl backdrop-blur-[2px]">
-                    <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/5" />
-
+                  <div className="absolute inset-x-[7%] top-[7%] h-[68%] overflow-hidden rounded-t-[2rem] border border-white/10 bg-[#101018] shadow-2xl">
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:38px_38px]" />
+                    <div className="absolute left-[7%] top-[12%] h-[58%] w-[8%] rounded-full bg-[var(--room-light-primary)] opacity-70 blur-md" />
+                    <div className="absolute right-[7%] top-[12%] h-[58%] w-[8%] rounded-full bg-[var(--room-light-secondary)] opacity-70 blur-md" />
+                    <div className="absolute left-1/2 top-[8%] h-[52%] w-[38%] -translate-x-1/2 rounded-[50%] bg-white/5 blur-3xl" />
+                    <div className="absolute bottom-[12%] left-1/2 h-[46%] w-[26%] -translate-x-1/2 rounded-t-[48%] border border-white/10 bg-black/35 shadow-2xl">
+                      <div className="absolute left-1/2 top-[10%] h-[27%] w-[35%] -translate-x-1/2 rounded-full bg-zinc-700/80" />
+                      <div className="absolute bottom-0 left-1/2 h-[62%] w-[64%] -translate-x-1/2 rounded-t-[46%] bg-zinc-800/90" />
+                    </div>
+                    <div className="absolute bottom-[8%] left-[12%] h-2 w-[25%] rounded-full bg-[var(--room-light-primary)] opacity-70 blur-sm" />
+                    <div className="absolute bottom-[8%] right-[12%] h-2 w-[25%] rounded-full bg-[var(--room-light-secondary)] opacity-70 blur-sm" />
                     <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full border border-white/10 bg-black/55 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-zinc-300 backdrop-blur">
-                      <span className="h-2 w-2 rounded-full bg-red-500" />
-                      Webcam Area
-                    </div>
-
-                    <div className="absolute right-5 top-5 rounded-full border border-white/10 bg-black/55 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-zinc-400 backdrop-blur">
-                      Transparent Scene
-                    </div>
-
-                    <div className="absolute inset-x-[8%] bottom-[12%] top-[22%] rounded-[1.5rem] border border-dashed border-white/15 bg-white/[0.025]">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-4xl opacity-70">🎥</div>
-                          <div className="mt-3 text-sm font-black text-zinc-300">
-                            Camera Preview Area
-                          </div>
-                          <div className="mt-1 text-xs text-zinc-500">
-                            Room Light will glow around your scene
-                          </div>
-                        </div>
-                      </div>
+                      <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+                      Live Studio Preview
                     </div>
                   </div>
 
-                  {settings.enabled && (
+                  <div className="absolute inset-x-[5%] bottom-[7%] h-[25%] rounded-[50%] bg-black/70 blur-2xl" />
+                  <div className="absolute bottom-[8%] left-1/2 h-[13%] w-[52%] -translate-x-1/2 rounded-t-[1.5rem] border border-white/10 bg-zinc-900/85 shadow-2xl">
+                    <div className="absolute inset-x-[8%] top-3 h-1.5 rounded-full bg-gradient-to-r from-[var(--room-light-primary)] via-white/30 to-[var(--room-light-secondary)] opacity-80" />
+                  </div>
+
+                  {settings.enabled && settings.effect === "aurora" && (
+                    <Aurora
+                      primaryColor={settings.primaryColor}
+                      secondaryColor={settings.secondaryColor}
+                      accentColor="#38bdf8"
+                      opacity={(settings.opacity / 100) * (settings.intensity / 100)}
+                      blur={settings.blur}
+                      speed={Math.max(4, 16 - (settings.speed / 100) * 11)}
+                      intensity={Math.max(0.3, settings.intensity / 70)}
+                      animated={settings.animation}
+                      className="z-20"
+                    />
+                  )}
+
+                  {settings.enabled && settings.effect !== "aurora" && (
                     <div
                       className={getEffectClassName(settings)}
                       style={previewStyle}
@@ -747,10 +863,11 @@ function rowToSettings(
   row: DecorationSettingsRow,
 ): RoomLightSettings {
   const validEffects: LightEffect[] = [
-    "ambient",
-    "pulse",
-    "wave",
-    "spotlight",
+    "studio-softbox",
+    "rgb-studio",
+    "streamer-room",
+    "stage-light",
+    "aurora",
   ];
 
   return {
@@ -918,17 +1035,21 @@ function getEffectClassName(
     ? "animate-[roomLightPreview_var(--room-light-duration)_ease-in-out_infinite]"
     : "";
 
-  if (settings.effect === "spotlight") {
-    return `${base} ${transition} ${animation} bg-[radial-gradient(ellipse_at_top,var(--room-light-primary)_0%,transparent_58%),radial-gradient(ellipse_at_bottom,var(--room-light-secondary)_0%,transparent_55%)] opacity-[var(--room-light-opacity)] blur-[var(--room-light-blur)]`;
+  if (settings.effect === "studio-softbox") {
+    return `${base} ${transition} ${animation} bg-[radial-gradient(ellipse_at_18%_42%,var(--room-light-primary)_0%,transparent_38%),radial-gradient(ellipse_at_82%_42%,var(--room-light-secondary)_0%,transparent_38%),radial-gradient(ellipse_at_50%_18%,rgba(255,255,255,.45)_0%,transparent_32%)] opacity-[var(--room-light-opacity)] blur-[var(--room-light-blur)]`;
   }
 
-  if (settings.effect === "wave") {
-    return `${base} ${transition} ${animation} bg-[conic-gradient(from_0deg,var(--room-light-primary),var(--room-light-secondary),var(--room-light-primary))] opacity-[var(--room-light-opacity)] blur-[var(--room-light-blur)]`;
+  if (settings.effect === "rgb-studio") {
+    return `${base} ${transition} ${animation} bg-[radial-gradient(circle_at_8%_50%,var(--room-light-primary)_0%,transparent_40%),radial-gradient(circle_at_92%_50%,var(--room-light-secondary)_0%,transparent_40%),linear-gradient(115deg,transparent_30%,rgba(255,255,255,.08)_50%,transparent_70%)] opacity-[var(--room-light-opacity)] blur-[var(--room-light-blur)]`;
   }
 
-  if (settings.effect === "pulse") {
-    return `${base} ${transition} ${animation} bg-[radial-gradient(circle_at_20%_50%,var(--room-light-primary)_0%,transparent_45%),radial-gradient(circle_at_80%_50%,var(--room-light-secondary)_0%,transparent_45%)] opacity-[var(--room-light-opacity)] blur-[var(--room-light-blur)]`;
+  if (settings.effect === "streamer-room") {
+    return `${base} ${transition} ${animation} bg-[radial-gradient(circle_at_18%_25%,var(--room-light-primary)_0%,transparent_36%),radial-gradient(circle_at_82%_30%,var(--room-light-secondary)_0%,transparent_36%),radial-gradient(ellipse_at_50%_100%,var(--room-light-primary)_0%,transparent_42%)] opacity-[var(--room-light-opacity)] blur-[var(--room-light-blur)]`;
   }
 
-  return `${base} ${transition} ${animation} bg-[radial-gradient(circle_at_15%_50%,var(--room-light-primary)_0%,transparent_42%),radial-gradient(circle_at_85%_50%,var(--room-light-secondary)_0%,transparent_42%),radial-gradient(circle_at_50%_100%,var(--room-light-primary)_0%,transparent_45%)] opacity-[var(--room-light-opacity)] blur-[var(--room-light-blur)]`;
+  if (settings.effect === "aurora") {
+    return "";
+  }
+
+  return `${base} ${transition} ${animation} bg-[conic-gradient(from_205deg_at_22%_0%,transparent_0deg,var(--room-light-primary)_18deg,transparent_42deg),conic-gradient(from_137deg_at_78%_0%,transparent_0deg,var(--room-light-secondary)_18deg,transparent_42deg),radial-gradient(ellipse_at_50%_100%,var(--room-light-primary)_0%,transparent_45%)] opacity-[var(--room-light-opacity)] blur-[var(--room-light-blur)]`;
 }
