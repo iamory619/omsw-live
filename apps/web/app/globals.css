@@ -78,3 +78,69 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+@keyframes neonSoftPulse {
+  0%,
+  100% {
+    opacity: 0.88;
+    filter: brightness(1);
+  }
+
+  50% {
+    opacity: 1;
+    filter: brightness(1.14);
+  }
+}
+
+@keyframes neonLineFlow {
+  0% {
+    filter:
+      hue-rotate(0deg)
+      brightness(1);
+  }
+
+  50% {
+    filter:
+      hue-rotate(14deg)
+      brightness(1.12);
+  }
+
+  100% {
+    filter:
+      hue-rotate(0deg)
+      brightness(1);
+  }
+}
+
+@keyframes neonCornerPulse {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes neonRgbShift {
+  0% {
+    filter:
+      hue-rotate(0deg)
+      saturate(1.1);
+  }
+
+  100% {
+    filter:
+      hue-rotate(360deg)
+      saturate(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-neon-frame-style] * {
+    animation: none !important;
+  }
+}
