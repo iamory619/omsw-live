@@ -144,3 +144,160 @@ body {
     animation: none !important;
   }
 }
+
+@keyframes floatingParticleDown {
+  0% {
+    transform:
+      translate3d(0, -18vh, 0)
+      rotate(var(--particle-rotation));
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    transform:
+      translate3d(
+        var(--particle-drift),
+        118vh,
+        0
+      )
+      rotate(calc(var(--particle-rotation) + 360deg));
+    opacity: 0;
+  }
+}
+
+@keyframes floatingParticleUp {
+  0% {
+    transform:
+      translate3d(0, 118vh, 0)
+      rotate(var(--particle-rotation));
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    transform:
+      translate3d(
+        var(--particle-drift),
+        -18vh,
+        0
+      )
+      rotate(calc(var(--particle-rotation) + 360deg));
+    opacity: 0;
+  }
+}
+
+@keyframes floatingParticleLeft {
+  0% {
+    transform:
+      translate3d(118vw, 0, 0)
+      rotate(var(--particle-rotation));
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    transform:
+      translate3d(
+        -18vw,
+        var(--particle-drift),
+        0
+      )
+      rotate(calc(var(--particle-rotation) + 360deg));
+    opacity: 0;
+  }
+}
+
+@keyframes floatingParticleRight {
+  0% {
+    transform:
+      translate3d(-18vw, 0, 0)
+      rotate(var(--particle-rotation));
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    transform:
+      translate3d(
+        118vw,
+        var(--particle-drift),
+        0
+      )
+      rotate(calc(var(--particle-rotation) + 360deg));
+    opacity: 0;
+  }
+}
+
+@keyframes floatingParticleFloat {
+  0%,
+  100% {
+    transform:
+      translate3d(0, 0, 0)
+      rotate(var(--particle-rotation));
+  }
+
+  25% {
+    transform:
+      translate3d(
+        calc(var(--particle-drift) * 0.35),
+        -18px,
+        0
+      )
+      rotate(calc(var(--particle-rotation) + 12deg));
+  }
+
+  50% {
+    transform:
+      translate3d(
+        var(--particle-drift),
+        8px,
+        0
+      )
+      rotate(calc(var(--particle-rotation) - 8deg));
+  }
+
+  75% {
+    transform:
+      translate3d(
+        calc(var(--particle-drift) * 0.45),
+        20px,
+        0
+      )
+      rotate(calc(var(--particle-rotation) + 6deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-particle-type] > * {
+    animation: none !important;
+  }
+}

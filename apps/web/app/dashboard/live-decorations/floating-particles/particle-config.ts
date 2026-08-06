@@ -1,0 +1,198 @@
+import type {
+  FloatingParticlesPresetOption,
+  FloatingParticlesSettings,
+  ParticleTypeOption,
+} from "./types";
+
+export const FLOATING_PARTICLES_STORAGE_KEY =
+  "omsw-floating-particles-settings";
+
+export const DEFAULT_FLOATING_PARTICLES_SETTINGS: FloatingParticlesSettings =
+  {
+    enabled: true,
+    preset: "custom",
+    canvasMode: "portrait",
+    particleType: "stars",
+    primaryColor: "#ffffff",
+    secondaryColor: "#f9a8d4",
+    particleCount: 24,
+    minSize: 12,
+    maxSize: 34,
+    speed: 45,
+    opacity: 85,
+    direction: "down",
+    glow: true,
+    randomRotation: true,
+    animation: true,
+    smooth: true,
+  };
+
+export const PARTICLE_TYPE_OPTIONS: ParticleTypeOption[] =
+  [
+    {
+      id: "stars",
+      name: "Stars",
+      description: "ดาวลอยนุ่ม ๆ สำหรับไลฟ์ทั่วไป",
+      icon: "⭐",
+    },
+    {
+      id: "hearts",
+      name: "Hearts",
+      description: "หัวใจลอย เหมาะกับไลฟ์น่ารัก",
+      icon: "❤️",
+    },
+    {
+      id: "sparkles",
+      name: "Sparkles",
+      description: "ประกายวิบวับแบบเวทมนตร์",
+      icon: "✨",
+    },
+    {
+      id: "snow",
+      name: "Snow",
+      description: "เกล็ดหิมะตกอย่างนุ่มนวล",
+      icon: "❄️",
+    },
+    {
+      id: "sakura",
+      name: "Sakura",
+      description: "กลีบซากุระลอยแบบญี่ปุ่น",
+      icon: "🌸",
+    },
+    {
+      id: "leaves",
+      name: "Leaves",
+      description: "ใบไม้ลอยสำหรับโทนธรรมชาติ",
+      icon: "🍃",
+    },
+    {
+      id: "confetti",
+      name: "Confetti",
+      description: "กระดาษสีสำหรับช่วงฉลอง",
+      icon: "🎉",
+    },
+    {
+      id: "coins",
+      name: "Coins",
+      description: "เหรียญลอยสำหรับไลฟ์สายมูหรือเกม",
+      icon: "🪙",
+    },
+    {
+      id: "bubbles",
+      name: "Bubbles",
+      description: "ฟองสบู่ลอยเบา ๆ",
+      icon: "🫧",
+    },
+  ];
+
+export const FLOATING_PARTICLES_PRESETS: FloatingParticlesPresetOption[] =
+  [
+    {
+      id: "pink-hearts",
+      name: "Pink Hearts",
+      description: "หัวใจชมพูหวานสำหรับ TikTok Live",
+      icon: "🩷",
+      settings: {
+        particleType: "hearts",
+        primaryColor: "#ff5ca8",
+        secondaryColor: "#f9a8d4",
+        particleCount: 22,
+        minSize: 14,
+        maxSize: 34,
+        speed: 38,
+        opacity: 88,
+        direction: "up",
+        glow: true,
+      },
+    },
+    {
+      id: "gold-stars",
+      name: "Gold Stars",
+      description: "ดาวสีทองแบบหรูและเด่น",
+      icon: "⭐",
+      settings: {
+        particleType: "stars",
+        primaryColor: "#fde047",
+        secondaryColor: "#f59e0b",
+        particleCount: 26,
+        minSize: 10,
+        maxSize: 28,
+        speed: 42,
+        opacity: 90,
+        direction: "down",
+        glow: true,
+      },
+    },
+    {
+      id: "magic-sparkles",
+      name: "Magic Sparkles",
+      description: "ประกายม่วงฟ้าแบบเวทมนตร์",
+      icon: "✨",
+      settings: {
+        particleType: "sparkles",
+        primaryColor: "#c084fc",
+        secondaryColor: "#38bdf8",
+        particleCount: 30,
+        minSize: 8,
+        maxSize: 24,
+        speed: 34,
+        opacity: 86,
+        direction: "float",
+        glow: true,
+      },
+    },
+    {
+      id: "winter-snow",
+      name: "Winter Snow",
+      description: "หิมะขาวฟ้าแบบฤดูหนาว",
+      icon: "❄️",
+      settings: {
+        particleType: "snow",
+        primaryColor: "#ffffff",
+        secondaryColor: "#bae6fd",
+        particleCount: 36,
+        minSize: 8,
+        maxSize: 20,
+        speed: 30,
+        opacity: 82,
+        direction: "down",
+        glow: false,
+      },
+    },
+    {
+      id: "sakura-dream",
+      name: "Sakura Dream",
+      description: "ซากุระชมพูพาสเทล",
+      icon: "🌸",
+      settings: {
+        particleType: "sakura",
+        primaryColor: "#f9a8d4",
+        secondaryColor: "#fda4af",
+        particleCount: 24,
+        minSize: 14,
+        maxSize: 30,
+        speed: 32,
+        opacity: 86,
+        direction: "down",
+        glow: false,
+      },
+    },
+    {
+      id: "gaming-confetti",
+      name: "Gaming Confetti",
+      description: "กระดาษสีสดสำหรับช่วงชนะหรือฉลอง",
+      icon: "🎉",
+      settings: {
+        particleType: "confetti",
+        primaryColor: "#22d3ee",
+        secondaryColor: "#f472b6",
+        particleCount: 34,
+        minSize: 10,
+        maxSize: 26,
+        speed: 58,
+        opacity: 92,
+        direction: "down",
+        glow: true,
+      },
+    },
+  ];

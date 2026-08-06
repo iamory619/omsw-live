@@ -67,7 +67,10 @@ export default function LiveDecorationsPage() {
           </Link>
 
           {/* Floating Particles */}
-          <div className="rounded-3xl border border-white/10 bg-zinc-950 p-6 opacity-60">
+          <Link
+            href="/dashboard/live-decorations/floating-particles"
+            className="group rounded-3xl border border-sky-500/30 bg-sky-500/10 p-6 transition-all duration-300 hover:border-sky-400 hover:bg-sky-500/15 hover:shadow-[0_0_35px_rgba(14,165,233,.25)]"
+          >
             <div className="text-4xl">✨</div>
 
             <h2 className="mt-4 text-2xl font-black">
@@ -75,19 +78,20 @@ export default function LiveDecorationsPage() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-zinc-400">
-              เอฟเฟกต์อนุภาคลอย เช่น ดาว หิมะ หัวใจ และประกายไฟ
+              เอฟเฟกต์อนุภาคลอย เช่น ดาว หัวใจ หิมะ ซากุระ
+              ประกายไฟ ฟองสบู่ และอื่น ๆ สำหรับ OBS
             </p>
 
             <div className="mt-6 flex items-center justify-between">
-              <span className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-black text-yellow-300">
-                Coming Soon
+              <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-black text-emerald-300">
+                Available
               </span>
 
-              <span className="font-bold text-zinc-500">
-                อยู่ระหว่างพัฒนา
+              <span className="font-bold text-sky-200 transition group-hover:translate-x-1">
+                เปิดการตั้งค่า →
               </span>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </main>
