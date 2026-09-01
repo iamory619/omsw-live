@@ -143,11 +143,11 @@ function getStageAssets(
     const activity2 =
       `${stageBase}/stage-4-idle-Activity2.png`;
 
-    const activity3 =
-      `${stageBase}/stage-4-idle-Activity3.png`;
+    // const activity3 =
+    //   `${stageBase}/stage-4-idle-Activity3.png`;
 
-    const activity4 =
-      `${stageBase}/stage-4-idle-Activity4.png`;
+    // const activity4 =
+    //   `${stageBase}/stage-4-idle-Activity4.png`;
 
     const activity5 =
       `${stageBase}/stage-4-idle-Activity5.png`;
@@ -163,16 +163,16 @@ function getStageAssets(
       giftFrames: [
         activity1,
         activity2,
-        activity3,
-        activity4,
+        // activity3,
+        // activity4,
         activity5,
       ],
 
       idleSpecialFrames: [
         [activity1],
         [activity2],
-        [activity3],
-        [activity4],
+        // [activity3],
+        // [activity4],
         [activity5],
       ],
     };
@@ -188,18 +188,21 @@ function getStageAssets(
     const pao3 =
       `${stageBase}/stage-3-idle-pao3.png`;
 
+       const pao4 =
+      `${stageBase}/stage-3-idle-pao4.png`;
+
     return {
       master: `${stageBase}/stage-3-master.png`,
 
       blinkFrames: [
         `${stageBase}/stage-3-idle-blink1.png`,
-        `${stageBase}/stage-3-idle-blink2.png`,
       ],
 
       giftFrames: [
         pao1,
         pao2,
         pao3,
+        pao4,
       ],
 
       idleSpecialFrames: [
@@ -207,6 +210,7 @@ function getStageAssets(
           pao1,
           pao2,
           pao3,
+          pao4,
         ],
         [
           `${stageBase}/stage-3-idle-flower.png`,
@@ -226,9 +230,9 @@ function getStageAssets(
 
       giftFrames: [
         `${stageBase}/stage-2-love1.png`,
-        `${stageBase}/stage-2-love2.png`,
-        `${stageBase}/stage-2-love3.png`,
-        `${stageBase}/stage-2-love4.png`,
+       `${stageBase}/stage-2-love2.png`,
+        // `${stageBase}/stage-2-love3.png`,
+        // `${stageBase}/stage-2-love4.png`,
       ],
     };
   }

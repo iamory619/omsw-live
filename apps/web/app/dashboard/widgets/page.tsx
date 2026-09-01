@@ -54,6 +54,7 @@ const PETS = [
   { id: "husky", name: "Siberian Husky", emoji: "🐺" },
   // { id: "trex", name: "Tiny T-Rex", emoji: "🦖" },
   { id: "pony", name: "Magic Pony", emoji: "🦄" },
+  { id: "capybara", name: "Capybara", emoji: "🦫" },
 ] as const;
 
 type PetType = (typeof PETS)[number]["id"];
@@ -181,7 +182,8 @@ export default function DashboardPage() {
       savedPet === "cat" ||
       savedPet === "husky" ||
       // savedPet === "trex" ||
-      savedPet === "pony"
+      savedPet === "pony" ||
+      savedPet === "capybara"
     ) {
       setSelectedPet(savedPet);
     }

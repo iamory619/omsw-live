@@ -8,6 +8,7 @@ import { CatPet, type PetState } from "./components/CatPet";
 import { HuskyPet } from "./components/HuskyPet";
 import { TrexPet } from "./components/TrexPet";
 import { PonyPet } from "./components/PonyPet";
+import { CapybaraPet } from "./components/CapybaraPet";
 import { getPetStage, isPetType, type PetType } from "./pet-config";
 
 type GiftPayload = {
@@ -60,6 +61,7 @@ function getPetFeedingName(petType: PetType) {
   if (petType === "husky") return "husky";
   if (petType === "trex") return "T-Rex";
   if (petType === "pony") return "pony";
+  if (petType === "capybara") return "capybara";
   return "kitty";
 }
 
@@ -303,7 +305,7 @@ export default function EvolutionPetWidget() {
      * CatPet.tsx จัดการ Blink และ Idle Activity ของแมวเองแล้ว
      * จึงไม่ให้ page.tsx สุ่ม walk / sleep / happy ซ้ำ
      */
-    if (petType === "cat") return;
+    if (petType === "cat" || petType === "capybara") return;
 
     if (idleTimerRef.current) {
       clearTimeout(idleTimerRef.current);
@@ -434,6 +436,13 @@ export default function EvolutionPetWidget() {
               scale={stage.scale}
               stage={stage.stage}
               progress={progress}
+              stageXp={stageXp}
+            />
+          ) : petType === "capybara" ? (
+            <CapybaraPet
+              state={state}
+              scale={stage.scale}
+              stage={stage.stage}
               stageXp={stageXp}
             />
           ) : (

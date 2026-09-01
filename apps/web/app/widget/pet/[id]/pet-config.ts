@@ -1,4 +1,9 @@
-export type PetType = "cat" | "husky" | "trex" | "pony";
+export type PetType =
+  | "cat"
+  | "husky"
+  | "trex"
+  | "pony"
+  | "capybara";
 
 export type PetStageConfig = {
   stage: number;
@@ -62,19 +67,42 @@ export const PET_CONFIG: Record<PetType, PetConfig> = {
       { stage: 5, name: "Legendary Alicorn", minXp: 700, nextXp: 1200, scale: 0.92 },
     ],
   },
+
+  capybara: {
+    type: "capybara",
+    displayName: "Capybara",
+    stages: [
+      { stage: 1, name: "Baby Capybara", minXp: 0, nextXp: 25, scale: 0.78 },
+      { stage: 2, name: "Curious Capybara", minXp: 25, nextXp: 100, scale: 0.84 },
+      { stage: 3, name: "Happy Capybara", minXp: 100, nextXp: 300, scale: 0.9 },
+      { stage: 4, name: "Onsen Capybara", minXp: 300, nextXp: 700, scale: 0.96 },
+      { stage: 5, name: "Capybara King", minXp: 700, nextXp: 1200, scale: 1.02 },
+    ],
+  },
 };
 
 export function isPetType(value: string | null): value is PetType {
-  return value === "cat" || value === "husky" || value === "trex" || value === "pony";
+  return (
+    value === "cat" ||
+    value === "husky" ||
+    value === "trex" ||
+    value === "pony" ||
+    value === "capybara"
+  );
 }
 
 export function getPetConfig(petType: PetType): PetConfig {
   return PET_CONFIG[petType];
 }
 
-export function getPetStage(petType: PetType, xp: number): PetStageConfig {
+export function getPetStage(
+  petType: PetType,
+  xp: number,
+): PetStageConfig {
   const config = getPetConfig(petType);
-  let currentStage = config.stages[0];
+
+  let currentStage =
+    config.stages[0];
 
   for (const stage of config.stages) {
     if (xp >= stage.minXp) {

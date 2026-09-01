@@ -128,6 +128,7 @@ export default function DecorationOverlayPage() {
   const [settings, setSettings] =
     useState<RoomLightSettings>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
+  const [roomLightTest, setRoomLightTest] = useState(false);
 
   useEffect(() => {
     if (!overlayId) {
@@ -138,15 +139,29 @@ export default function DecorationOverlayPage() {
     let cancelled = false;
 
     const loadSettings = async () => {
-      const { data, error } = await supabase.rpc(
-        "get_decoration_settings_by_overlay",
-        {
-          p_overlay_id: overlayId,
-        },
-      );
+      const [
+        settingsResponse,
+        testStateResponse,
+      ] = await Promise.all([
+        supabase.rpc(
+          "get_decoration_settings_by_overlay",
+          {
+            p_overlay_id: overlayId,
+          },
+        ),
+        supabase.rpc(
+          "get_decoration_test_state_by_overlay",
+          {
+            p_overlay_id: overlayId,
+          },
+        ),
+      ]);
 
-      if (error) {
-        console.error("Decoration overlay RPC error:", error);
+      if (settingsResponse.error) {
+        console.error(
+          "Decoration overlay RPC error:",
+          settingsResponse.error,
+        );
 
         if (!cancelled) {
           setLoading(false);
@@ -155,16 +170,40 @@ export default function DecorationOverlayPage() {
         return;
       }
 
-      const row = Array.isArray(data)
-        ? data[0]
-        : data;
+      const settingsRow = Array.isArray(
+        settingsResponse.data,
+      )
+        ? settingsResponse.data[0]
+        : settingsResponse.data;
+
+      if (testStateResponse.error) {
+        console.error(
+          "Decoration test state RPC error:",
+          testStateResponse.error,
+        );
+      }
+
+      const testRow = Array.isArray(
+        testStateResponse.data,
+      )
+        ? testStateResponse.data[0]
+        : testStateResponse.data;
 
       if (!cancelled) {
         setSettings(
-          row
-            ? rowToSettings(row as DecorationSettingsRow)
+          settingsRow
+            ? rowToSettings(
+                settingsRow as DecorationSettingsRow,
+              )
             : DEFAULT_SETTINGS,
         );
+
+        setRoomLightTest(
+          Boolean(
+            testRow?.room_light_test,
+          ),
+        );
+
         setLoading(false);
       }
     };
@@ -181,7 +220,11 @@ export default function DecorationOverlayPage() {
     };
   }, [overlayId, supabase]);
 
-  if (loading || !overlayId || !settings.enabled) {
+  if (
+    loading ||
+    !overlayId ||
+    (!settings.enabled && !roomLightTest)
+  ) {
     return null;
   }
 
@@ -193,6 +236,7 @@ export default function DecorationOverlayPage() {
       data-overlay-id={overlayId}
       data-canvas-mode={settings.canvasMode}
       data-placement={settings.placement}
+      data-test-mode={roomLightTest ? "true" : "false"}
       className="fixed inset-0 overflow-hidden bg-transparent"
     >
       <div className="pointer-events-none absolute inset-0">
