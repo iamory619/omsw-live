@@ -42,13 +42,6 @@ const VEHICLES = [
   { id: "vespa", name: "Vespa", image: "/assets/vehicles/vespa.png" },
 ];
 
-const LANTERNS = [
-  { id: "phoenix", name: "Phoenix", image: "/assets/lantern/phoenix-back.png" },
-  { id: "rat", name: "Rat", image: "/assets/lantern/rat-back.png" },
-  { id: "cat", name: "Cat", image: "/assets/lantern/cat-back.png" },
-  { id: "rabbit", name: "Rabbit", image: "/assets/lantern/rabbit-back.png" },
-];
-
 const PETS = [
   { id: "cat", name: "Cat", emoji: "🐱" },
   { id: "husky", name: "Siberian Husky", emoji: "🐺" },
@@ -83,7 +76,6 @@ type WidgetItem = {
   resetButtonClass: string;
   basketPicker?: boolean;
   vehiclePicker?: boolean;
-  lanternPicker?: boolean;
   petPicker?: boolean;
 };
 
@@ -99,7 +91,6 @@ type WidgetSettings = {
   user_id: string;
   basket: string;
   vehicle: string;
-  lantern: string;
   gift_goal_enabled: boolean;
   basket_enabled: boolean;
   vehicle_enabled: boolean;
@@ -163,7 +154,6 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [selectedVehicle, setSelectedVehicle] = useState("tuktuk");
-  const [selectedLantern, setSelectedLantern] = useState("phoenix");
   const [selectedPet, setSelectedPet] = useState<PetType>("cat");
   const [status, setStatus] = useState<
     "idle" | "not-live" | "success" | "server-error"
@@ -332,11 +322,9 @@ export default function DashboardPage() {
 
         if (createdSettings) {
           setSelectedVehicle(createdSettings.vehicle);
-          setSelectedLantern(createdSettings.lantern);
         }
       } else {
         setSelectedVehicle(settings.vehicle);
-        setSelectedLantern(settings.lantern);
       }
 
       setSettingsLoading(false);
@@ -532,11 +520,6 @@ export default function DashboardPage() {
     saveWidgetSettings({ vehicle: vehicleId });
   };
 
-  const selectLantern = (lanternId: string) => {
-    setSelectedLantern(lanternId);
-    saveWidgetSettings({ lantern: lanternId });
-  };
-
   const selectPet = (petType: PetType) => {
     setSelectedPet(petType);
     window.localStorage.setItem("omsw-evolution-pet", petType);
@@ -569,8 +552,8 @@ export default function DashboardPage() {
           {
             id: "magic-lantern",
             name: "🧙🏻‍♀️ Magic Lantern",
-            description: "Collect gifts inside a magical lantern.",
-            url: `${origin}/widget/magic-lantern/${overlayId}?lantern=${selectedLantern}`,
+            description: "Float gifts inside a magical lantern. Gifts worth 5,000+ coins trigger a Legendary effect.",
+            url: `${origin}/widget/magic-lantern/${overlayId}`,
             requiredFeature: "magicLantern",
             active: true,
             category: "creator",
@@ -580,7 +563,6 @@ export default function DashboardPage() {
             badge: "Creator",
             configureHref: "/dashboard/widgets/magic-lantern",
 
-            lanternPicker: true,
             testEvent: "test-lantern",
             resetEvent: "reset-lantern",
             testLabel: "🧙 Test Lantern",
@@ -689,7 +671,6 @@ export default function DashboardPage() {
             testButtonClass: "bg-fuchsia-600 hover:bg-fuchsia-500",
             resetButtonClass: "bg-red-600 hover:bg-red-500",
           },
-          
         ]
       : [];
 
@@ -895,8 +876,8 @@ export default function DashboardPage() {
                             Widget Center
                           </h2>
                           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
-                            Preview, configure and control creator widgets,
-                            live decorations and seller tools from one workspace.
+                            Preview, configure and control creator widgets, live
+                            decorations and seller tools from one workspace.
                           </p>
                         </div>
 
@@ -979,7 +960,7 @@ export default function DashboardPage() {
                           return (
                             <Card
                               key={widget.id}
-                              className="flex min-h-[640px] flex-col overflow-hidden"
+                              className="flex flex-col overflow-hidden"
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
@@ -1121,7 +1102,7 @@ export default function DashboardPage() {
                                 </div>
                               )}
 
-                              <div className="mt-auto pt-5">
+                              <div className="mt-5">
                                 <div className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-xs text-zinc-400">
                                   <div className="mb-1 flex items-center justify-between gap-3">
                                     <span className="font-black text-zinc-300">

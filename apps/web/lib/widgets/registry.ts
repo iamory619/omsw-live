@@ -13,11 +13,13 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     resetEvent: "reset-goal",
     enabled: true,
   },
+
   {
     id: "magic-lantern",
     name: "Magic Lantern",
-    emoji: "🧙",
-    description: "Collect gifts inside a magical lantern animation.",
+    emoji: "🏮",
+    description:
+      "Float TikTok gifts inside a magical lantern. Gifts worth 5,000+ coins automatically trigger Legendary mode.",
     category: "animation",
     requiredPlan: "creator",
     path: "/widget/magic-lantern",
@@ -25,6 +27,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     resetEvent: "reset-lantern",
     enabled: true,
   },
+
   {
     id: "gift-vehicle",
     name: "Gift Vehicle",
@@ -37,6 +40,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     resetEvent: "reset-vehicle",
     enabled: true,
   },
+
   {
     id: "gift-basket",
     name: "Gift Basket",
@@ -49,6 +53,7 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     resetEvent: "reset-basket",
     enabled: true,
   },
+
   {
     id: "fortune-stick",
     name: "Fortune Stick",
@@ -61,11 +66,12 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     resetEvent: "reset-fortune",
     enabled: true,
   },
+
   {
     id: "evolution-pet",
     name: "Evolution Pet",
     emoji: "🐱",
-    description: "A virtual pet that evolves based on gift activity.",
+    description: "A virtual pet that reacts to viewer gifts and special events.",
     category: "pet",
     requiredPlan: "creator",
     path: "/widget/pet",

@@ -98,32 +98,43 @@ const normalizeGiftName = (value: unknown) =>
 
 const createGiftPayload = ({
   user = "Mimi",
+  uniqueId = "mimi",
   giftName = "Rose",
   amount = 1,
-  diamond = amount,
+  repeatCount = amount,
+  diamond = 1,
   giftImage = "/assets/rose.png",
 }: {
   user?: string;
+  uniqueId?: string;
   giftName?: string;
   amount?: number;
+  repeatCount?: number;
   diamond?: number;
   giftImage?: string;
 }) => {
   return {
     user,
+    uniqueId,
     giftName,
     amount,
+    repeatCount,
     diamond,
     giftImage,
   };
 };
 
-const createRosePayload = (amount = 1) => {
+const createRosePayload = (
+  repeatCount = 1,
+  diamond = 1,
+) => {
   return createGiftPayload({
     user: "Mimi",
+    uniqueId: "mimi",
     giftName: "Rose",
-    amount,
-    diamond: amount,
+    amount: repeatCount,
+    repeatCount,
+    diamond,
     giftImage: "/assets/rose.png",
   });
 };
@@ -283,10 +294,17 @@ app.post("/connect", async (req, res) => {
         return;
       }
 
+      const repeatCount = Math.max(
+        1,
+        Number(data.repeatCount) || 1,
+      );
+
       const giftPayload = createGiftPayload({
         user: data.nickname || "Someone",
+        uniqueId: data.uniqueId || "",
         giftName: data.giftName || "Gift",
-        amount: Math.max(1, Number(data.repeatCount) || 1),
+        amount: repeatCount,
+        repeatCount,
         diamond: Math.max(0, Number(data.diamondCount) || 0),
         giftImage:
           data.giftPictureUrl ||
@@ -425,8 +443,30 @@ io.on("connection", (socket) => {
 
     if (!overlayId) return;
 
-    io.to(overlayId).emit("test-lantern", createRosePayload(1));
-    io.to(overlayId).emit("lantern-gift", createRosePayload(1));
+    /*
+     * Test Legendary mode directly.
+     * The widget also listens to "test-lantern", so emit only once
+     * to avoid duplicate gifts appearing in the lantern.
+     */
+    const testGift = createGiftPayload({
+      user: "Mimi",
+      uniqueId: "mimi",
+      giftName: "Legendary Rose",
+      amount: 1,
+      repeatCount: 1,
+      diamond: 1,
+      giftImage: "/assets/rose.png",
+    });
+
+    io.to(overlayId).emit("test-lantern", testGift);
+
+    console.log("🧪 Test Magic Lantern:", {
+      overlayId,
+      giftName: testGift.giftName,
+      diamond: testGift.diamond,
+      repeatCount: testGift.repeatCount,
+      roomSize: io.sockets.adapter.rooms.get(overlayId)?.size ?? 0,
+    });
   });
 
   socket.on("reset-lantern", (payload: string | TestPayload) => {
@@ -476,8 +516,8 @@ io.on("connection", (socket) => {
 
     if (!overlayId) return;
 
-    io.to(overlayId).emit("test-fortune", createRosePayload(99));
-    io.to(overlayId).emit("fortune-gift", createRosePayload(99));
+    io.to(overlayId).emit("test-fortune", createRosePayload(1, 99));
+    io.to(overlayId).emit("fortune-gift", createRosePayload(1, 99));
   });
 
   socket.on("reset-fortune", (payload: string | TestPayload) => {
